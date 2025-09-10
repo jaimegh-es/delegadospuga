@@ -1,0 +1,104 @@
+<nav class="nav-container">
+	<div class="nav-content">
+		<div class="nav-logo">
+			<h2><i class="fas fa-school"></i> Delegados 1B</h2>
+		</div>
+		<ul class="nav-menu">
+			<li><a href="/#inicio">Inicio</a></li>
+			<li><a href="/#noticias">Noticias</a></li>
+			<li><a href="/#funciones">Funciones</a></li>
+			<li><a href="/#sugerencias">Sugerencias</a></li>
+		</ul>
+		<div class="nav-burger">
+			<span></span>
+			<span></span>
+			<span></span>
+		</div>
+	</div>
+</nav>
+
+<style>
+	.nav-container {
+		position: fixed;
+		top: 0;
+		width: 100%;
+		z-index: 1000;
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(20px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+		transition: all 0.3s ease;
+	}
+
+	.nav-content {
+		max-width: 1200px;
+		margin: 0 auto;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 16px 24px;
+	}
+
+	.nav-logo h2 {
+		color: white;
+		font-weight: 600;
+		font-size: 1.5rem;
+	}
+
+	.nav-menu {
+		display: flex;
+		list-style: none;
+		gap: 32px;
+	}
+
+	.nav-menu a {
+		color: white;
+		text-decoration: none;
+		font-weight: 500;
+		transition: all 0.3s ease;
+		position: relative;
+	}
+
+	.nav-menu a::after {
+		content: '';
+		position: absolute;
+		bottom: -4px;
+		left: 0;
+		width: 0;
+		height: 2px;
+		background: white;
+		transition: width 0.3s ease;
+	}
+
+	.nav-menu a:hover::after {
+		width: 100%;
+	}
+
+	.nav-menu a:hover {
+		color: #ffffff;
+		transform: translateY(-2px);
+	}
+
+	.nav-burger {
+		display: none;
+		flex-direction: column;
+		cursor: pointer;
+		gap: 4px;
+	}
+
+	.nav-burger span {
+		width: 24px;
+		height: 3px;
+		background: white;
+		transition: 0.3s;
+	}
+
+	@media (max-width: 768px) {
+		.nav-menu {
+			display: none;
+		}
+
+		.nav-burger {
+			display: flex;
+		}
+	}
+</style>
