@@ -1,0 +1,104 @@
+---
+// src/components/LinksSection.astro
+---
+
+<section class="links-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Recursos de interés</h2>
+    </div>
+    <div class="links-grid">
+      <a href="/recursos/calendarioescolar" class="link-card">
+        <h3>Calendario Escolar</h3>
+        <p>Estate informado de qué día no hay instituto :).</p>
+        <span>Leer más →</span>
+      </a>
+      <!-- <a href="/privacy" class="link-card">
+        <h3>Política de Privacidad</h3>
+        <p>Cómo protegemos tus datos.</p>
+        <span>Leer más →</span>
+      </a>
+      <a href="/terms" class="link-card">
+        <h3>Términos y Condiciones</h3>
+        <p>Nuestros términos de servicio.</p>
+        <span>Leer más →</span>
+      </a>-->
+    </div>
+  </div>
+</section>
+
+<style>
+.links-section {
+  padding: 80px 0;
+  background-color: #f8fafc;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.section-header {
+  margin-bottom: 60px;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #001e60, #003d99);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.link-card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: left;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.link-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}
+
+.link-card h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+.link-card p {
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.link-card span {
+  color: #001e60;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.link-card:hover span {
+  color: #002a80;
+  transform: translateX(4px);
+}
+</style>
