@@ -1,0 +1,31 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/Hero.astro';
+import Navigation from '../../components/Navigation.astro';
+import NewsSection from '../../components/NewsSection.astro';
+import FeaturesSection from '../../components/FeaturesSection.astro';
+import SuggestionsSection from '../../components/SuggestionsSection.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<Layout>
+	<Navigation />
+	<div class="content">
+	<h1>Como acceder al Moodle</h1>
+	<p>Para una mejor explicación vamos a hacerla en base a ejemplos:</p>
+	<h2>Usuario</h2>
+	<p>Imaginemos que nuestro nombre es Juan Bernabé RioSanto, entonces tendremos que separar el nombre del primer apellido con un punto y no poner el segundo.</p>
+	<p>Quedaría tal que así, usuario: <strong>juan.bernabe</strong>, sin tilde</p>
+
+	<h3>¿Y si mi nombre es compuesto?</h3>
+	<p>En este caso supondremos que hay un alumno que se llama <strong>Jose María Pérez Ruíz</strong> y está intentando acceder a su moodle.</p>
+	<p>Su usuario constará de sus dos palabras que componen el nombre juntas, sin ser separadas por puntos, y al final de la última un punto que la separe del primer apellido.</p>
+	<p>Su usuario sería <strong>josemaria.perez</strong></p>
+
+	<h2>Contraseña</h2>
+	<p>La contraseña por defecto es el número de expediente del alumno.</p>
+	<p>Este número puede ser consultado en la aplicación AbalarMobil o en cualquier boletín de notas.</p>
+	</div>
+	<Footer />
+</Layout>
+
