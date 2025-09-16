@@ -1,0 +1,148 @@
+<footer class="footer">
+	<div class="container">
+		<div class="footer-content">
+			<div class="footer-section">
+				<h3><i class="fas fa-school"></i> Delegados 1B</h3>
+				<p>Representando el cambio.</p>
+			</div>
+
+			<div class="footer-section">
+				<h4>Enlaces Rápidos</h4>
+				<ul>
+					<li><a href="/#noticias">Noticias</a></li>
+					<li><a href="/#funciones">Funciones</a></li>
+					<li><a href="/#sugerencias">Sugerencias</a></li>
+					<li><a href="/#app">App</a></li>
+				</ul>
+			</div>
+
+			<div class="footer-section">
+				<h4>Contacto</h4>
+				<ul>
+					<li><a href="https://forms.wps.com/w/write/eu/KYmNAKFj/" style="text-decoration: none;"><i class="fas fa-envelope"></i>Sugerencias</a></li>
+					<li><i class="fas fa-map-marker-alt"></i> IES Rafael Puga Ramón</li>
+				</ul>
+			</div>
+
+			<div class="footer-section">
+				<h4>Legal</h4>
+				<ul>
+					<li><a href="/privacy">Política de privacidad</a></li>
+					<li><a href="/cookies">Política de cookies</a></li>
+					<li><a href="/terms">Términos de uso del sitio</a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="footer-bottom">
+			<p>Sitio web licenciado bajo GNU GPLv3.0. Diseñado y desarrollado por JGH</p>
+		</div>
+	</div>
+</footer>
+
+<style>
+	.footer {
+		background: linear-gradient(135deg, #000d33 0%, #001e60 100%);
+		color: white;
+		padding: 60px 0 20px;
+		position: relative;
+	}
+
+	.container {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 24px;
+	}
+
+	.footer-content {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 40px;
+		margin-bottom: 40px;
+	}
+
+	.footer-section h3 {
+		font-size: 1.5rem;
+		margin-bottom: 16px;
+		background: linear-gradient(45deg, #ffffff, #ffffff);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+	}
+
+	.footer-section h4 {
+		font-size: 1.25rem;
+		margin-bottom: 16px;
+		color: #ffffff;
+	}
+
+	.footer-section p {
+		color: #94a3b8;
+		line-height: 1.6;
+		margin-bottom: 24px;
+	}
+
+	.footer-section ul {
+		list-style: none;
+	}
+
+	.footer-section ul li {
+		margin-bottom: 12px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.footer-section ul li a {
+		color: #94a3b8;
+		text-decoration: none;
+		transition: all 0.3s ease;
+	}
+
+	.footer-section ul li a:hover {
+		color: #ffffff;
+		transform: translateX(4px);
+	}
+
+	.social-links {
+		display: flex;
+		gap: 16px;
+	}
+
+	.social-link {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 48px;
+		height: 48px;
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: 12px;
+		font-size: 1.5rem;
+		transition: all 0.3s ease;
+		transform: perspective(1000px);
+	}
+
+	.social-link:hover {
+		background: rgba(255, 255, 255, 0.2);
+		transform: perspective(1000px) translateY(-4px) rotateX(15deg);
+		box-shadow: 0 8px 32px rgba(255, 255, 255, 0.3);
+	}
+
+	.footer-bottom {
+		text-align: center;
+		padding-top: 40px;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		color: #64748b;
+	}
+
+	@media (max-width: 768px) {
+		.footer-content {
+			grid-template-columns: 1fr;
+			gap: 32px;
+		}
+
+		.footer {
+			padding: 40px 0 20px;
+		}
+	}
+</style>
