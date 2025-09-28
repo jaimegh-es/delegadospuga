@@ -1,7 +1,7 @@
 <nav class="nav-container">
 	<div class="nav-content">
 		<div class="nav-logo">
-			<a href="/" style="text-decoration: none;"><h2><i class="fas fa-school"></i> Delegados 1B</h2></a>
+			<a href="/" style="text-decoration: none;"><img src={import.meta.env.BASE_URL + "delegados.png"} class="logo" alt="delegados logo" /><h2> Delegados 1B</h2></a>
 		</div>
 		<ul class="nav-menu">
 			<li><a href="/#inicio">Inicio</a></li>
@@ -44,6 +44,17 @@
 		color: white;
 		font-weight: 600;
 		font-size: 1.5rem;
+	}
+
+	.nav-logo a {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.logo {
+		width: 40px;
+		height: auto;
 	}
 
 	.nav-menu {
