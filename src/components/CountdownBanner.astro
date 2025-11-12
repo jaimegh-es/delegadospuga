@@ -1,0 +1,458 @@
+---
+// Configuración de días festivos y periodos de vacaciones
+// Puedes añadir días individuales o periodos de vacaciones
+
+const holidays = [
+	// Días festivos individuales
+	// { day: 6, month: 12, year: 2024, name: "Día de la Constitución" },
+	// { day: 1, month: 1, year: 2025, name: "Año Nuevo" },
+
+	// Periodos de vacaciones (se mostrará la fecha de inicio)
+	// {
+	//   startDay: 23, startMonth: 12,
+	//   endDay: 7, endMonth: 1,
+	//   year: 2024,
+	//   name: "Vacaciones de Navidad",
+	//   isPeriod: true
+	// },
+
+	{ day: 8, month: 12, year: 2025, name: "Inmaculada Concepción" },
+	{
+		startDay: 22, startMonth: 12,
+		endDay: 7, endMonth: 1,
+		year: 2025,
+		name: "Vacaciones de Navidad",
+		isPeriod: true
+	},
+	{
+		startDay: 16, startMonth: 2,
+		endDay: 18, endMonth: 2,
+		year: 2026,
+		name: "Vacaciones de carnaval",
+		isPeriod: true
+	},
+	{ day: 19, month: 3, year: 2026, name: "Festivo Galicia" },
+	{ day: 20, month: 3, year: 2026, name: "Día libre elección por el centro" },
+
+{
+		startDay: 30, startMonth: 3,
+		endDay: 6, endMonth: 4,
+		year: 2026,
+		name: "Semana Santa",
+		isPeriod: true
+	},
+	{ day: 1, month: 5, year: 2026, name: "San José Trabajador" },
+	{ day: 20, month: 6, year: 2026, name: "Fin de curso" },
+];
+
+// Función para encontrar el próximo festivo o periodo activo
+function getNextHoliday() {
+	const now = new Date();
+	const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+	// Convertir los festivos a objetos Date
+	const holidayDates = holidays.map(h => {
+		if (h.isPeriod) {
+			// Para periodos, crear fecha de inicio y fin
+			return {
+				date: new Date(h.year, h.startMonth - 1, h.startDay),
+				endDate: new Date(h.year, h.endMonth - 1, h.endDay),
+				name: h.name,
+				day: h.startDay,
+				month: h.startMonth,
+				endDay: h.endDay,
+				endMonth: h.endMonth,
+				year: h.year,
+				isPeriod: true
+			};
+		} else {
+			// Días individuales
+			return {
+				date: new Date(h.year, h.month - 1, h.day),
+				name: h.name,
+				day: h.day,
+				month: h.month,
+				year: h.year,
+				isPeriod: false
+			};
+		}
+	});
+
+	// Primero, buscar si estamos dentro de un periodo activo
+	const activePeriod = holidayDates.find(h =>
+		h.isPeriod && today >= h.date && today <= h.endDate
+	);
+
+	if (activePeriod) {
+		// Si estamos en un periodo, mostrar cuenta atrás hasta el fin
+		return {
+			...activePeriod,
+			isActive: true,
+			targetDate: activePeriod.endDate
+		};
+	}
+
+	// Si no hay periodo activo, buscar el próximo festivo/periodo futuro
+	const futureHolidays = holidayDates
+		.filter(h => {
+			if (h.isPeriod) {
+				// Para periodos, verificar si la fecha de inicio es futura
+				return h.date > today;
+			} else {
+				// Para días individuales
+				return h.date >= today;
+			}
+		})
+		.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+	if (futureHolidays.length > 0) {
+		return {
+			...futureHolidays[0],
+			isActive: false,
+			targetDate: futureHolidays[0].date
+		};
+	}
+
+	return null;
+}
+
+const nextHoliday = getNextHoliday();
+
+// Nombres de los meses en español
+const monthNames = [
+	"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+	"Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
+---
+
+{nextHoliday && (
+	<div class="countdown-banner" id="countdown-banner">
+		<div class="countdown-content">
+			<div class="countdown-info">
+				<span class="countdown-label">
+					{nextHoliday.isActive ? 'Quedan de vacaciones:' : (nextHoliday.isPeriod ? 'Próximo periodo:' : 'Próximo festivo:')}
+				</span>
+				<span class="countdown-holiday">{nextHoliday.name}</span>
+				<span class="countdown-date">
+					{nextHoliday.isPeriod ? (
+						`${nextHoliday.day} de ${monthNames[nextHoliday.month - 1]} - ${nextHoliday.endDay} de ${monthNames[nextHoliday.endMonth - 1]}`
+					) : (
+						`${nextHoliday.day} de ${monthNames[nextHoliday.month - 1]} de ${nextHoliday.year}`
+					)}
+				</span>
+			</div>
+			<div class="countdown-timer">
+				<div class="countdown-unit">
+					<span class="countdown-value" id="days">0</span>
+					<span class="countdown-label-small">días</span>
+				</div>
+				<div class="countdown-unit">
+					<span class="countdown-value" id="hours">0</span>
+					<span class="countdown-label-small">horas</span>
+				</div>
+				<div class="countdown-unit">
+					<span class="countdown-value" id="minutes">0</span>
+					<span class="countdown-label-small">minutos</span>
+				</div>
+				<div class="countdown-unit">
+					<span class="countdown-value" id="seconds">0</span>
+					<span class="countdown-label-small">segundos</span>
+				</div>
+			</div>
+		</div>
+	</div>
+)}
+
+<style>
+	.countdown-banner {
+		position: fixed;
+		top: 73px; /* Justo debajo del header */
+		left: 0;
+		right: 0;
+		background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+		border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+		z-index: 999;
+		backdrop-filter: blur(10px);
+		transition: transform 0.3s ease, opacity 0.3s ease;
+	}
+
+	.countdown-banner.hidden {
+		transform: translateY(-100%);
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.countdown-content {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 10px 24px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 16px;
+	}
+
+	.countdown-info {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.countdown-label {
+		color: rgba(255, 255, 255, 0.8);
+		font-size: 0.75rem;
+		font-weight: 500;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.countdown-holiday {
+		color: white;
+		font-size: 1.125rem;
+		font-weight: 700;
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	}
+
+	.countdown-date {
+		color: rgba(255, 255, 255, 0.9);
+		font-size: 0.875rem;
+		font-weight: 500;
+	}
+
+	.countdown-timer {
+		display: flex;
+		gap: 12px;
+		align-items: center;
+	}
+
+	.countdown-unit {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		background: rgba(255, 255, 255, 0.1);
+		padding: 8px 12px;
+		border-radius: 8px;
+		min-width: 55px;
+		backdrop-filter: blur(10px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		transition: transform 0.3s ease, box-shadow 0.3s ease;
+	}
+
+	.countdown-unit:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	}
+
+	.countdown-value {
+		color: white;
+		font-size: 1.5rem;
+		font-weight: 700;
+		line-height: 1;
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	}
+
+	.countdown-label-small {
+		color: rgba(255, 255, 255, 0.8);
+		font-size: 0.65rem;
+		font-weight: 500;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		margin-top: 2px;
+	}
+
+	@media (max-width: 768px) {
+		.countdown-banner {
+			top: 69px; /* Ajuste para móvil */
+		}
+
+		.countdown-content {
+			flex-direction: column;
+			padding: 8px 16px;
+			gap: 12px;
+		}
+
+		.countdown-info {
+			align-items: center;
+			text-align: center;
+		}
+
+		.countdown-holiday {
+			font-size: 1rem;
+		}
+
+		.countdown-date {
+			font-size: 0.75rem;
+		}
+
+		.countdown-timer {
+			gap: 8px;
+		}
+
+		.countdown-unit {
+			min-width: 50px;
+			padding: 6px 10px;
+		}
+
+		.countdown-value {
+			font-size: 1.25rem;
+		}
+
+		.countdown-label-small {
+			font-size: 0.6rem;
+		}
+	}
+</style>
+
+<script>
+	// Solo ejecutar si el banner existe
+	const banner = document.getElementById('countdown-banner');
+	if (banner) {
+		// Variable para almacenar la fecha actual desde la API
+		let currentDate = null;
+
+		// Función para obtener la fecha actual desde una API
+		async function getCurrentDate() {
+			try {
+				const response = await fetch('https://worldtimeapi.org/api/timezone/Europe/Madrid');
+				const data = await response.json();
+				return new Date(data.datetime);
+			} catch (error) {
+				console.warn('Error obteniendo fecha de API, usando fecha local:', error);
+				return new Date();
+			}
+		}
+
+		// Datos del próximo festivo desde el servidor
+		const dateText = document.querySelector('.countdown-date')?.textContent || '';
+		const label = document.querySelector('.countdown-label')?.textContent || '';
+		const isActive = label.includes('Quedan de vacaciones');
+
+		// Convertir el nombre del mes a número
+		const monthNames = [
+			"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+			"Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+		];
+
+		// Función para parsear la fecha del texto
+		function parseDate(text) {
+			// Para periodos: "22 de Diciembre - 7 de Enero"
+			const periodMatch = text.match(/(\d+) de (\w+) - (\d+) de (\w+)/);
+			if (periodMatch) {
+				const endDay = parseInt(periodMatch[3]);
+				const endMonthName = periodMatch[4];
+				const endMonthIndex = monthNames.indexOf(endMonthName);
+
+				// Determinar el año para la fecha de fin
+				const startDay = parseInt(periodMatch[1]);
+				const startMonthIndex = monthNames.indexOf(periodMatch[2]);
+				const currentYear = new Date().getFullYear();
+
+				// Si el mes de fin es menor que el mes de inicio, es del año siguiente
+				const endYear = endMonthIndex < startMonthIndex ? currentYear + 1 : currentYear;
+
+				return {
+					day: isActive ? endDay : startDay,
+					month: isActive ? endMonthIndex : startMonthIndex,
+					year: endYear,
+					isPeriod: true
+				};
+			}
+
+			// Para días individuales: "1 de Mayo de 2025"
+			const singleMatch = text.match(/(\d+) de (\w+) de (\d{4})/);
+			if (singleMatch) {
+				return {
+					day: parseInt(singleMatch[1]),
+					month: monthNames.indexOf(singleMatch[2]),
+					year: parseInt(singleMatch[3]),
+					isPeriod: false
+				};
+			}
+
+			return null;
+		}
+
+		const parsedDate = parseDate(dateText);
+
+		if (parsedDate) {
+			// Crear la fecha objetivo (a las 23:59:59 si es periodo activo, 00:00:00 si no)
+			let targetDate;
+			if (isActive) {
+				// Para periodos activos, cuenta hasta el final del día
+				targetDate = new Date(parsedDate.year, parsedDate.month, parsedDate.day, 23, 59, 59).getTime();
+			} else {
+				// Para futuros, cuenta hasta el inicio
+				targetDate = new Date(parsedDate.year, parsedDate.month, parsedDate.day, 0, 0, 0).getTime();
+			}
+
+			async function updateCountdown() {
+				// Obtener la fecha actual (usar la de la API si está disponible)
+				if (!currentDate) {
+					currentDate = await getCurrentDate();
+				}
+
+				const now = currentDate ? currentDate.getTime() : new Date().getTime();
+				const distance = targetDate - now;
+
+				if (distance < 0) {
+					// Si el festivo/periodo ya pasó, recargar la página para obtener el siguiente
+					window.location.reload();
+					return;
+				}
+
+				const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+				const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+				const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+				const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+				const daysEl = document.getElementById('days');
+				const hoursEl = document.getElementById('hours');
+				const minutesEl = document.getElementById('minutes');
+				const secondsEl = document.getElementById('seconds');
+
+				if (daysEl) daysEl.textContent = days.toString();
+				if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
+				if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
+				if (secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
+
+				// Actualizar el currentDate para el siguiente tick
+				if (currentDate) {
+					currentDate = new Date(currentDate.getTime() + 1000);
+				}
+			}
+
+			// Actualizar inmediatamente
+			updateCountdown();
+
+			// Actualizar cada segundo
+			setInterval(updateCountdown, 1000);
+		}
+
+		// Funcionalidad para ocultar el banner al hacer scroll
+		let lastScrollTop = 0;
+		let scrollTimeout;
+
+		window.addEventListener('scroll', () => {
+			// Limpiar el timeout anterior
+			clearTimeout(scrollTimeout);
+
+			// Esperar un poco antes de procesar el scroll para mejor rendimiento
+			scrollTimeout = setTimeout(() => {
+				const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+				// Si hacemos scroll hacia abajo y hemos bajado más de 100px
+				if (scrollTop > lastScrollTop && scrollTop > 100) {
+					banner.classList.add('hidden');
+				}
+				// Si hacemos scroll hacia arriba
+				else if (scrollTop < lastScrollTop) {
+					banner.classList.remove('hidden');
+				}
+
+				lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+			}, 50);
+		}, { passive: true });
+	}
+</script>
