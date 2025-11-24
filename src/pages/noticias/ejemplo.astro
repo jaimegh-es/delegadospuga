@@ -1,0 +1,108 @@
+---
+import NewsLayout from "../../layouts/NewsLayout.astro";
+---
+
+<NewsLayout title="Nueva sección de noticias | Delegados Puga">
+    <header class="article-header">
+        <span class="date">24 Nov 2025</span>
+        <h1>Nueva sección de noticias</h1>
+        <img
+            src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=2070&auto=format&fit=crop"
+            alt="Nueva sección de noticias"
+            class="featured-image"
+        />
+    </header>
+
+    <div class="article-body">
+        <p class="lead">
+            Estamos emocionados de anunciar el lanzamiento de nuestra nueva
+            sección de noticias, diseñada para mantener a todos los estudiantes
+            informados sobre los últimos acontecimientos de la clase.
+        </p>
+
+        <h2>¿Qué encontrarás aquí?</h2>
+        <p>En este espacio publicaremos información relevante sobre:</p>
+        <ul>
+            <li>Cambios en el calendario de exámenes</li>
+            <li>Eventos especiales y actividades</li>
+            <li>Recordatorios importantes</li>
+            <li>Novedades sobre recursos académicos</li>
+        </ul>
+
+        <p>
+            Nuestro objetivo es crear un canal de comunicación más directo y
+            efectivo entre los delegados y el resto de la clase. Te invitamos a
+            visitar esta sección regularmente para no perderte ninguna novedad.
+        </p>
+    </div>
+</NewsLayout>
+
+<style>
+    .article-header {
+        margin-bottom: 40px;
+    }
+
+    .date {
+        display: block;
+        color: #6b7280;
+        margin-bottom: 12px;
+        font-weight: 500;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        color: #2000ad;
+        margin-bottom: 24px;
+        line-height: 1.2;
+    }
+
+    .featured-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .article-body {
+        font-size: 1.125rem;
+        line-height: 1.8;
+        color: #374151;
+    }
+
+    .lead {
+        font-size: 1.25rem;
+        color: #1f2937;
+        margin-bottom: 32px;
+        font-weight: 500;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+        color: #2000ad;
+        margin: 40px 0 20px;
+    }
+
+    p {
+        margin-bottom: 24px;
+    }
+
+    ul {
+        margin-bottom: 24px;
+        padding-left: 24px;
+    }
+
+    li {
+        margin-bottom: 12px;
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2rem;
+        }
+
+        .featured-image {
+            height: 250px;
+        }
+    }
+</style>

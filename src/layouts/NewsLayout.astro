@@ -1,0 +1,73 @@
+---
+import Layout from "./Layout.astro";
+import Navigation from "../components/Navigation.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+    title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<Layout title={title}>
+    <Navigation />
+
+    <main class="news-content">
+        <div class="back-button-container">
+            <a href="/#noticias" class="back-button">
+                <i class="fa-solid fa-arrow-left"></i> Volver a noticias
+            </a>
+        </div>
+
+        <article class="content-wrapper">
+            <slot />
+        </article>
+    </main>
+
+    <Footer />
+</Layout>
+
+<style>
+    .news-content {
+        padding-top: 120px;
+        min-height: 100vh;
+        background: #f8fafc;
+    }
+
+    .back-button-container {
+        max-width: 800px;
+        margin: 0 auto 20px;
+        padding: 0 20px;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #2000ad;
+        text-decoration: none;
+        font-weight: 600;
+        transition: transform 0.3s ease;
+    }
+
+    .back-button:hover {
+        transform: translateX(-5px);
+    }
+
+    .content-wrapper {
+        max-width: 800px;
+        margin: 0 auto 60px;
+        padding: 40px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (max-width: 768px) {
+        .content-wrapper {
+            margin: 0 20px 60px;
+            padding: 24px;
+        }
+    }
+</style>
