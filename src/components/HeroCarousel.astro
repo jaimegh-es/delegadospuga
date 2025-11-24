@@ -1,0 +1,469 @@
+---
+
+---
+
+<section class="hero-carousel" id="inicio">
+    <div class="carousel-container">
+        <div class="carousel-track">
+            <!-- Slide 1 -->
+            <div class="carousel-slide active">
+                <img
+                    src="/pabellon.webp"
+                    alt="IES Puga Ramón"
+                    class="slide-background"
+                />
+                <div class="slide-overlay"></div>
+                <div class="slide-content">
+                    <h1 class="hero-title">¿Qué mejorarías?</h1>
+                    <p class="hero-subtitle">
+                        Danos una opinión sincera de lo que tú quieras mejorar.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="https://live.e-survey.io/switch/share/2859b07c28" class="btn-primary">Entrar en encuesta</a>
+                       <!--  <a href="#links" class="btn-secondary">Ver Recursos</a>-->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="carousel-slide">
+                <img
+                    src="/puga.jpg"
+                    alt="Eventos Escolares"
+                    class="slide-background"
+                />
+                <div class="slide-overlay"></div>
+                <div class="slide-content">
+                    <h1 class="hero-title">¡Pronto se acaban los examenes!</h1>
+                    <p class="hero-subtitle">
+                        ¡Consulta los pocos que quedan por hacer!
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#calendar" class="btn-primary">Ver examenes</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="carousel-slide">
+                <img
+                    src="/pabellon.webp"
+                    alt="Noticias"
+                    class="slide-background"
+                />
+                <div class="slide-overlay"></div>
+                <div class="slide-content">
+                    <h1 class="hero-title">Noticias Recientes</h1>
+                    <p class="hero-subtitle">
+                        Las últimas novedades de nuestra clase
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#noticias" class="btn-primary">Leer Noticias</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Arrows -->
+        <button class="carousel-nav prev" aria-label="Anterior slide">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg
+            >
+        </button>
+        <button class="carousel-nav next" aria-label="Siguiente slide">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg
+            >
+        </button>
+
+        <!-- Indicators -->
+        <div class="carousel-indicators">
+            <button class="indicator active" aria-label="Ir al slide 1"
+            ></button>
+            <button class="indicator" aria-label="Ir al slide 2"></button>
+            <button class="indicator" aria-label="Ir al slide 3"></button>
+        </div>
+    </div>
+
+    <div class="hero-scroll">
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hero-carousel {
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+        background-color: #000;
+    }
+
+    .carousel-container {
+        height: 100%;
+        width: 100%;
+        position: relative;
+    }
+
+    .carousel-track {
+        height: 100%;
+        width: 100%;
+        position: relative;
+    }
+
+    .carousel-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.8s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+    }
+
+    .carousel-slide.active {
+        opacity: 1;
+        z-index: 2;
+    }
+
+    .slide-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scale(1.1);
+        transition: transform 6s ease;
+    }
+
+    .carousel-slide.active .slide-background {
+        transform: scale(1);
+    }
+
+    .slide-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            135deg,
+            rgba(32, 0, 173, 0.4) 0%,
+            rgba(0, 86, 204, 0.3) 100%
+        );
+        z-index: 1;
+    }
+
+    .slide-content {
+        position: relative;
+        z-index: 3;
+        text-align: center;
+        color: white;
+        max-width: 800px;
+        padding: 0 24px;
+        transform: translateY(20px);
+        opacity: 0;
+        transition: all 0.8s ease-out 0.3s;
+    }
+
+    .carousel-slide.active .slide-content {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 700;
+        margin-bottom: 24px;
+        line-height: 1.2;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+        margin-bottom: 40px;
+        font-weight: 300;
+        text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 24px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* Navigation Arrows */
+    .carousel-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+    }
+
+    .carousel-nav:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .carousel-nav.prev {
+        left: 24px;
+    }
+
+    .carousel-nav.next {
+        right: 24px;
+    }
+
+    /* Indicators */
+    .carousel-indicators {
+        position: absolute;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 12px;
+        z-index: 10;
+    }
+
+    .indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .indicator.active {
+        background: white;
+        transform: scale(1.2);
+    }
+
+    /* Scroll Indicator (kept from original) */
+    .hero-scroll {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        z-index: 10;
+    }
+
+    .scroll-indicator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.875rem;
+        opacity: 0.8;
+    }
+
+    .scroll-line {
+        width: 2px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.5);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .scroll-line::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 20px;
+        background: white;
+        animation: scroll-move 2s infinite;
+    }
+
+    @keyframes scroll-move {
+        0% {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+        50% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.125rem;
+        }
+
+        .hero-buttons {
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .carousel-nav {
+            width: 40px;
+            height: 40px;
+        }
+
+        .carousel-nav.prev {
+            left: 10px;
+        }
+        .carousel-nav.next {
+            right: 10px;
+        }
+    }
+</style>
+
+<script>
+    class HeroCarousel {
+        constructor() {
+            this.currentSlide = 0;
+            this.slides = document.querySelectorAll(".carousel-slide");
+            this.indicators = document.querySelectorAll(".indicator");
+            this.prevBtn = document.querySelector(".carousel-nav.prev");
+            this.nextBtn = document.querySelector(".carousel-nav.next");
+            this.totalSlides = this.slides.length;
+            this.interval = null;
+            this.isPlaying = true;
+
+            this.init();
+        }
+
+        init() {
+            if (!this.slides.length) return;
+
+            // Event Listeners
+            this.prevBtn?.addEventListener("click", () => {
+                this.pause();
+                this.prev();
+            });
+
+            this.nextBtn?.addEventListener("click", () => {
+                this.pause();
+                this.next();
+            });
+
+            this.indicators.forEach((indicator, index) => {
+                indicator.addEventListener("click", () => {
+                    this.pause();
+                    this.goToSlide(index);
+                });
+            });
+
+            // Auto play
+            this.startAutoPlay();
+
+            // Pause on hover
+            const container = document.querySelector(".carousel-container");
+            container?.addEventListener("mouseenter", () => this.pause());
+            container?.addEventListener("mouseleave", () =>
+                this.startAutoPlay(),
+            );
+        }
+
+        updateClasses() {
+            // Update slides
+            this.slides.forEach((slide, index) => {
+                if (index === this.currentSlide) {
+                    slide.classList.add("active");
+                } else {
+                    slide.classList.remove("active");
+                }
+            });
+
+            // Update indicators
+            this.indicators.forEach((indicator, index) => {
+                if (index === this.currentSlide) {
+                    indicator.classList.add("active");
+                } else {
+                    indicator.classList.remove("active");
+                }
+            });
+        }
+
+        goToSlide(index) {
+            this.currentSlide = (index + this.totalSlides) % this.totalSlides;
+            this.updateClasses();
+        }
+
+        next() {
+            this.goToSlide(this.currentSlide + 1);
+        }
+
+        prev() {
+            this.goToSlide(this.currentSlide - 1);
+        }
+
+        startAutoPlay() {
+            if (this.interval) clearInterval(this.interval);
+            this.interval = setInterval(() => this.next(), 5000);
+        }
+
+        pause() {
+            if (this.interval) clearInterval(this.interval);
+        }
+    }
+
+    // Initialize when DOM is loaded
+    document.addEventListener("astro:page-load", () => {
+        new HeroCarousel();
+    });
+
+    // Fallback for non-ViewTransitions
+    if (document.readyState === "complete") {
+        new HeroCarousel();
+    } else {
+        document.addEventListener("DOMContentLoaded", () => {
+            new HeroCarousel();
+        });
+    }
+</script>

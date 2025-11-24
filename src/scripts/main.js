@@ -2,7 +2,7 @@
 gsap.registerPlugin(ScrollTrigger);
 
 // Initialize animations when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initializeAnimations();
     initializeParallax();
     initializeFormHandling();
@@ -187,39 +187,39 @@ function initializeParallax() {
 function initializeFormHandling() {
     const form = document.getElementById('suggestionForm');
     if (form) {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function (e) {
             e.preventDefault();
-            
+
             const button = form.querySelector('.submit-btn');
             const originalText = button.querySelector('span').textContent;
-            
+
             // Animate button
             gsap.to(button, {
                 duration: 0.3,
                 scale: 0.95,
                 ease: 'power2.out'
             });
-            
+
             button.querySelector('span').textContent = 'Enviando...';
             button.disabled = true;
-            
+
             // Simulate form submission
             setTimeout(() => {
                 button.querySelector('span').textContent = '¡Enviado! ✓';
-                
+
                 gsap.to(button, {
                     duration: 0.3,
                     scale: 1,
-                    backgroundColor: '#001e60',
+                    backgroundColor: '#2000ad',
                     ease: 'back.out(1.7)'
                 });
-                
+
                 // Reset form
                 setTimeout(() => {
                     form.reset();
                     button.querySelector('span').textContent = originalText;
                     button.disabled = false;
-                    
+
                     gsap.to(button, {
                         duration: 0.3,
                         backgroundColor: '',
@@ -233,7 +233,7 @@ function initializeFormHandling() {
     // Enhanced form field animations
     const formFields = document.querySelectorAll('input, select, textarea');
     formFields.forEach(field => {
-        field.addEventListener('focus', function() {
+        field.addEventListener('focus', function () {
             gsap.to(this, {
                 duration: 0.3,
                 scale: 1.02,
@@ -242,7 +242,7 @@ function initializeFormHandling() {
             });
         });
 
-        field.addEventListener('blur', function() {
+        field.addEventListener('blur', function () {
             gsap.to(this, {
                 duration: 0.3,
                 scale: 1,
@@ -272,14 +272,14 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // Interactive cursor effect
-document.addEventListener('mousemove', function(e) {
+document.addEventListener('mousemove', function (e) {
     const interactiveElements = document.querySelectorAll('.btn-primary, .btn-secondary, .news-card, .feature-card');
-    
+
     interactiveElements.forEach(element => {
         const rect = element.getBoundingClientRect();
         const x = e.clientX - rect.left - rect.width / 2;
         const y = e.clientY - rect.top - rect.height / 2;
-        
+
         if (Math.abs(x) < rect.width / 2 && Math.abs(y) < rect.height / 2) {
             gsap.to(element, {
                 duration: 0.3,
@@ -292,7 +292,7 @@ document.addEventListener('mousemove', function(e) {
 });
 
 // Reset transforms when mouse leaves
-document.addEventListener('mouseleave', function() {
+document.addEventListener('mouseleave', function () {
     gsap.to('.btn-primary, .btn-secondary, .news-card, .feature-card', {
         duration: 0.5,
         rotationY: 0,
@@ -303,10 +303,10 @@ document.addEventListener('mouseleave', function() {
 
 // Navbar scroll effect
 let lastScrollTop = 0;
-window.addEventListener('scroll', function() {
+window.addEventListener('scroll', function () {
     const nav = document.querySelector('.nav-container');
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    
+
     if (scrollTop > lastScrollTop && scrollTop > 100) {
         // Scrolling down
         gsap.to(nav, {
@@ -322,6 +322,6 @@ window.addEventListener('scroll', function() {
             ease: 'power2.out'
         });
     }
-    
+
     lastScrollTop = scrollTop;
 });

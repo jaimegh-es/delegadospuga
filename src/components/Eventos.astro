@@ -1,12 +1,50 @@
 ---
 // Datos de exámenes - Editar aquí para añadir/modificar exámenes
 const examenes = {
-    '2025-11-14': [ { asignatura: 'Magosto', hora: '12:50-14:30', aula: '', detalles: 'Se celebrará el Magosto en el centro' } ],
-    '2025-11-17': [ { asignatura: 'Culturas y comportamiento del chimpancé', hora: '10:50-12:30', aula: '', detalles: 'Manolo nos trae a una persona que colaboró con Jane Goodall y que fue alumna de este centro. ' } ],
-    '2025-11-19': [ { asignatura: 'Las mujeres en el museo', hora: '09:30-11:30', aula: 'Museo de Bellas Artes', detalles: 'https://museobelasartescoruna.xunta.gal/es/educacion/visitas/las-mujeres-en-el-museo' } ],
-    '2025-12-11': [ { asignatura: 'Taller TCA', hora: '10:50-12:30', aula: '', detalles: 'Taller sobre los Trastornos de la Conducta Alimentaria abordado desde una "perspectiva de género"...' } ],
-    '2025-12-12': [ { asignatura: 'Taller Ludopatía', hora: '10:50-12:30', aula: '', detalles: 'Taller acerca de los peligros y riesgos inherentes a la ludopatía y los juegos de apuestas.' } ],
-
+    "2025-11-14": [
+        {
+            asignatura: "Magosto",
+            hora: "12:50-14:30",
+            aula: "",
+            detalles: "Se celebrará el Magosto en el centro",
+        },
+    ],
+    "2025-11-17": [
+        {
+            asignatura: "Culturas y comportamiento del chimpancé",
+            hora: "10:50-12:30",
+            aula: "",
+            detalles:
+                "Manolo nos trae a una persona que colaboró con Jane Goodall y que fue alumna de este centro. ",
+        },
+    ],
+    "2025-11-19": [
+        {
+            asignatura: "Las mujeres en el museo",
+            hora: "09:30-11:30",
+            aula: "Museo de Bellas Artes",
+            detalles:
+                "https://museobelasartescoruna.xunta.gal/es/educacion/visitas/las-mujeres-en-el-museo",
+        },
+    ],
+    "2025-12-11": [
+        {
+            asignatura: "Taller TCA",
+            hora: "10:50-12:30",
+            aula: "",
+            detalles:
+                'Taller sobre los Trastornos de la Conducta Alimentaria abordado desde una "perspectiva de género"...',
+        },
+    ],
+    "2025-12-12": [
+        {
+            asignatura: "Taller Ludopatía",
+            hora: "10:50-12:30",
+            aula: "",
+            detalles:
+                "Taller acerca de los peligros y riesgos inherentes a la ludopatía y los juegos de apuestas.",
+        },
+    ],
 };
 
 // Función para generar los días del mes
@@ -24,14 +62,14 @@ function generarDiasMes(año, mes) {
 
     // Días del mes
     for (let dia = 1; dia <= diasEnMes; dia++) {
-        const fecha = `${año}-${mes.toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
+        const fecha = `${año}-${mes.toString().padStart(2, "0")}-${dia.toString().padStart(2, "0")}`;
         const examen = examenes[fecha];
 
         dias.push({
             numero: dia,
             fecha: fecha,
             examen: examen || null,
-            vacio: false
+            vacio: false,
         });
     }
 
@@ -58,7 +96,7 @@ function dividirEnSemanas(dias) {
 }
 ---
 
-<section class="calendario-section" id="calendar">
+<section class="calendario-section" id="eventos">
     <div class="container">
         <div class="section-header">
             <h2 class="section-title">Eventos</h2>
@@ -67,8 +105,6 @@ function dividirEnSemanas(dias) {
 
         <div class="calendario-container">
             <div class="meses-grid">
-              
-
                 <div class="mes">
                     <h3 class="mes-titulo">Noviembre 2025</h3>
                     <table class="calendario-tabla">
@@ -84,27 +120,60 @@ function dividirEnSemanas(dias) {
                             </tr>
                         </thead>
                         <tbody>
-                            {dividirEnSemanas(noviembre).map(semana => (
-                                <tr>
-                                    {semana.map(dia => (
-                                        <td class={dia.vacio ? 'dia-vacio' : (dia.examen ? 'dia tiene-examen' : 'dia')} data-examen-fecha={dia.examen ? dia.fecha : null}>
-                                            {!dia.vacio && (
-                                                <>
-                                                    <div class="numero-dia">{dia.numero}</div>
-                                                    {dia.examen && dia.examen.length > 0 && (
-                                                        <div class="examen-info">
-                                                            <div class="asignatura">{dia.examen[0].asignatura}</div>
-                                                            {dia.examen.length > 1 && (
-                                                                <div class="asignatura">{dia.examen[1].asignatura}</div>
-                                                            )}
+                            {
+                                dividirEnSemanas(noviembre).map((semana) => (
+                                    <tr>
+                                        {semana.map((dia) => (
+                                            <td
+                                                class={
+                                                    dia.vacio
+                                                        ? "dia-vacio"
+                                                        : dia.examen
+                                                          ? "dia tiene-examen"
+                                                          : "dia"
+                                                }
+                                                data-examen-fecha={
+                                                    dia.examen
+                                                        ? dia.fecha
+                                                        : null
+                                                }
+                                            >
+                                                {!dia.vacio && (
+                                                    <>
+                                                        <div class="numero-dia">
+                                                            {dia.numero}
                                                         </div>
-                                                    )}
-                                                </>
-                                            )}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
+                                                        {dia.examen &&
+                                                            dia.examen.length >
+                                                                0 && (
+                                                                <div class="examen-info">
+                                                                    <div class="asignatura">
+                                                                        {
+                                                                            dia
+                                                                                .examen[0]
+                                                                                .asignatura
+                                                                        }
+                                                                    </div>
+                                                                    {dia.examen
+                                                                        .length >
+                                                                        1 && (
+                                                                        <div class="asignatura">
+                                                                            {
+                                                                                dia
+                                                                                    .examen[1]
+                                                                                    .asignatura
+                                                                            }
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                    </>
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -124,27 +193,60 @@ function dividirEnSemanas(dias) {
                             </tr>
                         </thead>
                         <tbody>
-                            {dividirEnSemanas(diciembre).map(semana => (
-                                <tr>
-                                    {semana.map(dia => (
-                                        <td class={dia.vacio ? 'dia-vacio' : (dia.examen ? 'dia tiene-examen' : 'dia')} data-examen-fecha={dia.examen ? dia.fecha : null}>
-                                            {!dia.vacio && (
-                                                <>
-                                                    <div class="numero-dia">{dia.numero}</div>
-                                                    {dia.examen && dia.examen.length > 0 && (
-                                                        <div class="examen-info">
-                                                            <div class="asignatura">{dia.examen[0].asignatura}</div>
-                                                            {dia.examen.length > 1 && (
-                                                                <div class="asignatura">{dia.examen[1].asignatura}</div>
-                                                            )}
+                            {
+                                dividirEnSemanas(diciembre).map((semana) => (
+                                    <tr>
+                                        {semana.map((dia) => (
+                                            <td
+                                                class={
+                                                    dia.vacio
+                                                        ? "dia-vacio"
+                                                        : dia.examen
+                                                          ? "dia tiene-examen"
+                                                          : "dia"
+                                                }
+                                                data-examen-fecha={
+                                                    dia.examen
+                                                        ? dia.fecha
+                                                        : null
+                                                }
+                                            >
+                                                {!dia.vacio && (
+                                                    <>
+                                                        <div class="numero-dia">
+                                                            {dia.numero}
                                                         </div>
-                                                    )}
-                                                </>
-                                            )}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
+                                                        {dia.examen &&
+                                                            dia.examen.length >
+                                                                0 && (
+                                                                <div class="examen-info">
+                                                                    <div class="asignatura">
+                                                                        {
+                                                                            dia
+                                                                                .examen[0]
+                                                                                .asignatura
+                                                                        }
+                                                                    </div>
+                                                                    {dia.examen
+                                                                        .length >
+                                                                        1 && (
+                                                                        <div class="asignatura">
+                                                                            {
+                                                                                dia
+                                                                                    .examen[1]
+                                                                                    .asignatura
+                                                                            }
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                    </>
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -161,326 +263,339 @@ function dividirEnSemanas(dias) {
     </div>
 </div>
 
-
 <style>
-.calendario-section {
-    padding: 60px 0;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-}
-
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 24px;
-}
-
-.section-header {
-    text-align: center;
-    margin-bottom: 60px;
-}
-
-.section-title {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 16px;
-    background: linear-gradient(45deg, #001e60, #003d99);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.section-subtitle {
-    font-size: 1.25rem;
-    color: #64748b;
-    font-weight: 400;
-}
-
-.calendario-container {
-    background: white;
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-}
-
-.meses-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-}
-
-.mes {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 24px;
-    border: 1px solid #e2e8f0;
-}
-
-.mes-titulo {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #001e60;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-
-.calendario-tabla {
-    width: 100%;
-    border-collapse: collapse;
-    border-spacing: 0;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.calendario-tabla th {
-    background: linear-gradient(135deg, #001e60 0%, #003d99 100%);
-    color: white;
-    padding: 12px 8px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 0.875rem;
-    border: none;
-}
-
-.calendario-tabla td {
-    width: 14.28%;
-    height: 80px;
-    border: 1px solid #e2e8f0;
-    position: relative;
-    vertical-align: top;
-    padding: 4px;
-}
-
-.dia {
-    background: white;
-    height: 100%;
-    position: relative;
-}
-
-.dia-vacio {
-    background: #f8fafc;
-}
-
-.dia.tiene-examen {
-    background: linear-gradient(135deg, #001e60 0%, #003d99 100%);
-    color: white;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.dia.tiene-examen:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(0, 30, 96, 0.3);
-}
-
-.numero-dia {
-    position: absolute;
-    top: 4px;
-    left: 6px;
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: #374151;
-}
-
-.dia.tiene-examen .numero-dia {
-    color: white;
-}
-
-.examen-info {
-    position: absolute;
-    bottom: 4px;
-    left: 4px;
-    right: 4px;
-    text-align: center;
-    font-size: 0.6rem;
-    line-height: 1.1;
-}
-
-.examen-info .asignatura {
-    font-weight: 700;
-    margin-bottom: 2px;
-    text-transform: uppercase;
-}
-
-.examen-info .hora {
-    font-weight: 500;
-    opacity: 0.9;
-}
-
-/* Modal Styles */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background: white;
-    padding: 30px;
-    border-radius: 16px;
-    width: 90%;
-    max-width: 500px;
-    position: relative;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-.modal-close {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 1.8rem;
-    cursor: pointer;
-    color: #64748b;
-}
-
-#modal-fecha-titulo {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #001e60;
-    margin-bottom: 20px;
-}
-
-.examen-item {
-    border-bottom: 1px solid #e2e8f0;
-    padding: 15px 0;
-}
-.examen-item:last-child {
-    border-bottom: none;
-}
-
-#modal-detalles {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #374151;
-}
-
-
-/* Responsive */
-@media (max-width: 1024px) {
-    .meses-grid {
-        grid-template-columns: 1fr;
-        gap: 32px;
-    }
-}
-
-@media (max-width: 768px) {
     .calendario-section {
-        padding: 40px 0;
+        padding: 60px 0;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
     }
 
     .section-title {
-        font-size: 2rem;
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+        background: linear-gradient(45deg, #2000ad, #003d99);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .section-subtitle {
+        font-size: 1.25rem;
+        color: #64748b;
+        font-weight: 400;
     }
 
     .calendario-container {
-        padding: 24px;
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    }
+
+    .meses-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
     }
 
     .mes {
-        padding: 16px;
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid #e2e8f0;
     }
 
-    .calendario-tabla td {
-        height: 60px;
+    .mes-titulo {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2000ad;
+        margin-bottom: 20px;
+        text-align: center;
     }
 
-    .numero-dia {
-        font-size: 0.75rem;
-    }
-
-    .examen-info {
-        font-size: 0.5rem;
-    }
-
-    .examen-info .asignatura {
-        margin-bottom: 1px;
-    }
-}
-
-@media (max-width: 480px) {
-    .calendario-tabla td {
-        height: 50px;
-    }
-
-    .numero-dia {
-        font-size: 0.7rem;
-        top: 2px;
-        left: 4px;
-    }
-
-    .examen-info {
-        font-size: 0.45rem;
-        bottom: 2px;
+    .calendario-tabla {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
     }
 
     .calendario-tabla th {
-        padding: 8px 4px;
-        font-size: 0.75rem;
+        background: linear-gradient(45deg, #2000ad, #003d99);
+        color: white;
+        padding: 12px 8px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+        border: none;
     }
-}
+
+    .calendario-tabla td {
+        width: 14.28%;
+        height: 80px;
+        border: 1px solid #e2e8f0;
+        position: relative;
+        vertical-align: top;
+        padding: 4px;
+    }
+
+    .dia {
+        background: white;
+        height: 100%;
+        position: relative;
+    }
+
+    .dia-vacio {
+        background: #f8fafc;
+    }
+
+    .dia.tiene-examen {
+        background: linear-gradient(45deg, #2000ad, #003d99);
+        color: white;
+        cursor: pointer;
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .dia.tiene-examen:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(0, 30, 96, 0.3);
+    }
+
+    .numero-dia {
+        position: absolute;
+        top: 4px;
+        left: 6px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #374151;
+    }
+
+    .dia.tiene-examen .numero-dia {
+        color: white;
+    }
+
+    .examen-info {
+        position: absolute;
+        bottom: 4px;
+        left: 4px;
+        right: 4px;
+        text-align: center;
+        font-size: 0.6rem;
+        line-height: 1.1;
+    }
+
+    .examen-info .asignatura {
+        font-weight: 700;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+    }
+
+    .examen-info .hora {
+        font-weight: 500;
+        opacity: 0.9;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 500px;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 1.8rem;
+        cursor: pointer;
+        color: #64748b;
+    }
+
+    #modal-fecha-titulo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2000ad;
+        margin-bottom: 20px;
+    }
+
+    .examen-item {
+        border-bottom: 1px solid #e2e8f0;
+        padding: 15px 0;
+    }
+    .examen-item:last-child {
+        border-bottom: none;
+    }
+
+    #modal-detalles {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #374151;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .meses-grid {
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .calendario-section {
+            padding: 40px 0;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .calendario-container {
+            padding: 24px;
+        }
+
+        .mes {
+            padding: 16px;
+        }
+
+        .calendario-tabla td {
+            height: 60px;
+        }
+
+        .numero-dia {
+            font-size: 0.75rem;
+        }
+
+        .examen-info {
+            font-size: 0.5rem;
+        }
+
+        .examen-info .asignatura {
+            margin-bottom: 1px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .calendario-tabla td {
+            height: 50px;
+        }
+
+        .numero-dia {
+            font-size: 0.7rem;
+            top: 2px;
+            left: 4px;
+        }
+
+        .examen-info {
+            font-size: 0.45rem;
+            bottom: 2px;
+        }
+
+        .calendario-tabla th {
+            padding: 8px 4px;
+            font-size: 0.75rem;
+        }
+    }
 </style>
 
 <script define:vars={{ examenes }}>
-    document.addEventListener('DOMContentLoaded', () => {
-        const modal = document.getElementById('examen-modal');
-        const modalClose = document.getElementById('modal-close');
-        const modalFechaTitulo = document.getElementById('modal-fecha-titulo');
-        const modalExamenesLista = document.getElementById('modal-examenes-lista');
+    document.addEventListener("DOMContentLoaded", () => {
+        const modal = document.getElementById("examen-modal");
+        const modalClose = document.getElementById("modal-close");
+        const modalFechaTitulo = document.getElementById("modal-fecha-titulo");
+        const modalExamenesLista = document.getElementById(
+            "modal-examenes-lista",
+        );
 
-        document.querySelectorAll('.tiene-examen').forEach(celda => {
-            celda.addEventListener('click', () => {
+        document.querySelectorAll(".tiene-examen").forEach((celda) => {
+            celda.addEventListener("click", () => {
                 const fecha = celda.dataset.examenFecha;
                 if (fecha && examenes[fecha] && examenes[fecha].length > 0) {
                     const examenesDelDia = examenes[fecha];
-                    modalFechaTitulo.textContent = new Date(fecha + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
-                    modalExamenesLista.innerHTML = ''; // Limpiar lista
+                    modalFechaTitulo.textContent = new Date(
+                        fecha + "T00:00:00",
+                    ).toLocaleDateString("es-ES", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                    });
+                    modalExamenesLista.innerHTML = ""; // Limpiar lista
 
-                    examenesDelDia.forEach(examen => {
-                        const examenDiv = document.createElement('div');
-                        examenDiv.classList.add('examen-item');
+                    examenesDelDia.forEach((examen) => {
+                        const examenDiv = document.createElement("div");
+                        examenDiv.classList.add("examen-item");
                         examenDiv.innerHTML = `
                             <h4>${examen.asignatura}</h4>
-                            <p><strong>Hora:</strong> ${examen.hora || 'No especificada'}</p>
-                            <p><strong>Aula:</strong> ${examen.aula || 'No especificada'}</p>
-                            <p><strong>Detalles:</strong> ${examen.detalles || 'No hay detalles adicionales.'}</p>
+                            <p><strong>Hora:</strong> ${examen.hora || "No especificada"}</p>
+                            <p><strong>Aula:</strong> ${examen.aula || "No especificada"}</p>
+                            <p><strong>Detalles:</strong> ${examen.detalles || "No hay detalles adicionales."}</p>
                         `;
                         modalExamenesLista.appendChild(examenDiv);
                     });
 
-                    modal.style.display = 'flex';
+                    modal.style.display = "flex";
                 }
             });
         });
 
         function closeModal() {
-            modal.style.display = 'none';
+            modal.style.display = "none";
         }
 
-        modalClose.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
+        modalClose.addEventListener("click", closeModal);
+        modal.addEventListener("click", (e) => {
             if (e.target === modal) {
                 closeModal();
             }
         });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
                 closeModal();
             }
         });
