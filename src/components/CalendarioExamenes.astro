@@ -1,139 +1,23 @@
 ---
 // Datos de exámenes - Editar aquí para añadir/modificar exámenes
 const examenes = {
-    "2025-11-25": [
+    "2026-01-14": [
         {
-            asignatura: "Gramatica y Vocabulario Inglés",
+            asignatura: "Recuperación Lengua",
             hora: "",
             aula: "B1B",
-            detalles: "Detalles del examen de Gramatica y Vocabulario...",
+            detalles: "Recuperación examen de Lengua.",
         },
     ],
-    "2025-10-07": [
+    "2026-01-21": [
         {
-            asignatura: "Verbos y preposiciones Inglés",
+            asignatura: "Presentación trabajo Lengua",
             hora: "",
             aula: "B1B",
-            detalles:
-                "Caen los verbs+prepositions de la página 206 del Students Book",
+            detalles: "Presentación trabajo de Lengua.",
         },
     ],
-    "2025-11-18": [
-        {
-            asignatura: "Writing Inglés",
-            hora: "",
-            aula: "B1B",
-            detalles: "Detalles del examen de Writing...",
-        },
-        {
-            asignatura: "Gallego 2º Parte",
-            hora: "",
-            aula: "B1",
-            detalles: "Examen de la segunda parte de gallego.",
-        },
-    ],
-    "2025-11-28": [
-        {
-            asignatura: "Reading and Listening Inglés",
-            hora: "",
-            aula: "B1B",
-            detalles: "Detalles del examen de Reading and Listening...",
-        },
-    ],
-    "2025-10-20": [
-        {
-            asignatura: "Trigonometría Mate",
-            hora: "",
-            aula: "B1",
-            detalles: "Detalles del examen de Trigonometría...",
-        },
-    ],
-    "2025-10-21": [
-        {
-            asignatura: "Trigonometría Mate",
-            hora: "",
-            aula: "B1",
-            detalles: "Detalles del examen de Trigonometría...",
-        },
-    ],
-    "2025-12-01": [
-        {
-            asignatura: "Geometría Analítica Mate",
-            hora: "",
-            aula: "B1",
-            detalles: "Detalles del examen de Geometría Analítica...",
-        },
-    ],
-    "2025-10-29": [
-        {
-            asignatura: "Examen Física y Química",
-            hora: "",
-            aula: "B1",
-            detalles: "Próximamente dirá el contenido del examen.",
-        },
-    ],
-    "2025-11-21": [
-        {
-            asignatura: "Examen Física y Química",
-            hora: "",
-            aula: "B1",
-            detalles: "Próximamente dirá el contenido del examen.",
-        },
-    ],
-    "2025-10-23": [
-        {
-            asignatura: "Gallego 1º Parte",
-            hora: "",
-            aula: "B1",
-            detalles: "Examen de la primera parte de gallego.",
-        },
-    ],
-    "2025-11-05": [
-        {
-            asignatura: "Ex Libro Lectura Lengua",
-            hora: "",
-            aula: "B1",
-            detalles: "Examen del libro de lectura: La Celestina.",
-        },
-    ],
-    "2025-11-27": [
-        {
-            asignatura: "Entrega Oral Gal",
-            hora: "",
-            aula: "B1",
-            detalles: "Fecha máxima de entrega del oral de gallego.",
-        },
-        {
-            asignatura: "Ex Literatura Lengua",
-            hora: "",
-            aula: "B1",
-            detalles: "Examen de literatura estudiada en Lengua.",
-        },
-    ],
-    "2025-11-11": [
-        {
-            asignatura: "Ex Libro Lectura Gallego",
-            hora: "",
-            aula: "B1",
-            detalles: "Examen libro lectura gallego.",
-        },
-    ],
-    "2025-11-14": [
-        {
-            asignatura: "Recuperación Mate",
-            hora: "",
-            aula: "B1",
-            detalles: "Recuperación examen de Matemáticas.",
-        },
-    ],
-    "2025-11-20": [
-        {
-            asignatura: "Ex Tecnología",
-            hora: "",
-            aula: "Inf",
-            detalles: "Examen de tecnología.",
-        },
-    ],
+
 };
 
 // Función para generar los días del mes
@@ -172,8 +56,8 @@ function generarDiasMes(año, mes) {
 
 // Generar calendarios para cada mes
 
-const noviembre = generarDiasMes(2025, 11);
-const diciembre = generarDiasMes(2025, 12);
+const noviembre = generarDiasMes(2025, 12);
+const diciembre = generarDiasMes(2026, 1);
 
 // Función para dividir en semanas
 function dividirEnSemanas(dias) {
@@ -195,7 +79,7 @@ function dividirEnSemanas(dias) {
         <div class="calendario-container">
             <div class="meses-grid">
                 <div class="mes">
-                    <h3 class="mes-titulo">Noviembre 2025</h3>
+                    <h3 class="mes-titulo">Diciembre 2025</h3>
                     <table class="calendario-tabla">
                         <thead>
                             <tr>
@@ -268,7 +152,7 @@ function dividirEnSemanas(dias) {
                 </div>
 
                 <div class="mes">
-                    <h3 class="mes-titulo">Diciembre 2025</h3>
+                    <h3 class="mes-titulo">Enero 2026</h3>
                     <table class="calendario-tabla">
                         <thead>
                             <tr>
