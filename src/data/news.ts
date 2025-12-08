@@ -7,11 +7,11 @@ export interface NewsItem {
 }
 
 export const news: NewsItem[] = [
-    {
-        title: "Encuesta abierta",
+    /*{
+        title: "Trabajamos",
         image: "delegados.png",
         description: "Hemos creado una encuesta anónima para recoger propuestas que libremente deseeis hacer.",
         link: "https://live.e-survey.io/switch/share/2859b07c28",
         date: "25 Nov 2025"
-    },
+    },*/
 ];
