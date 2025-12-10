@@ -7,11 +7,11 @@ export interface NewsItem {
 }
 
 export const news: NewsItem[] = [
-    /*{
-        title: "Se prohibe la salida del centro durante el tiempo de recreo",
-        image: "prohibidosalir.jpg",
-        description: ".",
-        link: "/noticias/prohibido-salida-centro",
-        date: "25 Nov 2025"
-    },*/
+    {
+        title: "¡IMPORTANTE INSCRIBIRSE! Salida día 16",
+        image: "unitour.png",
+        description: "Es importante inscribirse para la salida...",
+        link: "/noticias/161225",
+        date: "10 Dic 2025"
+    },
 ];

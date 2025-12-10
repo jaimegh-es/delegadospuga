@@ -1,0 +1,99 @@
+---
+import NewsLayout from "../../layouts/NewsLayout.astro";
+---
+
+<NewsLayout title="Nueva sección de noticias | Delegados Puga">
+    <header class="article-header">
+        <span class="date">10 Dic 2025</span>
+        <h1>¡IMPORTANTE INSCRIBIRSE! Salida día 16 Feria Unitour</h1>
+        <img
+            src={import.meta.env.BASE_URL    + "unitour.png"}
+            alt="Nueva sección de noticias"
+            class="featured-image"
+        />
+    </header>
+
+    <div class="article-body">
+        <div style="display: flex; justify-content: center;">
+            <a href="https://www.unitour.es/inscripcion-online/la-coruna" class="btn-primary" style="background-color: #2000ad; color: white;">Inscribirse aquí</a>
+        </div>
+        
+        <p class="lead">
+            Es imprescindible inscribirse. Deberá llevarse el móvil con el QR de la entrada (que se generará cuando os inscribáis). Desde dirección darán instrucciones más detalladas sobre lo de llevar el móvil.
+        </p>
+
+        <h2>Un poco más a fondo sobre la feria</h2>
+        <h1><span>UNITOUR. Salón de Orientación Universitaria</span></h1><p>“UNITOUR es, desde 2006, el lugar de encuentro para estudiantes de bachillerato o FP, docentes, familias, universidades y servicios complementarios, convirtiéndose en el evento preuniversitario de referencia. ”</p><p>“UNITOUR facilita la labor de orientación universitaria, poniendo a su disposición, en una única jornada, las principales universidades nacionales e internacionales.”</p><br>
+        
+    </div>
+</NewsLayout>
+
+<style>
+    .article-header {
+        margin-bottom: 40px;
+    }
+
+    .date {
+        display: block;
+        color: #6b7280;
+        margin-bottom: 12px;
+        font-weight: 500;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        color: #2000ad;
+        margin-bottom: 24px;
+        line-height: 1.2;
+    }
+
+    .featured-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .article-body {
+        font-size: 1.125rem;
+        line-height: 1.8;
+        color: #374151;
+    }
+
+    .lead {
+        font-size: 1.25rem;
+        color: #1f2937;
+        margin-bottom: 32px;
+        font-weight: 500;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+        color: #2000ad;
+        margin: 40px 0 20px;
+    }
+
+    p {
+        margin-bottom: 24px;
+    }
+
+    ul {
+        margin-bottom: 24px;
+        padding-left: 24px;
+    }
+
+    li {
+        margin-bottom: 12px;
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2rem;
+        }
+
+        .featured-image {
+            height: 250px;
+        }
+    }
+</style>
