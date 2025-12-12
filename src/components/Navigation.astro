@@ -1,7 +1,17 @@
+---
+import EmailPopup from "./EmailPopup.astro";
+---
+
 <nav class="nav-container">
 	<div class="nav-content">
 		<div class="nav-logo">
-			<a href="/" style="text-decoration: none;"><img src={import.meta.env.BASE_URL + "delegados.png"} class="logo" alt="delegados logo" /><h2> Delegados 1B</h2></a>
+			<a href="/" style="text-decoration: none;"
+				><img
+					src={import.meta.env.BASE_URL + "delegados.png"}
+					class="logo"
+					alt="delegados logo"
+				/><h2>1B Bach</h2></a
+			>
 		</div>
 		<ul class="nav-menu">
 			<li><a href="/#hero">Inicio</a></li>
@@ -9,6 +19,11 @@
 			<li><a href="/#eventos">Eventos</a></li>
 			<li><a href="/#noticias">Noticias</a></li>
 			<li><a href="/#links">Recursos</a></li>
+			<li>
+				<a href="#" id="mail-btn" aria-label="Contactar por correo">
+					<i class="fa-solid fa-envelope"></i>
+				</a>
+			</li>
 		</ul>
 		<div class="nav-burger">
 			<span></span>
@@ -24,11 +39,12 @@
 		top: 0;
 		width: 100%;
 		z-index: 1000;
-background: linear-gradient(
-            135deg,
-            rgba(32, 0, 173, 0.7) 0%,
-            rgba(0, 86, 204, 0.6) 100%
-        );		backdrop-filter: blur(20px);
+		background: linear-gradient(
+			135deg,
+			rgba(32, 0, 173, 0.7) 0%,
+			rgba(0, 86, 204, 0.6) 100%
+		);
+		backdrop-filter: blur(20px);
 		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 		transition: all 0.3s ease;
 	}
@@ -74,7 +90,7 @@ background: linear-gradient(
 	}
 
 	.nav-menu a::after {
-		content: '';
+		content: "";
 		position: absolute;
 		bottom: -4px;
 		left: 0;
@@ -109,11 +125,71 @@ background: linear-gradient(
 
 	@media (max-width: 768px) {
 		.nav-menu {
-			display: none;
+			position: fixed;
+			top: 70px;
+			left: -100%;
+			flex-direction: column;
+			background: rgba(32, 0, 173, 0.95);
+			backdrop-filter: blur(20px);
+			width: 100%;
+			height: calc(100vh - 70px);
+			text-align: center;
+			transition: 0.3s;
+			padding-top: 2rem;
+			gap: 2rem;
+		}
+
+		.nav-menu.active {
+			left: 0;
+			display: flex;
+		}
+
+		.nav-menu a {
+			font-size: 1.2rem;
+			display: block;
+			padding: 1rem;
 		}
 
 		.nav-burger {
 			display: flex;
+			z-index: 1001;
+		}
+
+		.nav-burger.active span:nth-child(1) {
+			transform: translateY(7px) rotate(45deg);
+		}
+
+		.nav-burger.active span:nth-child(2) {
+			opacity: 0;
+		}
+
+		.nav-burger.active span:nth-child(3) {
+			transform: translateY(-7px) rotate(-45deg);
 		}
 	}
 </style>
+
+<script>
+	document.getElementById("mail-btn")?.addEventListener("click", (e) => {
+		e.preventDefault();
+		document.dispatchEvent(new Event("open-email-popup"));
+	});
+
+	const burger = document.querySelector(".nav-burger");
+	const nav = document.querySelector(".nav-menu");
+	const navLinks = document.querySelectorAll(".nav-menu li");
+
+	burger?.addEventListener("click", () => {
+		nav?.classList.toggle("active");
+		burger.classList.toggle("active");
+	});
+
+	navLinks.forEach((link) => {
+		link.addEventListener("click", () => {
+			nav?.classList.remove("active");
+			burger?.classList.remove("active");
+		});
+	});
+</script>
+
+<EmailPopup />
