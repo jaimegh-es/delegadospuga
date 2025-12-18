@@ -7,7 +7,7 @@ export interface NewsItem {
 }
 
 export const news: NewsItem[] = [
-    {
+    /*{
         title: "¡IMPORTANTE INSCRIBIRSE! Salida día 16",
         image: "unitour.png",
         description: "Es importante inscribirse para la salida...",
@@ -15,7 +15,7 @@ export const news: NewsItem[] = [
         date: "10 Dic 2025"
     },
 
-   /* {
+    {
         title: "¡IMPORTANTE INSCRIBIRSE! Salida día 16",
         image: "unitour.png",
         description: "Es importante inscribirse para la salida...",
