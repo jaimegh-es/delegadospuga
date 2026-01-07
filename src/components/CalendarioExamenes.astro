@@ -33,6 +33,14 @@ const examenes = {
             detalles: "Para recuperar la parte de química.",
         },
     ],
+     "2026-02-05": [
+        {
+            asignatura: "Examen libro gallego",
+            hora: "",
+            aula: "B1B",
+            detalles: "El libro es 'As malas mulleres', de Marilar Alexandre.",
+        },
+    ],
 
 };
 
@@ -72,8 +80,8 @@ function generarDiasMes(año, mes) {
 
 // Generar calendarios para cada mes
 
-const noviembre = generarDiasMes(2025, 12);
-const diciembre = generarDiasMes(2026, 1);
+const enero = generarDiasMes(2026, 1);
+const febrero = generarDiasMes(2026, 2);
 
 // Función para dividir en semanas
 function dividirEnSemanas(dias) {
@@ -95,7 +103,7 @@ function dividirEnSemanas(dias) {
         <div class="calendario-container">
             <div class="meses-grid">
                 <div class="mes">
-                    <h3 class="mes-titulo">Diciembre 2025</h3>
+                    <h3 class="mes-titulo">Enero</h3>
                     <table class="calendario-tabla">
                         <thead>
                             <tr>
@@ -110,7 +118,7 @@ function dividirEnSemanas(dias) {
                         </thead>
                         <tbody>
                             {
-                                dividirEnSemanas(noviembre).map((semana) => (
+                                dividirEnSemanas(enero).map((semana) => (
                                     <tr>
                                         {semana.map((dia) => (
                                             <td
@@ -168,7 +176,7 @@ function dividirEnSemanas(dias) {
                 </div>
 
                 <div class="mes">
-                    <h3 class="mes-titulo">Enero 2026</h3>
+                    <h3 class="mes-titulo">Febrero 2026</h3>
                     <table class="calendario-tabla">
                         <thead>
                             <tr>
@@ -183,7 +191,7 @@ function dividirEnSemanas(dias) {
                         </thead>
                         <tbody>
                             {
-                                dividirEnSemanas(diciembre).map((semana) => (
+                                dividirEnSemanas(febrero).map((semana) => (
                                     <tr>
                                         {semana.map((dia) => (
                                             <td

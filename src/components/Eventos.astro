@@ -1,60 +1,7 @@
 ---
 // Datos de exámenes - Editar aquí para añadir/modificar exámenes
 const examenes = {
-    "2025-11-14": [
-        {
-            asignatura: "Magosto",
-            hora: "12:50-14:30",
-            aula: "",
-            detalles: "Se celebrará el Magosto en el centro",
-        },
-    ],
-    "2025-11-17": [
-        {
-            asignatura: "Culturas y comportamiento del chimpancé",
-            hora: "10:50-12:30",
-            aula: "",
-            detalles:
-                "Manolo nos trae a una persona que colaboró con Jane Goodall y que fue alumna de este centro. ",
-        },
-    ],
-    "2025-11-19": [
-        {
-            asignatura: "Las mujeres en el museo",
-            hora: "09:30-11:30",
-            aula: "Museo de Bellas Artes",
-            detalles:
-                "https://museobelasartescoruna.xunta.gal/es/educacion/visitas/las-mujeres-en-el-museo",
-        },
-    ],
-    "2025-12-11": [
-        {
-            asignatura: "Taller TCA",
-            hora: "10:50-12:30",
-            aula: "",
-            detalles:
-                'Taller sobre los Trastornos de la Conducta Alimentaria abordado desde una "perspectiva de género"...',
-        },
-    ],
-    "2025-12-12": [
-        {
-            asignatura: "Taller Ludopatía",
-            hora: "10:50-12:30",
-            aula: "",
-            detalles:
-                "Taller acerca de los peligros y riesgos inherentes a la ludopatía y los juegos de apuestas.",
-        },
-    ],
 
-    "2025-12-16": [
-        {
-            asignatura: "Feria Orientación Académica",
-            hora: "",
-            aula: "",
-            detalles:
-                "Iremos a una feria de orientación académica con stands en los que preguntar acerca de las carreras, universidades, etc...",
-        },
-    ],
 
     "2025-12-10": [
         {
@@ -103,8 +50,8 @@ function generarDiasMes(año, mes) {
 
 // Generar calendarios para cada mes
 
-const noviembre = generarDiasMes(2025, 11);
-const diciembre = generarDiasMes(2025, 12);
+const enero = generarDiasMes(2026, 1);
+const febrero = generarDiasMes(2026, 2);
 
 // Función para dividir en semanas
 function dividirEnSemanas(dias) {
@@ -126,7 +73,7 @@ function dividirEnSemanas(dias) {
         <div class="calendario-container">
             <div class="meses-grid">
                 <div class="mes">
-                    <h3 class="mes-titulo">Noviembre 2025</h3>
+                    <h3 class="mes-titulo">Enero 2026</h3>
                     <table class="calendario-tabla">
                         <thead>
                             <tr>
@@ -141,7 +88,7 @@ function dividirEnSemanas(dias) {
                         </thead>
                         <tbody>
                             {
-                                dividirEnSemanas(noviembre).map((semana) => (
+                                dividirEnSemanas(enero).map((semana) => (
                                     <tr>
                                         {semana.map((dia) => (
                                             <td
@@ -199,7 +146,7 @@ function dividirEnSemanas(dias) {
                 </div>
 
                 <div class="mes">
-                    <h3 class="mes-titulo">Diciembre 2025</h3>
+                    <h3 class="mes-titulo">Febrero 2026</h3>
                     <table class="calendario-tabla">
                         <thead>
                             <tr>
@@ -214,7 +161,7 @@ function dividirEnSemanas(dias) {
                         </thead>
                         <tbody>
                             {
-                                dividirEnSemanas(diciembre).map((semana) => (
+                                dividirEnSemanas(febrero).map((semana) => (
                                     <tr>
                                         {semana.map((dia) => (
                                             <td
