@@ -1,0 +1,154 @@
+---
+---
+<section class="moodle-notifier-banner">
+    <div class="banner-container">
+        <div class="banner-content">
+            <div class="logo-wrapper">
+                <img src="https://hosted.inled.es/moodlenotifier.png" alt="Moodle Notifier Logo" class="moodle-logo" />
+            </div>
+            <div class="text-content">
+                <div class="badge">EXTENSIÓN RECOMENDADA</div>
+                <h2>Moodle Notifier</h2>
+                <p>No te pierdas ni una tarea más. Recibe notificaciones instantáneas de nuevas tareas y cambios en Moodle directamente en tu navegador.</p>
+                <div class="action-wrapper">
+                    <a href="https://inled.es/apps/moodlenotifier/" target="_blank" rel="noopener noreferrer" class="download-btn">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> Descargar ahora
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .moodle-notifier-banner {
+        padding: 40px 24px;
+        background: white;
+    }
+
+    .banner-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #ff4400 0%, #ff8800 100%);
+        border-radius: 24px;
+        padding: 40px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(255, 68, 0, 0.25);
+    }
+
+    .banner-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .banner-content {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .logo-wrapper {
+        flex-shrink: 0;
+        background: white;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .moodle-logo {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+    }
+
+    .text-content {
+        flex-grow: 1;
+    }
+
+    .badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        display: inline-block;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 0 0 12px 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        margin-bottom: 24px;
+        max-width: 600px;
+        line-height: 1.5;
+    }
+
+    .download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        background: white;
+        color: #ff4400;
+        padding: 16px 32px;
+        border-radius: 50px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        font-size: 1.1rem;
+    }
+
+    .download-btn:hover {
+        transform: scale(1.05) translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        color: #ff6600;
+    }
+
+    @media (max-width: 768px) {
+        .banner-content {
+            flex-direction: column;
+            text-align: center;
+            gap: 24px;
+        }
+
+        .moodle-logo {
+            width: 60px;
+            height: 60px;
+        }
+
+        h2 {
+            font-size: 2rem;
+        }
+
+        p {
+            font-size: 1rem;
+        }
+
+        .download-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>

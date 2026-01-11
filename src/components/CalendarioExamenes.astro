@@ -113,10 +113,18 @@ function dividirEnSemanas(dias) {
     <div class="container">
         <div class="section-header">
             <h2 class="section-title">Calendario de Exámenes</h2>
-            <p class="section-subtitle">1º Trimestre</p>
+            <div class="header-actions">
+                <p class="section-subtitle">1º Trimestre</p>
+                <button id="export-pdf-btn" class="export-btn">
+                    <i class="fa-solid fa-file-pdf"></i> Exportar a PDF
+                </button>
+            </div>
         </div>
 
         <div class="calendario-container">
+            <!-- Datos de exámenes para el script del cliente -->
+            <script type="application/json" id="examenes-data" is:inline set:html={JSON.stringify(examenes)}></script>
+            
             <div class="meses-grid">
                 <div class="mes">
                     <h3 class="mes-titulo">Enero</h3>
@@ -291,6 +299,35 @@ function dividirEnSemanas(dias) {
     .section-header {
         text-align: center;
         margin-bottom: 60px;
+    }
+
+    .header-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        margin-top: 10px;
+    }
+
+    .export-btn {
+        background: #2000ad;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(32, 0, 173, 0.2);
+    }
+
+    .export-btn:hover {
+        background: #003d99;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(32, 0, 173, 0.3);
     }
 
     .section-title {
@@ -556,30 +593,92 @@ function dividirEnSemanas(dias) {
     }
 </style>
 
-<script define:vars={{ examenes }}>
+<script>
+    import { jsPDF } from "jspdf";
+    import autoTable from "jspdf-autotable";
+
     document.addEventListener("DOMContentLoaded", () => {
         const modal = document.getElementById("examen-modal");
         const modalClose = document.getElementById("modal-close");
         const modalFechaTitulo = document.getElementById("modal-fecha-titulo");
-        const modalExamenesLista = document.getElementById(
-            "modal-examenes-lista",
-        );
+        const modalExamenesLista = document.getElementById("modal-examenes-lista");
+        const exportBtn = document.getElementById("export-pdf-btn");
+        
+        const examenesDataElement = document.getElementById('examenes-data');
+        const examenes = JSON.parse(examenesDataElement?.textContent || '{}');
+
+        exportBtn?.addEventListener("click", () => {
+            try {
+                const doc = new jsPDF();
+                
+                doc.setFontSize(18);
+                doc.setTextColor(32, 0, 173);
+                doc.text("Calendario de Exámenes - 1B Bach", 14, 20);
+                
+                doc.setFontSize(12);
+                doc.setTextColor(100, 116, 139);
+                doc.text("1º Trimestre - Curso 2025/2026", 14, 28);
+
+                const tableRows = [];
+                const fechasOrdenadas = Object.keys(examenes).sort();
+                
+                fechasOrdenadas.forEach(fecha => {
+                    const fechaFormateada = new Date(fecha + "T00:00:00").toLocaleDateString("es-ES", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric"
+                    });
+                    
+                    examenes[fecha].forEach((examen: any) => {
+                        tableRows.push([
+                            fechaFormateada,
+                            examen.asignatura,
+                            examen.hora || "No especificada",
+                            examen.aula || "B1B",
+                            examen.detalles || "-"
+                        ]);
+                    });
+                });
+
+                // Usamos la función autoTable directamente importada
+                autoTable(doc, {
+                    head: [['Fecha', 'Asignatura', 'Hora', 'Aula', 'Detalles']],
+                    body: tableRows,
+                    startY: 35,
+                    theme: 'striped',
+                    headStyles: { fillColor: [32, 0, 173] },
+                    styles: { fontSize: 9, cellPadding: 3 },
+                    columnStyles: {
+                        0: { cellWidth: 25 },
+                        1: { cellWidth: 40 },
+                        2: { cellWidth: 25 },
+                        3: { cellWidth: 20 },
+                        4: { cellWidth: 'auto' }
+                    }
+                });
+
+                doc.save("examenes-1b-bach.pdf");
+            } catch (error) {
+                console.error("Error al generar PDF:", error);
+                alert("Hubo un error al generar el PDF. Por favor, inténtalo de nuevo.");
+            }
+        });
 
         document.querySelectorAll(".tiene-examen").forEach((celda) => {
             celda.addEventListener("click", () => {
-                const fecha = celda.dataset.examenFecha;
+                const fecha = (celda as HTMLElement).dataset.examenFecha;
                 if (fecha && examenes[fecha] && examenes[fecha].length > 0) {
                     const examenesDelDia = examenes[fecha];
-                    modalFechaTitulo.textContent = new Date(
+                    modalFechaTitulo!.textContent = new Date(
                         fecha + "T00:00:00",
                     ).toLocaleDateString("es-ES", {
                         day: "numeric",
                         month: "long",
                         year: "numeric",
                     });
-                    modalExamenesLista.innerHTML = ""; // Limpiar lista
+                    modalExamenesLista!.innerHTML = ""; 
 
-                    examenesDelDia.forEach((examen) => {
+                    examenesDelDia.forEach((examen: any) => {
                         const examenDiv = document.createElement("div");
                         examenDiv.classList.add("examen-item");
                         examenDiv.innerHTML = `
@@ -588,20 +687,20 @@ function dividirEnSemanas(dias) {
                             <p><strong>Aula:</strong> ${examen.aula || "No especificada"}</p>
                             <p><strong>Detalles:</strong> ${examen.detalles || "No hay detalles adicionales."}</p>
                         `;
-                        modalExamenesLista.appendChild(examenDiv);
+                        modalExamenesLista!.appendChild(examenDiv);
                     });
 
-                    modal.style.display = "flex";
+                    modal!.style.display = "flex";
                 }
             });
         });
 
         function closeModal() {
-            modal.style.display = "none";
+            modal!.style.display = "none";
         }
 
-        modalClose.addEventListener("click", closeModal);
-        modal.addEventListener("click", (e) => {
+        modalClose?.addEventListener("click", closeModal);
+        modal?.addEventListener("click", (e) => {
             if (e.target === modal) {
                 closeModal();
             }

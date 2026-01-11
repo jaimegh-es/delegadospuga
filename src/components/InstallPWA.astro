@@ -1,0 +1,79 @@
+---
+---
+<div id="pwa-install-container" style="display: none;">
+    <button id="pwa-install-btn" class="install-btn">
+        <i class="fa-solid fa-download"></i> Descargar App
+    </button>
+</div>
+
+<style>
+    .install-btn {
+        background: #ffffff;
+        color: #2000ad;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .install-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        background: #f8fafc;
+    }
+
+    @media (max-width: 768px) {
+        .install-btn {
+            width: 100%;
+            justify-content: center;
+            padding: 12px;
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<script>
+    let deferredPrompt: any;
+    const installContainer = document.getElementById('pwa-install-container');
+    const installBtn = document.getElementById('pwa-install-btn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+        // Update UI to notify the user they can add to home screen
+        if (installContainer) {
+            installContainer.style.display = 'block';
+        }
+    });
+
+    installBtn?.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        // Show the prompt
+        deferredPrompt.prompt();
+        // Wait for the user to respond to the prompt
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to the install prompt: ${outcome}`);
+        // We've used the prompt, and can't use it again
+        deferredPrompt = null;
+        // Hide the install button
+        if (installContainer) {
+            installContainer.style.display = 'none';
+        }
+    });
+
+    window.addEventListener('appinstalled', (evt) => {
+        console.log('1B Bach App was installed.');
+        if (installContainer) {
+            installContainer.style.display = 'none';
+        }
+    });
+</script>

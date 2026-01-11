@@ -1,5 +1,6 @@
 ---
 import EmailPopup from "./EmailPopup.astro";
+import InstallPWA from "./InstallPWA.astro";
 ---
 
 <nav class="nav-container">
@@ -23,6 +24,9 @@ import EmailPopup from "./EmailPopup.astro";
 				<a href="#" id="mail-btn" aria-label="Contactar por correo">
 					<i class="fa-solid fa-envelope"></i>
 				</a>
+			</li>
+			<li class="install-li">
+				<InstallPWA />
 			</li>
 		</ul>
 		<div class="nav-burger">
@@ -79,6 +83,7 @@ import EmailPopup from "./EmailPopup.astro";
 		display: flex;
 		list-style: none;
 		gap: 32px;
+		align-items: center;
 	}
 
 	.nav-menu a {
@@ -123,6 +128,11 @@ import EmailPopup from "./EmailPopup.astro";
 		transition: 0.3s;
 	}
 
+	.install-li {
+		display: flex;
+		align-items: center;
+	}
+
 	@media (max-width: 768px) {
 		.nav-menu {
 			position: fixed;
@@ -135,7 +145,7 @@ import EmailPopup from "./EmailPopup.astro";
 			height: calc(100vh - 70px);
 			text-align: center;
 			transition: 0.3s;
-			padding-top: 2rem;
+			padding: 2rem;
 			gap: 2rem;
 		}
 
@@ -165,6 +175,10 @@ import EmailPopup from "./EmailPopup.astro";
 
 		.nav-burger.active span:nth-child(3) {
 			transform: translateY(-7px) rotate(-45deg);
+		}
+
+		.install-li {
+			width: 100%;
 		}
 	}
 </style>
