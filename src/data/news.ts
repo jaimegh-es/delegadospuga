@@ -8,9 +8,9 @@ export interface NewsItem {
 
 export const news: NewsItem[] = [
     /*{
-        title: "¡IMPORTANTE INSCRIBIRSE! Salida día 16",
-        image: "unitour.png",
-        description: "Es importante inscribirse para la salida...",
+        title: "Nuevas prohibiciones",
+        image: "prohibidosalir.jpg",
+        description: "Recordatorio de las nuevas prohibiciones",
         link: "/noticias/161225",
         date: "10 Dic 2025"
     },

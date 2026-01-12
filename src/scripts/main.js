@@ -43,32 +43,9 @@ function initializeAnimations() {
         repeat: -1
     });
 
-    // News cards animation
-    gsap.from('.news-card', {
-        scrollTrigger: {
-            trigger: '.news-section',
-            start: 'top 80%'
-        },
-        duration: 0.8,
-        y: 60,
-        opacity: 0,
-        stagger: 0.2,
-        ease: 'power2.out'
-    });
 
-    // Feature cards animation
-    gsap.from('.feature-card', {
-        scrollTrigger: {
-            trigger: '.features-section',
-            start: 'top 80%'
-        },
-        duration: 1,
-        y: 80,
-        opacity: 0,
-        rotationY: 15,
-        stagger: 0.15,
-        ease: 'power3.out'
-    });
+
+
 
     // Stats animation
     gsap.from('.stat-item', {
@@ -96,17 +73,7 @@ function initializeAnimations() {
         ease: 'power3.out'
     });
 
-    gsap.from('.info-card', {
-        scrollTrigger: {
-            trigger: '.suggestions-section',
-            start: 'top 80%'
-        },
-        duration: 0.8,
-        x: 100,
-        opacity: 0,
-        stagger: 0.2,
-        ease: 'power2.out'
-    });
+
 
     // Section titles animation
     gsap.from('.section-title', {
@@ -169,17 +136,14 @@ function initializeParallax() {
             opacity: 0,
             rotationY: 15,
             stagger: 0.1,
-            ease: 'power2.out'
-        }),
-        onLeave: elements => gsap.to(elements, {
-            duration: 0.3,
-            opacity: 0.8,
-            ease: 'power2.out'
+            ease: 'power2.out',
+            overwrite: true
         }),
         onEnterBack: elements => gsap.to(elements, {
             duration: 0.3,
             opacity: 1,
-            ease: 'power2.out'
+            ease: 'power2.out',
+            overwrite: true
         })
     });
 }
