@@ -1,0 +1,564 @@
+---
+// src/components/LostHours.astro
+import { stats } from "../data/stats";
+import { AlertTriangle, Calendar, BookOpen, BarChart3 } from "lucide-astro";
+
+const {
+    lostHours,
+    maxLostHoursInADay,
+    totalDailyHours,
+    worstDayOfWeek,
+    mostAbsentSubject,
+} = stats;
+
+const dailyImpactPercentage = Math.round(
+    (maxLostHoursInADay / totalDailyHours) * 100,
+);
+---
+
+<section class="lost-hours" id="lost-hours">
+    <div class="container">
+        <div class="message-wrapper">
+            <div class="glitch-wrapper">
+                <h2
+                    class="question"
+                    data-text="¿Venimos al instituto para admirar el paso del tiempo?"
+                >
+                    ¿Venimos al instituto para admirar el paso del tiempo?
+                </h2>
+            </div>
+
+            <div class="main-stats-grid">
+                <!-- Contador Principal -->
+                <div class="counter-display">
+                    <div class="counter-ring">
+                        <span class="count" id="hours-counter">{lostHours}</span
+                        >
+                        <div class="warning-ring"></div>
+                    </div>
+                    <span class="label">Horas perdidas sin profesor</span>
+                </div>
+
+                <!-- Detalles de Impacto -->
+                <div class="secondary-stats">
+                    <!-- Comparativa Diaria -->
+                    <div class="stat-card impact-card">
+                        <div class="stat-header">
+                            <div class="stat-icon-wrapper">
+                                <BarChart3 size={32} class="icon-primary" />
+                            </div>
+                            <div class="stat-title-group">
+                                <span class="stat-label"
+                                    >Récord de horas perdidas en un día</span
+                                >
+                                <div class="comparison-values">
+                                    <span class="stat-value"
+                                        >{maxLostHoursInADay} de {
+                                            totalDailyHours
+                                        }</span
+                                    >
+                                    <span class="impact-badge"
+                                        >{dailyImpactPercentage}% del día</span
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div
+                                class="progress-bar-fill"
+                                style={`width: ${dailyImpactPercentage}%`}
+                            >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Materia y Día -->
+                    <div class="stats-row">
+                        <div class="stat-card mini">
+                            <div class="stat-icon-wrapper mini">
+                                <BookOpen size={24} class="icon-secondary" />
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-value-small"
+                                    >{mostAbsentSubject}</span
+                                >
+                                <span class="stat-label-small"
+                                    >Materia con más ausencias</span
+                                >
+                            </div>
+                        </div>
+                        <div class="stat-card mini">
+                            <div class="stat-icon-wrapper mini">
+                                <Calendar size={24} class="icon-secondary" />
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-value-small"
+                                    >{worstDayOfWeek}</span
+                                >
+                                <span class="stat-label-small"
+                                    >Día de ausencia preferido</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aviso Crítico -->
+                    <div class="warning-banner">
+                        <AlertTriangle size={20} />
+                        <span>Al menos informar de que se va a faltar</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="description">
+                <p>
+                    Esta cifra representa el total de horas lectivas que no han
+                    sido impartidas por la ausencia de profesorado. <br>
+                    Sin trabajo, pudiendo estar en casa estudiando.
+                </p>
+                <div class="status-indicator">
+                    <span class="dot"></span>
+                    <span>Desde comienzo de curso</span>
+                </div>
+                <p>Aproximación a la baja, número de horas reales superior</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .lost-hours {
+        padding: 120px 0;
+        background: #ffffff;
+        color: #0f172a;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .lost-hours::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(
+                circle at 80% 20%,
+                rgba(239, 68, 68, 0.05) 0%,
+                transparent 50%
+            ),
+            radial-gradient(
+                circle at 20% 80%,
+                rgba(32, 0, 173, 0.05) 0%,
+                transparent 50%
+            );
+        pointer-events: none;
+    }
+
+    .container {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0 24px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .message-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 60px;
+    }
+
+    /* Glitch Effect */
+    .glitch-wrapper {
+        position: relative;
+    }
+
+    .question {
+        font-size: clamp(2rem, 6vw, 3.5rem);
+        font-weight: 950;
+        line-height: 1.1;
+        max-width: 900px;
+        margin: 0;
+        position: relative;
+        color: #0f172a;
+        text-transform: uppercase;
+        letter-spacing: -0.04em;
+    }
+
+    .question::before,
+    .question::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #ffffff;
+    }
+
+    .question::before {
+        left: 2px;
+        text-shadow: -2px 0 #ff00c1;
+        clip: rect(44px, 450px, 56px, 0);
+        animation: glitch-anim 5s infinite linear alternate-reverse;
+    }
+
+    .question::after {
+        left: -2px;
+        text-shadow:
+            -2px 0 #00fff9,
+            2px 2px #ff00c1;
+        animation: glitch-anim2 1s infinite linear alternate-reverse;
+    }
+
+    @keyframes glitch-anim {
+        0% {
+            clip: rect(31px, 9999px, 94px, 0);
+            transform: skew(0.85deg);
+        }
+        5% {
+            clip: rect(70px, 9999px, 71px, 0);
+            transform: skew(0.1deg);
+        }
+        100% {
+            clip: rect(67px, 9999px, 98px, 0);
+            transform: skew(0.51deg);
+        }
+    }
+
+    @keyframes glitch-anim2 {
+        0% {
+            clip: rect(65px, 9999px, 100px, 0);
+            transform: skew(0.13deg);
+        }
+        5% {
+            clip: rect(52px, 9999px, 94px, 0);
+            transform: skew(0.2deg);
+        }
+        100% {
+            clip: rect(10px, 9999px, 29px, 0);
+            transform: skew(0.1deg);
+        }
+    }
+
+    .main-stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 60px;
+        align-items: center;
+        width: 100%;
+        max-width: 1100px;
+    }
+
+    .counter-display {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .counter-ring {
+        position: relative;
+        width: 280px;
+        height: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        border: 4px solid #f8fafc;
+        border-radius: 50%;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .counter-ring:hover {
+        transform: scale(1.05);
+    }
+
+    .warning-ring {
+        position: absolute;
+        top: -15px;
+        left: -15px;
+        right: -15px;
+        bottom: -15px;
+        border: 2px dashed rgba(239, 68, 68, 0.3);
+        border-radius: 50%;
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .count {
+        font-size: 9rem;
+        font-weight: 950;
+        color: #ef4444;
+        text-shadow: 0 15px 30px rgba(239, 68, 68, 0.2);
+        font-family: "Inter", system-ui, sans-serif;
+        line-height: 1;
+    }
+
+    .label {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.35em;
+    }
+
+    .secondary-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        text-align: left;
+    }
+
+    .stat-card {
+        background: #ffffff;
+        border: 2px solid #f1f5f9;
+        border-radius: 28px;
+        padding: 32px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px) translateX(10px);
+        border-color: #ef4444;
+        box-shadow: 0 25px 50px rgba(239, 68, 68, 0.12);
+    }
+
+    .stat-header {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .stat-icon-wrapper {
+        background: #fff1f2;
+        color: #ef4444;
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px;
+        flex-shrink: 0;
+    }
+
+    .stat-icon-wrapper.mini {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+    }
+
+    .stat-title-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex-grow: 1;
+    }
+
+    .comparison-values {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .impact-badge {
+        background: #ef4444;
+        color: #ffffff;
+        padding: 4px 12px;
+        border-radius: 99px;
+        font-size: 0.85rem;
+        font-weight: 800;
+    }
+
+    .progress-bar-bg {
+        height: 10px;
+        background: #f1f5f9;
+        border-radius: 99px;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ef4444, #b91c1c);
+        border-radius: 99px;
+        transition: width 1.5s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .stat-card.mini {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 950;
+        color: #0f172a;
+    }
+
+    .stat-value-small {
+        font-size: 1.4rem;
+        font-weight: 900;
+        color: #0f172a;
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #94a3b8;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .stat-label-small {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        margin-top: 4px;
+        display: block;
+    }
+
+    .warning-banner {
+        background: #fffbeb;
+        border: 2px solid #fde68a;
+        color: #92400e;
+        padding: 16px 24px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .description {
+        max-width: 650px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        align-items: center;
+    }
+
+    .description p {
+        font-size: 1.25rem;
+        line-height: 1.7;
+        color: #475569;
+        margin: 0;
+    }
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 24px;
+        background: #fff1f2;
+        border: 2px solid #ffe4e6;
+        border-radius: 99px;
+        color: #e11d48;
+        font-size: 1rem;
+        font-weight: 750;
+    }
+
+    .dot {
+        width: 12px;
+        height: 12px;
+        background: #ef4444;
+        border-radius: 50%;
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.6);
+            opacity: 0.4;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .main-stats-grid {
+            grid-template-columns: 1fr;
+            gap: 50px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
+        .question {
+            font-size: 2rem;
+        }
+        .count {
+            font-size: 7rem;
+        }
+    }
+</style>
+
+<script>
+    const counter = document.getElementById("hours-counter");
+    if (counter) {
+        const target = parseInt(counter.innerText);
+        let current = 0;
+        const duration = 2000;
+        const startTime = performance.now();
+
+        const update = (timestamp: number) => {
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            const easeOutExpo = 1 - Math.pow(2, -10 * progress);
+            current = target * easeOutExpo;
+
+            counter.innerText = Math.floor(current).toString();
+
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            } else {
+                counter.innerText = target.toString();
+            }
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                requestAnimationFrame(update);
+                observer.disconnect();
+            }
+        });
+
+        observer.observe(counter);
+    }
+</script>

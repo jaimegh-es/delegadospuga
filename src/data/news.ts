@@ -8,18 +8,10 @@ export interface NewsItem {
 
 export const news: NewsItem[] = [
     /*{
-        title: "Nuevas prohibiciones",
-        image: "prohibidosalir.jpg",
-        description: "Recordatorio de las nuevas prohibiciones",
-        link: "/noticias/161225",
-        date: "10 Dic 2025"
-    },
-
-    {
-        title: "¡IMPORTANTE INSCRIBIRSE! Salida día 16",
-        image: "unitour.png",
-        description: "Es importante inscribirse para la salida...",
-        link: "/noticias/161225",
-        date: "10 Dic 2025"
+        title: "A punto de tampoco poder estar en clase en los recreos",
+        image: "favicon.svg",
+        description: "Poco a poco, cada vez menos derechos. Cada vez el tono es más áspero.",
+        link: "/noticias/menosderechos",
+        date: "13 Ene 2026"
     },*/
 ];
