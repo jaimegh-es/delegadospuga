@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import HeroCarousel from "../components/HeroCarousel.astro";
+import HeroCarousel from "../components/Hero.astro";
 import Navigation from "../components/Navigation.astro";
 import LinksSection from "../components/LinksSection.astro";
 import MoodleNotifierBanner from "../components/MoodleNotifierBanner.astro";
@@ -11,6 +11,7 @@ import CalendarioExamenes from "../components/CalendarioExamenes.astro";
 import Eventos from "../components/Eventos.astro";
 import DisclaimerPopup from "../components/DisclaimerPopup.astro";
 import LostHours from "../components/LostHours.astro";
+import NotificationSettings from "../components/NotificationSettings.astro";
 ---
 
 <Layout>
@@ -28,6 +29,7 @@ import LostHours from "../components/LostHours.astro";
 	<!-- 	 <LostHours /> -->
 	<Footer />
 	<DisclaimerPopup />
+	<NotificationSettings />
 
 	<script>
 		import "../scripts/main.js";
