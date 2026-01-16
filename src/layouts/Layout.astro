@@ -1,6 +1,7 @@
 ---
-import { pwaInfo } from 'virtual:pwa-info';
+import { pwaInfo } from "virtual:pwa-info";
 ---
+
 <!doctype html>
 <html lang="es">
 	<head>
@@ -21,21 +22,31 @@ import { pwaInfo } from 'virtual:pwa-info';
 		/>
 		<script
 			src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"
-			is:inline
-		></script>
+			is:inline></script>
 		<script
 			src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"
-			is:inline
-		></script>
+			is:inline></script>
 		<meta
 			name="google-site-verification"
 			content="9ZLJootCsdX0ar_N77lazLJnwImUq-2T5BvRGINna7k"
 		/>
-		{ pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} /> }
+		{pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
 	</head>
 	<body>
 		<slot />
 	</body>
+	<script>
+		import { registerSW } from "virtual:pwa-register";
+		registerSW({
+			immediate: true,
+			onRegistered(r) {
+				console.log("SW Registered:", r);
+			},
+			onRegisterError(error) {
+				console.log("SW registration error", error);
+			},
+		});
+	</script>
 </html>
 
 <style is:global>
@@ -59,10 +70,10 @@ import { pwaInfo } from 'virtual:pwa-info';
 		line-height: 1.6;
 		color: #1f2937;
 		background: linear-gradient(
-            135deg,
-            rgba(32, 0, 173, 0.7) 0%,
-            rgba(0, 86, 204, 0.6) 100%
-        );
+			135deg,
+			rgba(32, 0, 173, 0.7) 0%,
+			rgba(0, 86, 204, 0.6) 100%
+		);
 		overflow-x: hidden;
 	}
 
