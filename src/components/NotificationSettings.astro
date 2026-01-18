@@ -6,6 +6,7 @@ import {
     CalendarDays,
     Clock,
     Check,
+    Info,
 } from "lucide-astro";
 ---
 
@@ -23,9 +24,19 @@ import {
             <h3><BellRing size={20} /> Notificaciones</h3>
             <button id="notif-panel-close" class="close-btn">&times;</button>
         </div>
-
         <div class="notif-panel-body">
             <div id="notif-permission-section" class="notif-section">
+                <div class="notif-warning">
+                    <Info size={18} />
+                    <p>
+                        <strong>Importante:</strong> Para recibir alertas, mantén
+                        esta página abierta en segundo plano. <a
+                            href="/ayuda/notificaciones"
+                            style="color: inherit; text-decoration: underline;"
+                            >Más info</a
+                        >
+                    </p>
+                </div>
                 <p class="section-desc">
                     Activa las notificaciones para no perderte ningún examen.
                 </p>
@@ -39,6 +50,17 @@ import {
                 class="notif-section"
                 style="display: none;"
             >
+                <div class="notif-warning">
+                    <Info size={18} />
+                    <p>
+                        <strong>Importante:</strong> Mantén la página abierta en segundo
+                        plano para recibir los avisos. <a
+                            href="/ayuda/notificaciones"
+                            style="color: inherit; text-decoration: underline;"
+                            >Ayuda</a
+                        >
+                    </p>
+                </div>
                 <div class="config-group">
                     <label class="switch-label">
                         <span>Alertas de exámenes</span>
@@ -79,7 +101,7 @@ import {
 
                 <div
                     class="test-section"
-                    style="margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 15px;"
+                    style="margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 15px; display: flex; flex-direction: column; gap: 10px;"
                 >
                     <button
                         id="test-notif-btn"
@@ -88,810 +110,858 @@ import {
                     >
                         <Bell size={14} /> Probar notificación
                     </button>
+
+                    <a href="/ayuda/notificaciones" class="help-guide-link">
+                        <Info size={14} /> Guía: ¿No recibes avisos?
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal para configurar avisos individuales -->
-<div id="exam-notif-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-        <button id="exam-notif-modal-close" class="modal-close"
-            ><i class="fa-solid fa-xmark"></i></button
-        >
-        <div class="modal-header-accent"></div>
+    <!-- Modal para configurar avisos individuales -->
+    <div id="exam-notif-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button id="exam-notif-modal-close" class="modal-close"
+                ><i class="fa-solid fa-xmark"></i></button
+            >
+            <div class="modal-header-accent"></div>
 
-        <div class="modal-main-info">
-            <h3 id="exam-name-title">Configurar avisos</h3>
-            <p id="exam-date-text" class="modal-date-subtitle"></p>
-        </div>
-
-        <div class="alert-config-body">
-            <div class="current-alerts">
-                <label
-                    ><i class="fa-solid fa-list-check"></i> Mis avisos activos:</label
-                >
-                <div id="current-alerts-list"></div>
+            <div class="modal-main-info">
+                <h3 id="exam-name-title">Configurar avisos</h3>
+                <p id="exam-date-text" class="modal-date-subtitle"></p>
             </div>
 
-            <div class="add-alert-form">
-                <label
-                    ><i class="fa-solid fa-plus-circle"></i> Nuevo aviso personalizado:</label
-                >
-                <div class="input-row">
-                    <div class="select-wrapper">
-                        <select id="new-alert-type">
-                            <option value="days-before">Días antes</option>
-                            <option value="specific-date">Fecha exacta</option>
-                        </select>
+            <div class="alert-config-body">
+                <div class="current-alerts">
+                    <label
+                        ><i class="fa-solid fa-list-check"></i> Mis avisos activos:</label
+                    >
+                    <div id="current-alerts-list"></div>
+                </div>
+
+                <div class="add-alert-form">
+                    <label
+                        ><i class="fa-solid fa-plus-circle"></i> Nuevo aviso personalizado:</label
+                    >
+                    <div class="input-row">
+                        <div class="select-wrapper">
+                            <select id="new-alert-type">
+                                <option value="days-before">Días antes</option>
+                                <option value="specific-date"
+                                    >Fecha exacta</option
+                                >
+                            </select>
+                        </div>
+                        <div class="input-wrapper">
+                            <input
+                                type="number"
+                                id="new-alert-days"
+                                min="1"
+                                max="30"
+                                value="1"
+                                style="display: block; width: 80px;"
+                            />
+                            <input
+                                type="date"
+                                id="new-alert-date"
+                                style="display: none;"
+                            />
+                        </div>
+                        <button id="add-alert-btn" class="small-add-btn">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
                     </div>
-                    <div class="input-wrapper">
-                        <input
-                            type="number"
-                            id="new-alert-days"
-                            min="1"
-                            max="30"
-                            value="1"
-                            style="display: block; width: 80px;"
-                        />
-                        <input
-                            type="date"
-                            id="new-alert-date"
-                            style="display: none;"
-                        />
-                    </div>
-                    <button id="add-alert-btn" class="small-add-btn">
-                        <i class="fa-solid fa-plus"></i>
-                    </button>
                 </div>
             </div>
-        </div>
 
-        <div class="modal-footer">
-            <button id="save-exam-notifs" class="primary-btn full-width">
-                <i class="fa-solid fa-check"></i> Aplicar Cambios
-            </button>
+            <div class="modal-footer">
+                <button id="save-exam-notifs" class="primary-btn full-width">
+                    <i class="fa-solid fa-check"></i> Aplicar Cambios
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
-<style is:global>
-    .notification-settings-wrapper {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        z-index: 1000;
-    }
-
-    .notif-main-btn {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: #2000ad;
-        color: white;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 4px 15px rgba(32, 0, 173, 0.4);
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .notif-main-btn:hover {
-        transform: scale(1.1) rotate(15deg);
-        background: #003d99;
-    }
-
-    .notif-panel {
-        position: absolute;
-        bottom: 80px;
-        right: 0;
-        width: 320px;
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-        overflow: hidden;
-        animation: slideUp 0.3s ease-out;
-    }
-
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
+    <style is:global>
+        .notification-settings-wrapper {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
+
+        .notif-main-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #2000ad;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(32, 0, 173, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-    }
 
-    .notif-panel-header {
-        background: #2000ad;
-        color: white;
-        padding: 16px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .notif-panel-header h3 {
-        margin: 0;
-        font-size: 1.1rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .close-btn {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 1.5rem;
-        cursor: pointer;
-        line-height: 1;
-    }
-
-    .notif-panel-body {
-        padding: 20px;
-        max-height: 400px;
-        overflow-y: auto;
-    }
-
-    .notif-section {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .section-desc {
-        color: #64748b;
-        font-size: 0.9rem;
-        margin: 0;
-    }
-
-    .primary-btn {
-        background: #2000ad;
-        color: white;
-        border: none;
-        padding: 12px;
-        border-radius: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .primary-btn:hover {
-        background: #003d99;
-    }
-
-    .config-group {
-        border-bottom: 1px solid #f1f5f9;
-        padding-bottom: 15px;
-    }
-
-    .switch-label {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-        font-weight: 500;
-        font-size: 0.95rem;
-    }
-
-    /* Toggle Switch */
-    .switch-label input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    .slider {
-        position: relative;
-        display: inline-block;
-        width: 44px;
-        height: 24px;
-        background-color: #e2e8f0;
-        transition: 0.4s;
-        border-radius: 24px;
-    }
-
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 18px;
-        width: 18px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        transition: 0.4s;
-        border-radius: 50%;
-    }
-
-    input:checked + .slider {
-        background-color: #2000ad;
-    }
-
-    input:checked + .slider:before {
-        transform: translateX(20px);
-    }
-
-    .config-subgroup {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        font-size: 0.9rem;
-    }
-
-    .config-subgroup select {
-        padding: 8px;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
-    }
-
-    .exams-config-list h4 {
-        margin: 24px 0 12px;
-        font-size: 0.85rem;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        font-weight: 700;
-    }
-
-    .exam-config-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 14px;
-        background: #f8fafc;
-        border-radius: 12px;
-        margin-bottom: 8px;
-        transition: all 0.2s ease;
-        border: 1px solid transparent;
-    }
-
-    .exam-config-item:hover {
-        background: white;
-        border-color: #e2e8f0;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        transform: translateY(-2px);
-    }
-
-    .exam-info-small {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        flex: 1;
-        padding-right: 12px;
-    }
-
-    .exam-name-small {
-        font-weight: 600;
-        font-size: 0.95rem;
-        color: #1e293b;
-        line-height: 1.3;
-    }
-
-    .exam-date-small {
-        font-size: 0.75rem;
-        color: #64748b;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .exam-actions {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .config-btn {
-        background: white;
-        border: 1px solid #e2e8f0;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-size: 0.75rem;
-        cursor: pointer;
-        color: #2000ad;
-        font-weight: 600;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .config-btn:hover {
-        background: #f1f5f9;
-        border-color: #cbd5e1;
-        color: #003d99;
-    }
-
-    /* Mini Toggle Switch for Exams */
-    .mini-switch {
-        position: relative;
-        display: inline-block;
-        width: 36px;
-        height: 20px;
-    }
-
-    .mini-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    .mini-slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #e2e8f0;
-        transition: 0.3s;
-        border-radius: 20px;
-    }
-
-    .mini-slider:before {
-        position: absolute;
-        content: "";
-        height: 14px;
-        width: 14px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        transition: 0.3s;
-        border-radius: 50%;
-    }
-
-    input:checked + .mini-slider {
-        background-color: #10b981; /* Verde esmeralda para activos */
-    }
-
-    input:checked + .mini-slider:before {
-        transform: translateX(16px);
-    }
-
-    /* Modal styles */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(15, 23, 42, 0.75);
-        backdrop-filter: blur(4px);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 2000;
-        padding: 20px;
-    }
-
-    .modal-content {
-        background: white;
-        padding: 0;
-        border-radius: 24px;
-        width: 100%;
-        max-width: 440px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    }
-
-    .modal-header-accent {
-        height: 6px;
-        background: linear-gradient(90deg, #2000ad, #0056cc);
-    }
-
-    .modal-close {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background: #f1f5f9;
-        border: none;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        color: #64748b;
-        transition: all 0.2s;
-        z-index: 10;
-    }
-
-    .modal-close:hover {
-        background: #e2e8f0;
-        color: #1e293b;
-        transform: rotate(90deg);
-    }
-
-    .modal-main-info {
-        padding: 30px 30px 20px;
-    }
-
-    .modal-main-info h3 {
-        margin: 0;
-        font-size: 1.25rem;
-        color: #1e293b;
-        font-weight: 700;
-        line-height: 1.2;
-    }
-
-    .modal-date-subtitle {
-        margin: 8px 0 0;
-        color: #64748b;
-        font-size: 0.9rem;
-    }
-
-    .alert-config-body {
-        padding: 0 30px 30px;
-    }
-
-    .current-alerts {
-        margin-bottom: 25px;
-    }
-
-    .current-alerts label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 12px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #475569;
-    }
-
-    #current-alerts-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        min-height: 40px;
-        padding: 12px;
-        background: #f8fafc;
-        border-radius: 12px;
-        border: 1px dashed #e2e8f0;
-    }
-
-    .alert-tag {
-        background: #e0e7ff;
-        color: #4338ca;
-        padding: 6px 12px;
-        border-radius: 10px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        animation: fadeIn 0.2s ease;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: scale(0.9);
+        .notif-main-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            background: #003d99;
         }
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
 
-    .remove-alert {
-        cursor: pointer;
-        opacity: 0.6;
-        transition: opacity 0.2s;
-        font-size: 1.1rem;
-        line-height: 1;
-    }
-
-    .remove-alert:hover {
-        opacity: 1;
-        color: #ef4444;
-    }
-
-    .add-alert-form {
-        border-top: 1px solid #f1f5f9;
-        padding-top: 25px;
-    }
-
-    .add-alert-form label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 12px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #475569;
-    }
-
-    .input-row {
-        display: flex;
-        gap: 10px;
-        align-items: stretch;
-    }
-
-    .select-wrapper {
-        flex: 1.5;
-    }
-
-    .input-wrapper {
-        flex: 1;
-    }
-
-    .input-row select,
-    .input-row input {
-        width: 100%;
-        padding: 10px 12px;
-        border-radius: 10px;
-        border: 1px solid #e2e8f0;
-        font-size: 0.9rem;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-
-    .input-row select:focus,
-    .input-row input:focus {
-        border-color: #2000ad;
-    }
-
-    .small-add-btn {
-        background: #2000ad;
-        color: white;
-        border: none;
-        width: 42px;
-        border-radius: 10px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-        transition: all 0.2s;
-    }
-
-    .small-add-btn:hover {
-        background: #003d99;
-        transform: scale(1.05);
-    }
-
-    .modal-footer {
-        padding: 0 30px 30px;
-    }
-
-    .full-width {
-        width: 100%;
-        justify-content: center;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 14px;
-        font-size: 1rem;
-    }
-
-    @media (max-width: 480px) {
         .notif-panel {
-            width: 90vw;
-            right: -20px;
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 320px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notif-panel-header {
+            background: #2000ad;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notif-panel-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .notif-panel-body {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notif-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .section-desc {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .notif-warning {
+            background: #fff4e5;
+            border-left: 4px solid #ff9800;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            color: #965a00;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .notif-warning p {
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .help-guide-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: #64748b;
+            text-decoration: none;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .help-guide-link:hover {
+            background: #f1f5f9;
+            color: #2000ad;
+        }
+
+        .primary-btn {
+            background: #2000ad;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .primary-btn:hover {
+            background: #003d99;
+        }
+
+        .config-group {
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 15px;
+        }
+
+        .switch-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        /* Toggle Switch */
+        .switch-label input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            background-color: #e2e8f0;
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2000ad;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .config-subgroup {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .config-subgroup select {
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .exams-config-list h4 {
+            margin: 24px 0 12px;
+            font-size: 0.85rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 700;
+        }
+
+        .exam-config-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .exam-config-item:hover {
+            background: white;
+            border-color: #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .exam-info-small {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+            padding-right: 12px;
+        }
+
+        .exam-name-small {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1e293b;
+            line-height: 1.3;
+        }
+
+        .exam-date-small {
+            font-size: 0.75rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .exam-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .config-btn {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: #2000ad;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .config-btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #003d99;
+        }
+
+        /* Mini Toggle Switch for Exams */
+        .mini-switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+        }
+
+        .mini-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .mini-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e2e8f0;
+            transition: 0.3s;
+            border-radius: 20px;
+        }
+
+        .mini-slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .mini-slider {
+            background-color: #10b981; /* Verde esmeralda para activos */
+        }
+
+        input:checked + .mini-slider:before {
+            transform: translateX(16px);
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
         }
 
         .modal-content {
-            border-radius: 20px;
+            background: white;
+            padding: 0;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 440px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
-    }
-</style>
 
-<script>
-    // Importamos los datos de exámenes
-    interface Examen {
-        asignatura: string;
-        fecha: string;
-        aula?: string;
-        hora?: string;
-    }
+        .modal-header-accent {
+            height: 6px;
+            background: linear-gradient(90deg, #2000ad, #0056cc);
+        }
 
-    interface UserSettings {
-        enabled: boolean;
-        examsAlerts: boolean;
-        weeklyAlerts: boolean;
-        defaultAdvance: number;
-        disabledExams: string[];
-        customExams: {
-            [key: string]: { type: string; value: string | number }[];
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f1f5f9;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+            transform: rotate(90deg);
+        }
+
+        .modal-main-info {
+            padding: 30px 30px 20px;
+        }
+
+        .modal-main-info h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #1e293b;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .modal-date-subtitle {
+            margin: 8px 0 0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .alert-config-body {
+            padding: 0 30px 30px;
+        }
+
+        .current-alerts {
+            margin-bottom: 25px;
+        }
+
+        .current-alerts label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        #current-alerts-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 40px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px dashed #e2e8f0;
+        }
+
+        .alert-tag {
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .remove-alert {
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .remove-alert:hover {
+            opacity: 1;
+            color: #ef4444;
+        }
+
+        .add-alert-form {
+            border-top: 1px solid #f1f5f9;
+            padding-top: 25px;
+        }
+
+        .add-alert-form label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .select-wrapper {
+            flex: 1.5;
+        }
+
+        .input-wrapper {
+            flex: 1;
+        }
+
+        .input-row select,
+        .input-row input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-row select:focus,
+        .input-row input:focus {
+            border-color: #2000ad;
+        }
+
+        .small-add-btn {
+            background: #2000ad;
+            color: white;
+            border: none;
+            width: 42px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .small-add-btn:hover {
+            background: #003d99;
+            transform: scale(1.05);
+        }
+
+        .modal-footer {
+            padding: 0 30px 30px;
+        }
+
+        .full-width {
+            width: 100%;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            .notif-panel {
+                width: 90vw;
+                right: -20px;
+            }
+
+            .modal-content {
+                border-radius: 20px;
+            }
+        }
+    </style>
+
+    <script>
+        // Importamos los datos de exámenes
+        interface Examen {
+            asignatura: string;
+            fecha: string;
+            aula?: string;
+            hora?: string;
+        }
+
+        interface UserSettings {
+            enabled: boolean;
+            examsAlerts: boolean;
+            weeklyAlerts: boolean;
+            defaultAdvance: number;
+            disabledExams: string[];
+            customExams: {
+                [key: string]: { type: string; value: string | number }[];
+            };
+        }
+
+        let examenesGlobal: { [key: string]: Examen[] } = {};
+        let userSettings: UserSettings = {
+            enabled: false,
+            examsAlerts: true,
+            weeklyAlerts: false,
+            defaultAdvance: 3,
+            disabledExams: [],
+            customExams: {},
         };
-    }
 
-    let examenesGlobal: { [key: string]: Examen[] } = {};
-    let userSettings: UserSettings = {
-        enabled: false,
-        examsAlerts: true,
-        weeklyAlerts: false,
-        defaultAdvance: 3,
-        disabledExams: [],
-        customExams: {},
-    };
+        function init() {
+            const toggleBtn = document.getElementById("notif-toggle-btn");
+            const panel = document.getElementById("notif-panel");
+            const closeBtn = document.getElementById("notif-panel-close");
+            const testBtn = document.getElementById("test-notif-btn");
 
-    function init() {
-        const toggleBtn = document.getElementById("notif-toggle-btn");
-        const panel = document.getElementById("notif-panel");
-        const closeBtn = document.getElementById("notif-panel-close");
-        const testBtn = document.getElementById("test-notif-btn");
+            if (!toggleBtn || !panel || !closeBtn) return;
 
-        if (!toggleBtn || !panel || !closeBtn) return;
+            // Cargar ajustes
+            const saved = localStorage.getItem("pwa_notif_settings");
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                userSettings = { ...userSettings, ...parsed };
+            }
 
-        // Cargar ajustes
-        const saved = localStorage.getItem("pwa_notif_settings");
-        if (saved) {
-            const parsed = JSON.parse(saved);
-            userSettings = { ...userSettings, ...parsed };
-        }
+            // Obtener datos de exámenes
+            const dataEl = document.getElementById("examenes-data");
+            if (dataEl) {
+                examenesGlobal = JSON.parse(dataEl.textContent || "{}");
+            }
 
-        // Obtener datos de exámenes
-        const dataEl = document.getElementById("examenes-data");
-        if (dataEl) {
-            examenesGlobal = JSON.parse(dataEl.textContent || "{}");
-        }
+            updateUI();
 
-        updateUI();
-
-        toggleBtn.addEventListener("click", () => {
-            panel.style.display =
-                panel.style.display === "none" ? "block" : "none";
-        });
-
-        closeBtn.addEventListener("click", () => {
-            panel.style.display = "none";
-        });
-
-        testBtn?.addEventListener("click", () => {
-            showNotification(
-                "🔔 Prueba de Alerta",
-                "¡Funciona! Recibirás avisos de tus exámenes como este.",
-            );
-        });
-
-        // Activar notificaciones
-        document
-            .getElementById("enable-notifs-btn")
-            ?.addEventListener("click", requestPermission);
-
-        // Toggles
-        document
-            .getElementById("exam-alerts-toggle")
-            ?.addEventListener("change", (e) => {
-                userSettings.examsAlerts = (
-                    e.target as HTMLInputElement
-                ).checked;
-                saveSettings();
+            toggleBtn.addEventListener("click", () => {
+                panel.style.display =
+                    panel.style.display === "none" ? "block" : "none";
             });
 
-        document
-            .getElementById("weekly-alerts-toggle")
-            ?.addEventListener("change", (e) => {
-                userSettings.weeklyAlerts = (
-                    e.target as HTMLInputElement
-                ).checked;
-                saveSettings();
+            closeBtn.addEventListener("click", () => {
+                panel.style.display = "none";
             });
 
-        document
-            .getElementById("default-advance")
-            ?.addEventListener("change", (e) => {
-                userSettings.defaultAdvance = parseInt(
-                    (e.target as HTMLSelectElement).value,
-                );
-                saveSettings();
-            });
-    }
-
-    function requestPermission() {
-        if (!("Notification" in window)) {
-            alert("Este navegador no soporta notificaciones.");
-            return;
-        }
-
-        Notification.requestPermission().then((permission) => {
-            if (permission === "granted") {
-                userSettings.enabled = true;
-                saveSettings();
-                updateUI();
+            testBtn?.addEventListener("click", () => {
                 showNotification(
-                    "¡Campana y se acabó!",
-                    "Ya tienes activadas las alertas de exámenes.",
+                    "🔔 Prueba de Alerta",
+                    "¡Funciona! Recibirás avisos de tus exámenes como este.",
                 );
-            } else if (permission === "denied") {
-                alert(
-                    "Has bloqueado las notificaciones. Para activarlas, cambia los permisos en la configuración de tu navegador.",
-                );
-            }
-        });
-    }
+            });
 
-    function saveSettings() {
-        localStorage.setItem(
-            "pwa_notif_settings",
-            JSON.stringify(userSettings),
-        );
-        updateUI();
-    }
+            // Activar notificaciones
+            document
+                .getElementById("enable-notifs-btn")
+                ?.addEventListener("click", requestPermission);
 
-    function updateUI() {
-        const permissionSection = document.getElementById(
-            "notif-permission-section",
-        );
-        const configSection = document.getElementById("notif-config-section");
-
-        if (!permissionSection || !configSection) return;
-
-        if (userSettings.enabled && Notification.permission === "granted") {
-            permissionSection.style.display = "none";
-            configSection.style.display = "block";
-
-            const examToggle = document.getElementById(
-                "exam-alerts-toggle",
-            ) as HTMLInputElement;
-            const weekToggle = document.getElementById(
-                "weekly-alerts-toggle",
-            ) as HTMLInputElement;
-            const advanceSelect = document.getElementById(
-                "default-advance",
-            ) as HTMLSelectElement;
-
-            if (examToggle) examToggle.checked = userSettings.examsAlerts;
-            if (weekToggle) weekToggle.checked = userSettings.weeklyAlerts;
-            if (advanceSelect)
-                advanceSelect.value = userSettings.defaultAdvance.toString();
-
-            renderExamsList();
-        } else {
-            permissionSection.style.display = "block";
-            configSection.style.display = "none";
-        }
-    }
-
-    function renderExamsList() {
-        const container = document.getElementById("exams-list-container");
-        if (!container) return;
-        container.innerHTML = "";
-
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
-
-        const futuros: Examen[] = [];
-        Object.entries(examenesGlobal).forEach(([fecha, lista]) => {
-            const fechaD = new Date(fecha + "T00:00:00");
-            if (fechaD >= hoy) {
-                lista.forEach((ex) => {
-                    futuros.push({ ...ex, fecha });
+            // Toggles
+            document
+                .getElementById("exam-alerts-toggle")
+                ?.addEventListener("change", (e) => {
+                    userSettings.examsAlerts = (
+                        e.target as HTMLInputElement
+                    ).checked;
+                    saveSettings();
                 });
-            }
-        });
 
-        futuros.sort(
-            (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime(),
-        );
+            document
+                .getElementById("weekly-alerts-toggle")
+                ?.addEventListener("change", (e) => {
+                    userSettings.weeklyAlerts = (
+                        e.target as HTMLInputElement
+                    ).checked;
+                    saveSettings();
+                });
 
-        if (futuros.length === 0) {
-            container.innerHTML =
-                '<p class="section-desc">No hay exámenes próximos.</p>';
-            return;
+            document
+                .getElementById("default-advance")
+                ?.addEventListener("change", (e) => {
+                    userSettings.defaultAdvance = parseInt(
+                        (e.target as HTMLSelectElement).value,
+                    );
+                    saveSettings();
+                });
         }
 
-        futuros.slice(0, 8).forEach((ex) => {
-            const examId = `${ex.fecha}_${ex.asignatura}`;
-            const isEnabled = !userSettings.disabledExams.includes(examId);
+        function requestPermission() {
+            if (!("Notification" in window)) {
+                alert("Este navegador no soporta notificaciones.");
+                return;
+            }
 
-            const item = document.createElement("div");
-            item.className = "exam-config-item";
+            Notification.requestPermission().then((permission) => {
+                if (permission === "granted") {
+                    userSettings.enabled = true;
+                    saveSettings();
+                    updateUI();
+                    showNotification(
+                        "Notificaciones activadas",
+                        "Ahora recibirás notificaciones de tus exámenes.",
+                    );
+                } else if (permission === "denied") {
+                    alert(
+                        "Has bloqueado las notificaciones. Para activarlas, cambia los permisos en la configuración de tu navegador.",
+                    );
+                }
+            });
+        }
 
-            const fechaFormateada = new Date(
-                ex.fecha + "T00:00:00",
-            ).toLocaleDateString("es-ES", { day: "2-digit", month: "short" });
+        function saveSettings() {
+            localStorage.setItem(
+                "pwa_notif_settings",
+                JSON.stringify(userSettings),
+            );
+            updateUI();
+        }
 
-            item.innerHTML = `
+        function updateUI() {
+            const permissionSection = document.getElementById(
+                "notif-permission-section",
+            );
+            const configSection = document.getElementById(
+                "notif-config-section",
+            );
+
+            if (!permissionSection || !configSection) return;
+
+            if (userSettings.enabled && Notification.permission === "granted") {
+                permissionSection.style.display = "none";
+                configSection.style.display = "block";
+
+                const examToggle = document.getElementById(
+                    "exam-alerts-toggle",
+                ) as HTMLInputElement;
+                const weekToggle = document.getElementById(
+                    "weekly-alerts-toggle",
+                ) as HTMLInputElement;
+                const advanceSelect = document.getElementById(
+                    "default-advance",
+                ) as HTMLSelectElement;
+
+                if (examToggle) examToggle.checked = userSettings.examsAlerts;
+                if (weekToggle) weekToggle.checked = userSettings.weeklyAlerts;
+                if (advanceSelect)
+                    advanceSelect.value =
+                        userSettings.defaultAdvance.toString();
+
+                renderExamsList();
+            } else {
+                permissionSection.style.display = "block";
+                configSection.style.display = "none";
+            }
+        }
+
+        function renderExamsList() {
+            const container = document.getElementById("exams-list-container");
+            if (!container) return;
+            container.innerHTML = "";
+
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
+            const futuros: Examen[] = [];
+            Object.entries(examenesGlobal).forEach(([fecha, lista]) => {
+                const fechaD = new Date(fecha + "T00:00:00");
+                if (fechaD >= hoy) {
+                    lista.forEach((ex) => {
+                        futuros.push({ ...ex, fecha });
+                    });
+                }
+            });
+
+            futuros.sort(
+                (a, b) =>
+                    new Date(a.fecha).getTime() - new Date(b.fecha).getTime(),
+            );
+
+            if (futuros.length === 0) {
+                container.innerHTML =
+                    '<p class="section-desc">No hay exámenes próximos.</p>';
+                return;
+            }
+
+            futuros.slice(0, 8).forEach((ex) => {
+                const examId = `${ex.fecha}_${ex.asignatura}`;
+                const isEnabled = !userSettings.disabledExams.includes(examId);
+
+                const item = document.createElement("div");
+                item.className = "exam-config-item";
+
+                const fechaFormateada = new Date(
+                    ex.fecha + "T00:00:00",
+                ).toLocaleDateString("es-ES", {
+                    day: "2-digit",
+                    month: "short",
+                });
+
+                item.innerHTML = `
                 <div class="exam-info-small">
                     <span class="exam-name-small" style="${!isEnabled ? "text-decoration: line-through; opacity: 0.5" : ""}">${ex.asignatura}</span>
                     <span class="exam-date-small">
@@ -909,283 +979,294 @@ import {
                 </div>
             `;
 
-            const toggle = item.querySelector(
-                ".exam-toggle",
-            ) as HTMLInputElement;
-            toggle?.addEventListener("change", (e) => {
-                const target = e.target as HTMLInputElement;
-                if (target.checked) {
-                    userSettings.disabledExams =
-                        userSettings.disabledExams.filter(
-                            (id) => id !== examId,
-                        );
-                } else {
-                    if (!userSettings.disabledExams.includes(examId))
-                        userSettings.disabledExams.push(examId);
-                }
-                saveSettings();
+                const toggle = item.querySelector(
+                    ".exam-toggle",
+                ) as HTMLInputElement;
+                toggle?.addEventListener("change", (e) => {
+                    const target = e.target as HTMLInputElement;
+                    if (target.checked) {
+                        userSettings.disabledExams =
+                            userSettings.disabledExams.filter(
+                                (id) => id !== examId,
+                            );
+                    } else {
+                        if (!userSettings.disabledExams.includes(examId))
+                            userSettings.disabledExams.push(examId);
+                    }
+                    saveSettings();
+                });
+
+                item.querySelector(".config-btn")?.addEventListener(
+                    "click",
+                    () => openExamModal(ex),
+                );
+                container.appendChild(item);
             });
-
-            item.querySelector(".config-btn")?.addEventListener("click", () =>
-                openExamModal(ex),
-            );
-            container.appendChild(item);
-        });
-    }
-
-    let currentEditingExam: Examen | null = null;
-    let tempAlerts: { type: string; value: string | number }[] = [];
-
-    function openExamModal(ex: Examen) {
-        currentEditingExam = ex;
-        const examId = `${ex.fecha}_${ex.asignatura}`;
-        tempAlerts = [...(userSettings.customExams[examId] || [])];
-
-        const title = document.getElementById("exam-name-title");
-        const dateText = document.getElementById("exam-date-text");
-
-        if (title) title.textContent = ex.asignatura;
-        if (dateText)
-            dateText.textContent = new Date(
-                ex.fecha + "T00:00:00",
-            ).toLocaleDateString("es-ES", { dateStyle: "long" });
-
-        renderTempAlerts();
-        const modal = document.getElementById("exam-notif-modal");
-        if (modal) modal.style.display = "flex";
-    }
-
-    function renderTempAlerts() {
-        const list = document.getElementById("current-alerts-list");
-        if (!list) return;
-        list.innerHTML = "";
-
-        if (tempAlerts.length === 0) {
-            list.innerHTML = `<span class="section-desc">Usando antelación predeterminada (${userSettings.defaultAdvance} días)</span>`;
         }
 
-        tempAlerts.forEach((alert, index) => {
-            const tag = document.createElement("div");
-            tag.className = "alert-tag";
-            const label =
-                alert.type === "days-before"
-                    ? `${alert.value} días antes`
-                    : alert.value;
-            tag.innerHTML = `
+        let currentEditingExam: Examen | null = null;
+        let tempAlerts: { type: string; value: string | number }[] = [];
+
+        function openExamModal(ex: Examen) {
+            currentEditingExam = ex;
+            const examId = `${ex.fecha}_${ex.asignatura}`;
+            tempAlerts = [...(userSettings.customExams[examId] || [])];
+
+            const title = document.getElementById("exam-name-title");
+            const dateText = document.getElementById("exam-date-text");
+
+            if (title) title.textContent = ex.asignatura;
+            if (dateText)
+                dateText.textContent = new Date(
+                    ex.fecha + "T00:00:00",
+                ).toLocaleDateString("es-ES", { dateStyle: "long" });
+
+            renderTempAlerts();
+            const modal = document.getElementById("exam-notif-modal");
+            if (modal) modal.style.display = "flex";
+        }
+
+        function renderTempAlerts() {
+            const list = document.getElementById("current-alerts-list");
+            if (!list) return;
+            list.innerHTML = "";
+
+            if (tempAlerts.length === 0) {
+                list.innerHTML = `<span class="section-desc">Usando antelación predeterminada (${userSettings.defaultAdvance} días)</span>`;
+            }
+
+            tempAlerts.forEach((alert, index) => {
+                const tag = document.createElement("div");
+                tag.className = "alert-tag";
+                const label =
+                    alert.type === "days-before"
+                        ? `${alert.value} días antes`
+                        : alert.value;
+                tag.innerHTML = `
                 <i class="fa-solid fa-clock-rotate-left" style="font-size: 0.75rem;"></i>
                 <span>${label}</span>
                 <span class="remove-alert" data-index="${index}"><i class="fa-solid fa-circle-xmark"></i></span>
             `;
 
-            tag.querySelector(".remove-alert")?.addEventListener(
-                "click",
-                () => {
-                    tempAlerts.splice(index, 1);
-                    renderTempAlerts();
-                },
-            );
-            list.appendChild(tag);
-        });
-    }
-
-    // Modal Events
-    document
-        .getElementById("new-alert-type")
-        ?.addEventListener("change", (e) => {
-            const target = e.target as HTMLSelectElement;
-            const daysInput = document.getElementById("new-alert-days");
-            const dateInput = document.getElementById("new-alert-date");
-            if (daysInput)
-                daysInput.style.display =
-                    target.value === "days-before" ? "block" : "none";
-            if (dateInput)
-                dateInput.style.display =
-                    target.value === "specific-date" ? "block" : "none";
-        });
-
-    document.getElementById("add-alert-btn")?.addEventListener("click", () => {
-        const typeEl = document.getElementById(
-            "new-alert-type",
-        ) as HTMLSelectElement;
-        const type = typeEl.value;
-        let value: string | number;
-        if (type === "days-before") {
-            const input = document.getElementById(
-                "new-alert-days",
-            ) as HTMLInputElement;
-            value = input.value;
-            if (!value) return;
-        } else {
-            const input = document.getElementById(
-                "new-alert-date",
-            ) as HTMLInputElement;
-            value = input.value;
-            if (!value) return;
-        }
-
-        tempAlerts.push({ type, value });
-        renderTempAlerts();
-    });
-
-    document
-        .getElementById("save-exam-notifs")
-        ?.addEventListener("click", () => {
-            if (!currentEditingExam) return;
-            const examId = `${currentEditingExam.fecha}_${currentEditingExam.asignatura}`;
-            userSettings.customExams[examId] = tempAlerts;
-            saveSettings();
-            const modal = document.getElementById("exam-notif-modal");
-            if (modal) modal.style.display = "none";
-        });
-
-    document
-        .getElementById("exam-notif-modal-close")
-        ?.addEventListener("click", () => {
-            const modal = document.getElementById("exam-notif-modal");
-            if (modal) modal.style.display = "none";
-        });
-
-    async function showNotification(title: string, body: string) {
-        console.log("📢 Intento de notificación:", title);
-
-        if (!("Notification" in window)) return;
-
-        if (Notification.permission !== "granted") {
-            const permission = await Notification.requestPermission();
-            if (permission !== "granted") return;
-        }
-
-        const options: any = {
-            body: body,
-            icon: "/favicon.svg",
-            badge: "/favicon.svg",
-            vibrate: [200, 100, 200],
-            tag: "examen-alerta",
-            renotify: true,
-            data: { url: window.location.origin + "#calendar" },
-        };
-
-        // En Android/PWA se prefiere Service Worker, en Desktop el constructor directo
-        try {
-            if ("serviceWorker" in navigator) {
-                // Hacemos una carrera: si el SW no está listo en 500ms, disparar directamente
-                const swReady = navigator.serviceWorker.ready;
-                const timeout = new Promise((resolve) =>
-                    setTimeout(() => resolve("timeout"), 500),
+                tag.querySelector(".remove-alert")?.addEventListener(
+                    "click",
+                    () => {
+                        tempAlerts.splice(index, 1);
+                        renderTempAlerts();
+                    },
                 );
+                list.appendChild(tag);
+            });
+        }
 
-                const result = await Promise.race([swReady, timeout]);
+        // Modal Events
+        document
+            .getElementById("new-alert-type")
+            ?.addEventListener("change", (e) => {
+                const target = e.target as HTMLSelectElement;
+                const daysInput = document.getElementById("new-alert-days");
+                const dateInput = document.getElementById("new-alert-date");
+                if (daysInput)
+                    daysInput.style.display =
+                        target.value === "days-before" ? "block" : "none";
+                if (dateInput)
+                    dateInput.style.display =
+                        target.value === "specific-date" ? "block" : "none";
+            });
 
-                if (
-                    result !== "timeout" &&
-                    (result as ServiceWorkerRegistration).showNotification
-                ) {
-                    await (
-                        result as ServiceWorkerRegistration
-                    ).showNotification(title, options);
-                    console.log("✅ Notificación enviada via SW");
+        document
+            .getElementById("add-alert-btn")
+            ?.addEventListener("click", () => {
+                const typeEl = document.getElementById(
+                    "new-alert-type",
+                ) as HTMLSelectElement;
+                const type = typeEl.value;
+                let value: string | number;
+                if (type === "days-before") {
+                    const input = document.getElementById(
+                        "new-alert-days",
+                    ) as HTMLInputElement;
+                    value = input.value;
+                    if (!value) return;
                 } else {
-                    console.log(
-                        "⚠️ SW lento o no disponible, usando API directa",
+                    const input = document.getElementById(
+                        "new-alert-date",
+                    ) as HTMLInputElement;
+                    value = input.value;
+                    if (!value) return;
+                }
+
+                tempAlerts.push({ type, value });
+                renderTempAlerts();
+            });
+
+        document
+            .getElementById("save-exam-notifs")
+            ?.addEventListener("click", () => {
+                if (!currentEditingExam) return;
+                const examId = `${currentEditingExam.fecha}_${currentEditingExam.asignatura}`;
+                userSettings.customExams[examId] = tempAlerts;
+                saveSettings();
+                const modal = document.getElementById("exam-notif-modal");
+                if (modal) modal.style.display = "none";
+            });
+
+        document
+            .getElementById("exam-notif-modal-close")
+            ?.addEventListener("click", () => {
+                const modal = document.getElementById("exam-notif-modal");
+                if (modal) modal.style.display = "none";
+            });
+
+        async function showNotification(title: string, body: string) {
+            console.log("📢 Intento de notificación:", title);
+
+            if (!("Notification" in window)) return;
+
+            if (Notification.permission !== "granted") {
+                const permission = await Notification.requestPermission();
+                if (permission !== "granted") return;
+            }
+
+            const options: any = {
+                body: body,
+                icon: "/favicon.svg",
+                badge: "/favicon.svg",
+                vibrate: [200, 100, 200],
+                tag: "examen-alerta",
+                renotify: true,
+                data: { url: window.location.origin + "#calendar" },
+            };
+
+            // En Android/PWA se prefiere Service Worker, en Desktop el constructor directo
+            try {
+                if ("serviceWorker" in navigator) {
+                    // Hacemos una carrera: si el SW no está listo en 500ms, disparar directamente
+                    const swReady = navigator.serviceWorker.ready;
+                    const timeout = new Promise((resolve) =>
+                        setTimeout(() => resolve("timeout"), 500),
                     );
+
+                    const result = await Promise.race([swReady, timeout]);
+
+                    if (
+                        result !== "timeout" &&
+                        (result as ServiceWorkerRegistration).showNotification
+                    ) {
+                        await (
+                            result as ServiceWorkerRegistration
+                        ).showNotification(title, options);
+                        console.log("✅ Notificación enviada via SW");
+                    } else {
+                        console.log(
+                            "⚠️ SW lento o no disponible, usando API directa",
+                        );
+                        new Notification(title, options);
+                    }
+                } else {
                     new Notification(title, options);
                 }
-            } else {
-                new Notification(title, options);
-            }
-        } catch (err) {
-            console.error("❌ Error enviando notificación:", err);
-            try {
-                new Notification(title, options);
-            } catch (e) {
-                console.error("❌ Error final:", e);
+            } catch (err) {
+                console.error("❌ Error enviando notificación:", err);
+                try {
+                    new Notification(title, options);
+                } catch (e) {
+                    console.error("❌ Error final:", e);
+                }
             }
         }
-    }
 
-    function checkNotifications() {
-        if (!userSettings.enabled || Notification.permission !== "granted")
-            return;
+        function checkNotifications() {
+            if (!userSettings.enabled || Notification.permission !== "granted")
+                return;
 
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
-        const lastCheck = localStorage.getItem("last_notif_check") || "0";
-        const now = hoy.getTime();
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            const lastCheck = localStorage.getItem("last_notif_check") || "0";
+            const now = hoy.getTime();
 
-        if (new Date(parseInt(lastCheck)).toDateString() === hoy.toDateString())
-            return;
+            if (
+                new Date(parseInt(lastCheck)).toDateString() ===
+                hoy.toDateString()
+            )
+                return;
 
-        // Alertas de exámenes
-        if (userSettings.examsAlerts) {
-            Object.entries(examenesGlobal).forEach(([fecha, lista]) => {
-                const fechaEx = new Date(fecha + "T00:00:00");
-                const diffTime = fechaEx.getTime() - hoy.getTime();
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            // Alertas de exámenes
+            if (userSettings.examsAlerts) {
+                Object.entries(examenesGlobal).forEach(([fecha, lista]) => {
+                    const fechaEx = new Date(fecha + "T00:00:00");
+                    const diffTime = fechaEx.getTime() - hoy.getTime();
+                    const diffDays = Math.ceil(
+                        diffTime / (1000 * 60 * 60 * 24),
+                    );
 
-                lista.forEach((ex) => {
-                    const examId = `${fecha}_${ex.asignatura}`;
+                    lista.forEach((ex) => {
+                        const examId = `${fecha}_${ex.asignatura}`;
 
-                    if (userSettings.disabledExams.includes(examId)) return;
+                        if (userSettings.disabledExams.includes(examId)) return;
 
-                    const customs = userSettings.customExams[examId];
-                    let trigger = false;
+                        const customs = userSettings.customExams[examId];
+                        let trigger = false;
 
-                    if (customs && customs.length > 0) {
-                        customs.forEach((c) => {
-                            if (
-                                c.type === "days-before" &&
-                                parseInt(c.value.toString()) === diffDays
-                            )
-                                trigger = true;
-                            if (
-                                c.type === "specific-date" &&
-                                c.value === hoy.toISOString().split("T")[0]
-                            )
-                                trigger = true;
-                        });
-                    } else if (diffDays === userSettings.defaultAdvance) {
-                        trigger = true;
-                    }
+                        if (customs && customs.length > 0) {
+                            customs.forEach((c) => {
+                                if (
+                                    c.type === "days-before" &&
+                                    parseInt(c.value.toString()) === diffDays
+                                )
+                                    trigger = true;
+                                if (
+                                    c.type === "specific-date" &&
+                                    c.value === hoy.toISOString().split("T")[0]
+                                )
+                                    trigger = true;
+                            });
+                        } else if (diffDays === userSettings.defaultAdvance) {
+                            trigger = true;
+                        }
 
-                    if (trigger) {
-                        showNotification(
-                            `¡Aviso de Examen!`,
-                            `${ex.asignatura} en ${diffDays} día(s). Aula: ${ex.aula || "B1B"}.`,
+                        if (trigger) {
+                            showNotification(
+                                `¡Aviso de Examen!`,
+                                `${ex.asignatura} en ${diffDays} día(s). Aula: ${ex.aula || "B1B"}.`,
+                            );
+                        }
+                    });
+                });
+            }
+
+            // Resumen semanal (Sábados o Domingos)
+            if (
+                userSettings.weeklyAlerts &&
+                (hoy.getDay() === 0 || hoy.getDay() === 6)
+            ) {
+                const proxSemana = new Date(hoy);
+                proxSemana.setDate(hoy.getDate() + 7);
+
+                const examenesSemana: string[] = [];
+                Object.entries(examenesGlobal).forEach(([fecha, lista]) => {
+                    const f = new Date(fecha + "T00:00:00");
+                    if (f > hoy && f <= proxSemana) {
+                        lista.forEach((ex) =>
+                            examenesSemana.push(ex.asignatura),
                         );
                     }
                 });
-            });
-        }
 
-        // Resumen semanal (Sábados o Domingos)
-        if (
-            userSettings.weeklyAlerts &&
-            (hoy.getDay() === 0 || hoy.getDay() === 6)
-        ) {
-            const proxSemana = new Date(hoy);
-            proxSemana.setDate(hoy.getDate() + 7);
-
-            const examenesSemana: string[] = [];
-            Object.entries(examenesGlobal).forEach(([fecha, lista]) => {
-                const f = new Date(fecha + "T00:00:00");
-                if (f > hoy && f <= proxSemana) {
-                    lista.forEach((ex) => examenesSemana.push(ex.asignatura));
+                if (examenesSemana.length > 0) {
+                    showNotification(
+                        "Exámenes de la próxima semana",
+                        `Tienes ${examenesSemana.length} examen(es): ${examenesSemana.join(", ")}.`,
+                    );
                 }
-            });
-
-            if (examenesSemana.length > 0) {
-                showNotification(
-                    "Exámenes de la próxima semana",
-                    `Tienes ${examenesSemana.length} examen(es): ${examenesSemana.join(", ")}.`,
-                );
             }
+
+            localStorage.setItem("last_notif_check", now.toString());
         }
 
-        localStorage.setItem("last_notif_check", now.toString());
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-        init();
-        setTimeout(checkNotifications, 3000);
-    });
-</script>
+        document.addEventListener("DOMContentLoaded", () => {
+            init();
+            setTimeout(checkNotifications, 3000);
+        });
+    </script>
+</div>

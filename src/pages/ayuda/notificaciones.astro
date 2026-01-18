@@ -1,0 +1,421 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Navigation from "../../components/Navigation.astro";
+import Footer from "../../components/Footer.astro";
+import {
+    Info,
+    Smartphone,
+    Battery,
+    Bell,
+    Settings2,
+    ExternalLink,
+} from "lucide-astro";
+---
+
+<Layout title="Ayuda de Notificaciones - Delegados Puga">
+    <Navigation />
+
+    <main class="help-container">
+        <header class="help-header">
+            <div class="header-content">
+                <span class="badge">Soporte Técnico</span>
+                <h1>Guía de Notificaciones</h1>
+                <p>
+                    Asegúrate de recibir todos los avisos de tus exámenes sin
+                    fallos.
+                </p>
+            </div>
+            <div class="header-icon">
+                <Bell size={64} />
+            </div>
+        </header>
+
+        <section class="important-notice">
+            <div class="notice-icon">
+                <Info size={24} />
+            </div>
+            <div class="notice-content">
+                <h3>Información Crucial</h3>
+                <p>
+                    Las notificaciones de esta web funcionan mediante un sistema
+                    en segundo plano. Para que funcionen correctamente, <strong
+                        >la página debe permanecer abierta</strong
+                    > (aunque sea en una pestaña que no estés mirando).
+                </p>
+            </div>
+        </section>
+
+        <section class="devices-section">
+            <h2>Problemas en móviles (Android)</h2>
+            <p class="section-desc">
+                Muchos móviles (especialmente Xiaomi, Realme, Oppo, Huawei...)
+                cierran las aplicaciones en segundo plano para ahorrar batería,
+                lo que impide que lleguen las notificaciones.
+            </p>
+
+            <div class="device-guides">
+                <!-- Xiaomi / MIUI -->
+                <article class="device-card">
+                    <div class="card-header">
+                        <Smartphone size={24} />
+                        <h3>Xiaomi / MIUI / Poco</h3>
+                    </div>
+                    <ul class="steps-list">
+                        <li>
+                            <strong>Autoinicio:</strong> Ajustes > Aplicaciones >
+                            Administrar aplicaciones > Busca tu navegador > Activa
+                            "Autoinicio".
+                        </li>
+                        <li>
+                            <strong>Ahorro de batería:</strong> En la misma pantalla,
+                            entra en "Ahorro de batería" y selecciona "Sin restricciones".
+                        </li>
+                        <li>
+                            <strong>Bloqueo en recientes:</strong> Abre el menú de
+                            apps recientes, mantén pulsada la ventana del navegador
+                            y pulsa el icono del candado.
+                        </li>
+                    </ul>
+                </article>
+
+                <!-- Realme / Oppo / Vivo -->
+                <article class="device-card">
+                    <div class="card-header">
+                        <Smartphone size={24} />
+                        <h3>Realme / Oppo / Vivo</h3>
+                    </div>
+                    <ul class="steps-list">
+                        <li>
+                            <strong>Ejecución en segundo plano:</strong> Ajustes >
+                            Batería > Gestión de batería en segundo plano > Busca
+                            tu navegador > "Permitir actividad en segundo plano".
+                        </li>
+                        <li>
+                            <strong>Inicio automático:</strong> Ajustes > Aplicaciones
+                            > Inicio automático de aplicaciones > Activa tu navegador.
+                        </li>
+                    </ul>
+                </article>
+
+                <!-- Huawei -->
+                <article class="device-card">
+                    <div class="card-header">
+                        <Smartphone size={24} />
+                        <h3>Huawei</h3>
+                    </div>
+                    <ul class="steps-list">
+                        <li>
+                            <strong>Inicio de aplicaciones:</strong> Ajustes > Batería
+                            > Inicio de aplicaciones > Busca tu navegador > Desactiva
+                            "Gestionar automáticamente" y activa todas las opciones
+                            manuales.
+                        </li>
+                    </ul>
+                </article>
+
+                <!-- Samsung -->
+                <article class="device-card">
+                    <div class="card-header">
+                        <Smartphone size={24} />
+                        <h3>Samsung</h3>
+                    </div>
+                    <ul class="steps-list">
+                        <li>
+                            <strong>Aplicaciones nunca inactivas:</strong> Ajustes
+                            > Mantenimiento del dispositivo > Batería > Límites de
+                            uso en segundo plano > Aplicaciones nunca inactivas >
+                            Añade tu navegador.
+                        </li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <section class="general-tips">
+            <h2>Consejos Generales</h2>
+            <div class="tips-grid">
+                <div class="tip-item">
+                    <div class="tip-icon"><Battery size={20} /></div>
+                    <div class="tip-text">
+                        <h4>Desactiva el modo ahorro</h4>
+                        <p>
+                            El "Modo Ahorro" extremo suele capar todas las
+                            notificaciones web inmediatamente.
+                        </p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-icon"><Settings2 size={20} /></div>
+                    <div class="tip-text">
+                        <h4>Instala como PWA</h4>
+                        <p>
+                            Si usas Chrome o Edge, pulsa en "Añadir a pantalla
+                            de inicio". Las notificaciones son más fiables si la
+                            web está instalada.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="help-footer">
+            <p>
+                ¿Sigues teniendo problemas? Pregunta en el grupo de clase o
+                contacta con los delegados.
+            </p>
+            <a href="/" class="back-link">Volver al inicio</a>
+        </footer>
+    </main>
+
+    <Footer />
+</Layout>
+
+<style>
+    .help-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 120px 20px 60px;
+    }
+
+    .help-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        gap: 20px;
+    }
+
+    .badge {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-block;
+        margin-bottom: 12px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: white;
+        margin: 0 0 10px;
+        line-height: 1.1;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .header-content p {
+        font-size: 1.25rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0;
+    }
+
+    .header-icon {
+        color: #2000ad;
+        background: white;
+        padding: 30px;
+        border-radius: 30px;
+        display: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (min-width: 768px) {
+        .header-icon {
+            display: flex;
+        }
+    }
+
+    .important-notice {
+        background: #fff4e5;
+        border-left: 5px solid #ff9800;
+        padding: 24px;
+        border-radius: 16px;
+        display: flex;
+        gap: 16px;
+        margin-bottom: 60px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        color: #663c00;
+    }
+
+    .notice-icon {
+        color: #ff9800;
+        flex-shrink: 0;
+    }
+
+    .notice-content h3 {
+        margin: 0 0 8px;
+        color: #965a00;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+
+    .notice-content p {
+        margin: 0;
+        line-height: 1.6;
+        font-size: 1.1rem;
+    }
+
+    h2 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: white;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-desc {
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 40px;
+        font-size: 1.15rem;
+        max-width: 750px;
+        line-height: 1.6;
+    }
+
+    .device-guides {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+        gap: 24px;
+        margin-bottom: 80px;
+    }
+
+    @media (max-width: 768px) {
+        .device-guides {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .device-card {
+        background: white;
+        border-radius: 24px;
+        padding: 32px;
+        transition:
+            transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+            box-shadow 0.3s ease;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .device-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        color: #2000ad;
+    }
+
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.4rem;
+        color: #1e293b;
+        font-weight: 700;
+    }
+
+    .steps-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .steps-list li {
+        margin-bottom: 16px;
+        padding-left: 24px;
+        position: relative;
+        font-size: 1rem;
+        color: #475569;
+        line-height: 1.6;
+    }
+
+    .steps-list li::before {
+        content: "→";
+        color: #2000ad;
+        font-weight: bold;
+        position: absolute;
+        left: 0;
+    }
+
+    .steps-list li strong {
+        color: #1e293b;
+    }
+
+    .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+    }
+
+    .tip-item {
+        display: flex;
+        gap: 16px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 24px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .tip-icon {
+        color: #2000ad;
+        background: white;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .tip-text h4 {
+        margin: 0 0 8px;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .tip-text p {
+        margin: 0;
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.5;
+    }
+
+    .help-footer {
+        margin-top: 100px;
+        text-align: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 50px;
+    }
+
+    .help-footer p {
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 24px;
+        font-size: 1.1rem;
+    }
+
+    .back-link {
+        display: inline-block;
+        color: #2000ad;
+        font-weight: 700;
+        text-decoration: none;
+        padding: 14px 32px;
+        border-radius: 50px;
+        background: white;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .back-link:hover {
+        background: #f8fafc;
+        transform: scale(1.05) translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+</style>
