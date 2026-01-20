@@ -1,15 +1,15 @@
 ---
 // Datos de exámenes - Editar aquí para añadir/modificar exámenes
 const examenes = {
-
-
     "2026-02-13": [
         {
             asignatura: "Fiesta carnaval",
             hora: "",
             aula: "",
-            detalles:
-                "Este año la organizamos nosotros :)",
+            detalles: `
+                <p><strong>¡Este año la organizamos nosotros!</strong> 🎉</p>
+               
+            `,
         },
     ],
 };
@@ -222,7 +222,11 @@ function dividirEnSemanas(dias) {
     </div>
 </section>
 
-<div id="examen-modal" class="modal-overlay" style="display: none;">
+<div
+    id="examen-modal"
+    class="modal-overlay modal-eventos"
+    style="display: none;"
+>
     <div class="modal-content">
         <button id="modal-close" class="modal-close">&times;</button>
         <h3 id="modal-fecha-titulo"></h3>
@@ -230,7 +234,7 @@ function dividirEnSemanas(dias) {
     </div>
 </div>
 
-<style>
+<style is:global>
     .calendario-section {
         padding: 60px 0;
         background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -391,15 +395,26 @@ function dividirEnSemanas(dias) {
         z-index: 1000;
     }
 
-    .modal-content {
+    .modal-eventos .modal-content {
         background: white;
-        padding: 30px;
-        border-radius: 16px;
-        width: 90%;
-        max-width: 500px;
+        padding: 40px !important;
+        border-radius: 20px;
+        width: 95%;
+        max-width: 550px;
         position: relative;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
         animation: fadeIn 0.3s ease-out;
+        box-sizing: border-box;
+        max-height: 90vh;
+        overflow-y: auto !important;
+        overflow-x: hidden;
+    }
+
+    /* Asegurar que todo dentro use border-box */
+    .modal-eventos .modal-content *,
+    .modal-eventos .modal-content *::before,
+    .modal-eventos .modal-content *::after {
+        box-sizing: border-box;
     }
 
     @keyframes fadeIn {
@@ -426,9 +441,12 @@ function dividirEnSemanas(dias) {
 
     #modal-fecha-titulo {
         font-size: 1.8rem;
-        font-weight: 700;
+        font-weight: 800;
         color: #2000ad;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
+        padding-right: 30px;
+        line-height: 1.2;
+        word-wrap: break-word;
     }
 
     .examen-item {
@@ -443,6 +461,99 @@ function dividirEnSemanas(dias) {
         font-size: 1rem;
         line-height: 1.6;
         color: #374151;
+    }
+
+    /* Estilos para contenido HTML en detalles */
+    .detalles-content {
+        margin-top: 8px;
+    }
+
+    .detalles-html {
+        margin-top: 8px;
+        line-height: 1.8;
+    }
+
+    .detalles-html button,
+    .detalles-html a.btn {
+        background: linear-gradient(45deg, #2000ad, #003d99);
+        color: white !important;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: inline-block;
+        margin: 10px 0;
+        text-decoration: none !important;
+        font-size: 0.95rem;
+        border-bottom: none !important;
+        max-width: 100%;
+        white-space: normal;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(32, 0, 173, 0.2);
+    }
+
+    .detalles-html button:hover,
+    .detalles-html a.btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(32, 0, 173, 0.3);
+        color: white !important;
+        border-bottom: none !important;
+    }
+
+    .detalles-html a:not(.btn) {
+        color: #2000ad;
+        text-decoration: none;
+        font-weight: 600;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .detalles-html a:not(.btn):hover {
+        color: #003d99;
+        border-bottom-color: #003d99;
+    }
+
+    .detalles-html strong,
+    .detalles-html b {
+        color: #2000ad;
+        font-weight: 700;
+    }
+
+    .detalles-html em,
+    .detalles-html i {
+        font-style: italic;
+        color: #64748b;
+    }
+
+    .detalles-html ul,
+    .detalles-html ol {
+        margin: 8px 0;
+        padding-left: 24px;
+    }
+
+    .detalles-html li {
+        margin: 4px 0;
+    }
+
+    .detalles-html p {
+        margin: 8px 0;
+    }
+
+    .detalles-html code {
+        background: #f1f5f9;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+        color: #2000ad;
+    }
+
+    .detalles-html hr {
+        border: none;
+        border-top: 2px solid #e2e8f0;
+        margin: 12px 0;
     }
 
     /* Responsive */
@@ -536,12 +647,26 @@ function dividirEnSemanas(dias) {
                     examenesDelDia.forEach((examen) => {
                         const examenDiv = document.createElement("div");
                         examenDiv.classList.add("examen-item");
-                        examenDiv.innerHTML = `
-                            <h4>${examen.asignatura}</h4>
-                            <p><strong>Hora:</strong> ${examen.hora || "No especificada"}</p>
-                            <p><strong>Aula:</strong> ${examen.aula || "No especificada"}</p>
-                            <p><strong>Detalles:</strong> ${examen.detalles || "No hay detalles adicionales."}</p>
-                        `;
+
+                        // Crear elementos individuales
+                        const titulo = document.createElement("h4");
+                        titulo.textContent = examen.asignatura;
+
+                        const horaP = document.createElement("p");
+                        horaP.innerHTML = `<strong>Hora:</strong> ${examen.hora || "No especificada"}`;
+
+                        const aulaP = document.createElement("p");
+                        aulaP.innerHTML = `<strong>Aula:</strong> ${examen.aula || "No especificada"}`;
+
+                        const detallesP = document.createElement("div");
+                        detallesP.classList.add("detalles-content");
+                        detallesP.innerHTML = `<strong>Detalles:</strong><div class="detalles-html">${examen.detalles || "No hay detalles adicionales."}</div>`;
+
+                        examenDiv.appendChild(titulo);
+                        examenDiv.appendChild(horaP);
+                        examenDiv.appendChild(aulaP);
+                        examenDiv.appendChild(detallesP);
+
                         modalExamenesLista.appendChild(examenDiv);
                     });
 

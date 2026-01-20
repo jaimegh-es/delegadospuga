@@ -25,7 +25,7 @@ const examenes = {
             detalles: "Recuperación examen de Gallego.",
         },
     ],
-     "2026-01-23": [
+    "2026-01-23": [
         {
             asignatura: "Recuperación Química",
             hora: "",
@@ -33,31 +33,40 @@ const examenes = {
             detalles: "Para recuperar la parte de química.",
         },
     ],
-     "2026-02-05": [
+    "2026-02-05": [
         {
             asignatura: "Examen libro gallego",
             hora: "",
             aula: "B1B",
-            detalles: "El libro es 'As malas mulleres', de Marilar Alexandre.",
+            detalles: `
+                <p>El libro es <strong>'As malas mulleres'</strong>, de <em>Marilar Alexandre</em>.</p>
+                
+            `,
         },
     ],
-     "2026-01-28": [
+    "2026-01-28": [
         {
             asignatura: "Examen Mate",
             hora: "",
             aula: "B1B",
-            detalles: "Próximamente añadiré detalladamente lo que cae.",
+            detalles: `
+                <p>Lo que cae:</p>
+                <a href="/materia.ex.mate.28.pdf" target="_blank" class="btn">📚 Descargar PDF con la materia del examen</a>
+            `,
         },
     ],
-     "2026-01-30": [
+    "2026-01-30": [
         {
             asignatura: "Examen Mate",
             hora: "",
             aula: "B1B",
-            detalles: "Próximamente añadiré detalladamente lo que cae.",
+            detalles: `
+                <p>Lo que cae:</p>
+                <a href="/materia.ex.mate.28.pdf" target="_blank" class="btn">📚 Descargar PDF con la materia del examen</a>
+            `,
         },
     ],
-     "2026-02-24": [
+    "2026-02-24": [
         {
             asignatura: "Global Química",
             hora: "",
@@ -65,7 +74,7 @@ const examenes = {
             detalles: "Próximamente lo que cae.",
         },
     ],
-     "2026-02-25": [
+    "2026-02-25": [
         {
             asignatura: "Global Química",
             hora: "",
@@ -73,7 +82,7 @@ const examenes = {
             detalles: "Próximamente lo que cae.",
         },
     ],
-     "2026-03-03": [
+    "2026-03-03": [
         {
             asignatura: "Examen Física",
             hora: "",
@@ -81,7 +90,6 @@ const examenes = {
             detalles: "Próximamente lo que cae.",
         },
     ],
-
 };
 
 // Función para generar los días del mes
@@ -148,8 +156,13 @@ function dividirEnSemanas(dias) {
 
         <div class="calendario-container">
             <!-- Datos de exámenes para el script del cliente -->
-            <script type="application/json" id="examenes-data" is:inline set:html={JSON.stringify(examenes)}></script>
-            
+            <script
+                type="application/json"
+                id="examenes-data"
+                is:inline
+                set:html={JSON.stringify(examenes)}
+            />
+
             <div class="meses-grid">
                 <div class="mes">
                     <h3 class="mes-titulo">Enero</h3>
@@ -374,7 +387,11 @@ function dividirEnSemanas(dias) {
     </div>
 </section>
 
-<div id="examen-modal" class="modal-overlay" style="display: none;">
+<div
+    id="examen-modal"
+    class="modal-overlay modal-examenes"
+    style="display: none;"
+>
     <div class="modal-content">
         <button id="modal-close" class="modal-close">&times;</button>
         <h3 id="modal-fecha-titulo"></h3>
@@ -382,7 +399,7 @@ function dividirEnSemanas(dias) {
     </div>
 </div>
 
-<style>
+<style is:global>
     .calendario-section {
         padding: 60px 0;
         background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -572,15 +589,26 @@ function dividirEnSemanas(dias) {
         z-index: 1000;
     }
 
-    .modal-content {
+    .modal-examenes .modal-content {
         background: white;
-        padding: 30px;
-        border-radius: 16px;
-        width: 90%;
-        max-width: 500px;
+        padding: 40px !important;
+        border-radius: 20px;
+        width: 95%;
+        max-width: 550px;
         position: relative;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
         animation: fadeIn 0.3s ease-out;
+        box-sizing: border-box;
+        max-height: 90vh;
+        overflow-y: auto !important;
+        overflow-x: hidden;
+    }
+
+    /* Asegurar que todo dentro use border-box */
+    .modal-examenes .modal-content *,
+    .modal-examenes .modal-content *::before,
+    .modal-examenes .modal-content *::after {
+        box-sizing: border-box;
     }
 
     @keyframes fadeIn {
@@ -607,9 +635,12 @@ function dividirEnSemanas(dias) {
 
     #modal-fecha-titulo {
         font-size: 1.8rem;
-        font-weight: 700;
+        font-weight: 800;
         color: #2000ad;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
+        padding-right: 30px; /* Espacio para el botón de cerrar */
+        line-height: 1.2;
+        word-wrap: break-word;
     }
 
     .examen-item {
@@ -624,6 +655,99 @@ function dividirEnSemanas(dias) {
         font-size: 1rem;
         line-height: 1.6;
         color: #374151;
+    }
+
+    /* Estilos para contenido HTML en detalles */
+    .detalles-content {
+        margin-top: 8px;
+    }
+
+    .detalles-html {
+        margin-top: 8px;
+        line-height: 1.8;
+    }
+
+    .detalles-html button,
+    .detalles-html a.btn {
+        background: linear-gradient(45deg, #2000ad, #003d99);
+        color: white !important;
+        border: none;
+        padding: 12px 20px; /* Más padding para que parezca más botón */
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: inline-block;
+        margin: 10px 0; /* Margen vertical para separar de otros elementos */
+        text-decoration: none !important;
+        font-size: 0.95rem;
+        border-bottom: none !important;
+        max-width: 100%; /* No se sale del contenedor */
+        white-space: normal; /* Permite que el texto baje si es muy largo */
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(32, 0, 173, 0.2);
+    }
+
+    .detalles-html button:hover,
+    .detalles-html a.btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(32, 0, 173, 0.3);
+        color: white !important;
+        border-bottom: none !important;
+    }
+
+    .detalles-html a:not(.btn) {
+        color: #2000ad;
+        text-decoration: none;
+        font-weight: 600;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .detalles-html a:not(.btn):hover {
+        color: #003d99;
+        border-bottom-color: #003d99;
+    }
+
+    .detalles-html strong,
+    .detalles-html b {
+        color: #2000ad;
+        font-weight: 700;
+    }
+
+    .detalles-html em,
+    .detalles-html i {
+        font-style: italic;
+        color: #64748b;
+    }
+
+    .detalles-html ul,
+    .detalles-html ol {
+        margin: 8px 0;
+        padding-left: 24px;
+    }
+
+    .detalles-html li {
+        margin: 4px 0;
+    }
+
+    .detalles-html p {
+        margin: 8px 0;
+    }
+
+    .detalles-html code {
+        background: #f1f5f9;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+        color: #2000ad;
+    }
+
+    .detalles-html hr {
+        border: none;
+        border-top: 2px solid #e2e8f0;
+        margin: 12px 0;
     }
 
     /* Responsive */
@@ -699,51 +823,55 @@ function dividirEnSemanas(dias) {
         const modal = document.getElementById("examen-modal");
         const modalClose = document.getElementById("modal-close");
         const modalFechaTitulo = document.getElementById("modal-fecha-titulo");
-        const modalExamenesLista = document.getElementById("modal-examenes-lista");
+        const modalExamenesLista = document.getElementById(
+            "modal-examenes-lista",
+        );
         const exportBtn = document.getElementById("export-pdf-btn");
-        
-        const examenesDataElement = document.getElementById('examenes-data');
-        const examenes = JSON.parse(examenesDataElement?.textContent || '{}');
+
+        const examenesDataElement = document.getElementById("examenes-data");
+        const examenes = JSON.parse(examenesDataElement?.textContent || "{}");
 
         exportBtn?.addEventListener("click", () => {
             try {
                 const doc = new jsPDF();
-                
+
                 doc.setFontSize(18);
                 doc.setTextColor(32, 0, 173);
                 doc.text("Calendario de Exámenes - 1B Bach", 14, 20);
-                
+
                 doc.setFontSize(12);
                 doc.setTextColor(100, 116, 139);
                 doc.text("1º Trimestre - Curso 2025/2026", 14, 28);
 
                 const tableRows = [];
                 const fechasOrdenadas = Object.keys(examenes).sort();
-                
-                fechasOrdenadas.forEach(fecha => {
-                    const fechaFormateada = new Date(fecha + "T00:00:00").toLocaleDateString("es-ES", {
+
+                fechasOrdenadas.forEach((fecha) => {
+                    const fechaFormateada = new Date(
+                        fecha + "T00:00:00",
+                    ).toLocaleDateString("es-ES", {
                         day: "2-digit",
                         month: "2-digit",
-                        year: "numeric"
+                        year: "numeric",
                     });
-                    
+
                     examenes[fecha].forEach((examen: any) => {
                         tableRows.push([
                             fechaFormateada,
                             examen.asignatura,
                             examen.hora || "No especificada",
                             examen.aula || "B1B",
-                            examen.detalles || "-"
+                            examen.detalles || "-",
                         ]);
                     });
                 });
 
                 // Usamos la función autoTable directamente importada
                 autoTable(doc, {
-                    head: [['Fecha', 'Asignatura', 'Hora', 'Aula', 'Detalles']],
+                    head: [["Fecha", "Asignatura", "Hora", "Aula", "Detalles"]],
                     body: tableRows,
                     startY: 35,
-                    theme: 'striped',
+                    theme: "striped",
                     headStyles: { fillColor: [32, 0, 173] },
                     styles: { fontSize: 9, cellPadding: 3 },
                     columnStyles: {
@@ -751,14 +879,16 @@ function dividirEnSemanas(dias) {
                         1: { cellWidth: 40 },
                         2: { cellWidth: 25 },
                         3: { cellWidth: 20 },
-                        4: { cellWidth: 'auto' }
-                    }
+                        4: { cellWidth: "auto" },
+                    },
                 });
 
                 doc.save("examenes-1b-bach.pdf");
             } catch (error) {
                 console.error("Error al generar PDF:", error);
-                alert("Hubo un error al generar el PDF. Por favor, inténtalo de nuevo.");
+                alert(
+                    "Hubo un error al generar el PDF. Por favor, inténtalo de nuevo.",
+                );
             }
         });
 
@@ -774,17 +904,31 @@ function dividirEnSemanas(dias) {
                         month: "long",
                         year: "numeric",
                     });
-                    modalExamenesLista!.innerHTML = ""; 
+                    modalExamenesLista!.innerHTML = "";
 
                     examenesDelDia.forEach((examen: any) => {
                         const examenDiv = document.createElement("div");
                         examenDiv.classList.add("examen-item");
-                        examenDiv.innerHTML = `
-                            <h4>${examen.asignatura}</h4>
-                            <p><strong>Hora:</strong> ${examen.hora || "No especificada"}</p>
-                            <p><strong>Aula:</strong> ${examen.aula || "No especificada"}</p>
-                            <p><strong>Detalles:</strong> ${examen.detalles || "No hay detalles adicionales."}</p>
-                        `;
+
+                        // Crear elementos individuales
+                        const titulo = document.createElement("h4");
+                        titulo.textContent = examen.asignatura;
+
+                        const horaP = document.createElement("p");
+                        horaP.innerHTML = `<strong>Hora:</strong> ${examen.hora || "No especificada"}`;
+
+                        const aulaP = document.createElement("p");
+                        aulaP.innerHTML = `<strong>Aula:</strong> ${examen.aula || "No especificada"}`;
+
+                        const detallesP = document.createElement("div");
+                        detallesP.classList.add("detalles-content");
+                        detallesP.innerHTML = `<strong>Detalles:</strong><div class="detalles-html">${examen.detalles || "No hay detalles adicionales."}</div>`;
+
+                        examenDiv.appendChild(titulo);
+                        examenDiv.appendChild(horaP);
+                        examenDiv.appendChild(aulaP);
+                        examenDiv.appendChild(detallesP);
+
                         modalExamenesLista!.appendChild(examenDiv);
                     });
 
