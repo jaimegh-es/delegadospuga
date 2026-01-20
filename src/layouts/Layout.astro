@@ -37,13 +37,39 @@ import { pwaInfo } from "virtual:pwa-info";
 	</body>
 	<script>
 		import { registerSW } from "virtual:pwa-register";
+
+		// Limpiar cachés antiguos primero
+		if ("caches" in window) {
+			caches.keys().then(function (cacheNames) {
+				return Promise.all(
+					cacheNames.map(function (cacheName) {
+						// Eliminar cachés que no sean de imágenes
+						if (!cacheName.includes("images-cache")) {
+							console.log("Eliminando caché antiguo:", cacheName);
+							return caches.delete(cacheName);
+						}
+					}),
+				);
+			});
+		}
+
 		registerSW({
 			immediate: true,
 			onRegistered(r) {
 				console.log("SW Registered:", r);
+				// Verificar actualizaciones cada 30 segundos
+				if (r) {
+					setInterval(() => {
+						r.update();
+					}, 30000);
+				}
 			},
 			onRegisterError(error) {
 				console.log("SW registration error", error);
+			},
+			onNeedRefresh() {
+				console.log("Nueva versión disponible, recargando...");
+				window.location.reload();
 			},
 		});
 	</script>

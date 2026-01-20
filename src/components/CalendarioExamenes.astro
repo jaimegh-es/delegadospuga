@@ -11,10 +11,10 @@ const examenes = {
     ],
     "2026-01-21": [
         {
-            asignatura: "Presentación trabajo Lengua",
+            asignatura: "Recuperación Lengua",
             hora: "",
             aula: "B1B",
-            detalles: "Presentación trabajo de Lengua.",
+            detalles: "Recuperación examen de Lengua.",
         },
     ],
     "2026-01-16": [
@@ -57,7 +57,7 @@ const examenes = {
             detalles: "Próximamente añadiré detalladamente lo que cae.",
         },
     ],
-     "2026-02-13": [
+     "2026-02-24": [
         {
             asignatura: "Global Química",
             hora: "",
@@ -65,7 +65,15 @@ const examenes = {
             detalles: "Próximamente lo que cae.",
         },
     ],
-     "2026-02-27": [
+     "2026-02-25": [
+        {
+            asignatura: "Global Química",
+            hora: "",
+            aula: "B1B",
+            detalles: "Próximamente lo que cae.",
+        },
+    ],
+     "2026-03-03": [
         {
             asignatura: "Examen Física",
             hora: "",
@@ -114,6 +122,7 @@ function generarDiasMes(año, mes) {
 
 const enero = generarDiasMes(2026, 1);
 const febrero = generarDiasMes(2026, 2);
+const marzo = generarDiasMes(2026, 3);
 
 // Función para dividir en semanas
 function dividirEnSemanas(dias) {
@@ -232,6 +241,79 @@ function dividirEnSemanas(dias) {
                         <tbody>
                             {
                                 dividirEnSemanas(febrero).map((semana) => (
+                                    <tr>
+                                        {semana.map((dia) => (
+                                            <td
+                                                class={
+                                                    dia.vacio
+                                                        ? "dia-vacio"
+                                                        : dia.examen
+                                                          ? "dia tiene-examen"
+                                                          : "dia"
+                                                }
+                                                data-examen-fecha={
+                                                    dia.examen
+                                                        ? dia.fecha
+                                                        : null
+                                                }
+                                            >
+                                                {!dia.vacio && (
+                                                    <>
+                                                        <div class="numero-dia">
+                                                            {dia.numero}
+                                                        </div>
+                                                        {dia.examen &&
+                                                            dia.examen.length >
+                                                                0 && (
+                                                                <div class="examen-info">
+                                                                    <div class="asignatura">
+                                                                        {
+                                                                            dia
+                                                                                .examen[0]
+                                                                                .asignatura
+                                                                        }
+                                                                    </div>
+                                                                    {dia.examen
+                                                                        .length >
+                                                                        1 && (
+                                                                        <div class="asignatura">
+                                                                            {
+                                                                                dia
+                                                                                    .examen[1]
+                                                                                    .asignatura
+                                                                            }
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                    </>
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mes">
+                    <h3 class="mes-titulo">Marzo</h3>
+                    <table class="calendario-tabla">
+                        <thead>
+                            <tr>
+                                <th>L</th>
+                                <th>M</th>
+                                <th>X</th>
+                                <th>J</th>
+                                <th>V</th>
+                                <th>S</th>
+                                <th>D</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                dividirEnSemanas(marzo).map((semana) => (
                                     <tr>
                                         {semana.map((dia) => (
                                             <td

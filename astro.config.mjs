@@ -23,28 +23,32 @@ export default defineConfig({
           }
         ]
       },
+
       workbox: {
-        globPatterns: ['**/*.{ico,png,svg,webp,pdf}'],
-        maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
-        clientsClaim: true,
-        skipWaiting: true,
+        // Estrategia de caché: solo imágenes
         runtimeCaching: [
           {
-            urlPattern: ({ request }) => request.mode === 'navigate',
-            handler: 'NetworkFirst',
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|avif|ico)$/,
+            handler: 'CacheFirst',
             options: {
-              cacheName: 'pages-cache',
+              cacheName: 'images-cache',
               expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 24 * 60 * 60 // 1 day
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
+                maxEntries: 100,
+                maxAgeSeconds: 30 * 24 * 60 * 60 // 30 días
               }
             }
+          },
+          {
+            // Todo lo demás: NetworkOnly (sin caché)
+            urlPattern: /.*/,
+            handler: 'NetworkOnly'
           }
-        ]
+        ],
+        // No precachear nada automáticamente
+        globPatterns: [],
+        navigateFallback: null
       },
+
       devOptions: {
         enabled: true,
         navigateFallbackAllowlist: [/^\/$/],
