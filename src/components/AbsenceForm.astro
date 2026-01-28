@@ -1,0 +1,140 @@
+---
+import { teachersData } from '../data/teachers';
+
+// Get unique teachers and subjects for initial render
+const teachers = [...new Set(teachersData.map(t => t.teacher))].sort();
+const subjects = [...new Set(teachersData.map(t => t.subject))].sort();
+---
+<div class="form-card">
+  <h2>Reportar Ausencia</h2>
+  <form id="absence-form">
+    <div class="form-group">
+      <label for="subject">Asignatura</label>
+      <select id="subject" name="subject" required>
+        <option value="">Selecciona una asignatura</option>
+        {subjects.map(s => <option value={s}>{s}</option>)}
+      </select>
+    </div>
+
+    <!-- Hidden Teacher Field -->
+    <input type="hidden" id="teacher" name="teacher" />
+    
+    <div class="form-group">
+      <label for="date">Fecha</label>
+      <input type="date" id="date" name="date" required />
+    </div>
+
+    <button type="submit">Registrar Ausencia</button>
+  </form>
+</div>
+
+<style>
+  .form-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    color: #2000ad;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    box-sizing: border-box;
+    background-color: white;
+  }
+
+  input:focus, select:focus {
+    outline: none;
+    border-color: #2000ad;
+    box-shadow: 0 0 0 3px rgba(32, 0, 173, 0.1);
+  }
+
+  button {
+    width: 100%;
+    background-color: #2000ad;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 0.5rem;
+  }
+
+  button:hover {
+    background-color: #1a008c;
+  }
+</style>
+
+<script>
+  import { teachersData } from '../data/teachers';
+
+  const form = document.getElementById('absence-form') as HTMLFormElement;
+  const subjectSelect = document.getElementById('subject') as HTMLSelectElement;
+  const teacherInput = document.getElementById('teacher') as HTMLInputElement;
+
+  // Logic to link subject and teacher
+  subjectSelect?.addEventListener('change', (e) => {
+    const selectedSubject = (e.target as HTMLSelectElement).value;
+    if (selectedSubject) {
+      const match = teachersData.find(t => t.subject === selectedSubject);
+      if (match && teacherInput) {
+        teacherInput.value = match.teacher;
+      }
+    }
+  });
+
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    try {
+      const res = await fetch('/api/absences', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      
+      if (res.ok) {
+        alert('Ausencia registrada correctamente');
+        form.reset();
+        window.location.reload(); 
+      } else {
+        const txt = await res.text();
+        alert('Error al registrar ausencia: ' + txt);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error de conexión');
+    }
+  });
+</script>

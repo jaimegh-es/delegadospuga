@@ -1,14 +1,36 @@
 ---
 import NewsCard from "./NewsCard.astro";
-import { news } from "../data/news";
+import { db } from "../lib/firebase/server";
+
+let news = [];
+try {
+  const snapshot = await db.collection("news").orderBy("date", "desc").limit(6).get();
+  news = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        title: data.title,
+        image: data.image,
+        description: data.description,
+        link: `/noticias/${doc.id}`,
+        date: new Date(data.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+      };
+  });
+} catch (error) {
+  console.error("Error fetching news:", error);
+}
 ---
 
 <section class="news-section" id="noticias">
     <div class="container">
         <h2 class="section-title">Últimas Noticias</h2>
-        <div class="news-grid">
-            {news.map((item) => <NewsCard item={item} />)}
-        </div>
+        {news.length > 0 ? (
+            <div class="news-grid">
+                {news.map((item) => <NewsCard item={item} />)}
+            </div>
+        ) : (
+            <p style="text-align: center; color: #64748b;">No hay noticias recientes.</p>
+        )}
     </div>
 </section>
 

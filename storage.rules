@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // Bloqueo total: No se usa almacenamiento desde el cliente.
+      // Todo el contenido estático está en /public.
+      allow read, write: if false;
+    }
+  }
+}

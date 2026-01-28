@@ -1,0 +1,381 @@
+---
+---
+<div class="admin-card">
+  <h3>Quejas y Solicitudes (Admin)</h3>
+  
+  <div class="tabs">
+    <button id="tab-complaints" class="tab active" onclick="switchTab('complaints')">Quejas/Incidencias</button>
+    <button id="tab-requests" class="tab" onclick="switchTab('requests')">Solicitudes Públicas</button>
+  </div>
+
+  <div class="actions">
+    <button onclick="exportData('csv')" class="btn-csv"><i class="fa-solid fa-file-csv"></i> CSV</button>
+    <button onclick="exportData('pdf')" class="btn-pdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+  </div>
+
+  <div id="content-area" class="table-container">
+    <table class="data-table">
+        <thead id="table-head">
+            <!-- Populated by JS -->
+        </thead>
+        <tbody id="table-body">
+            <!-- Populated by JS -->
+        </tbody>
+    </table>
+    <p id="loading-msg" class="loading hidden">Cargando datos...</p>
+    <p id="empty-msg" class="hidden text-center py-8 text-gray-500 italic">No hay datos disponibles para esta pestaña.</p>
+  </div>
+
+  <!-- Detail Modal -->
+  <div id="detail-modal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h4 id="modal-title">Detalles</h4>
+        <div id="modal-body"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .admin-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    margin-top: 2rem;
+  }
+
+  h3 {
+    color: #1f2937;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+  }
+
+  .tab {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: #6b7280;
+    border-bottom: 2px solid transparent;
+  }
+  
+  .tab.active {
+    color: #2000ad;
+    border-bottom-color: #2000ad;
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    justify-content: flex-end;
+  }
+
+  .btn-csv, .btn-pdf {
+    padding: 0.4rem 0.8rem;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+  .btn-csv { background: #10b981; }
+  .btn-pdf { background: #ef4444; }
+
+  .table-container {
+    overflow-x: auto;
+    border: 1px solid #f3f4f6;
+    border-radius: 8px;
+    min-height: 200px;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  .data-table th {
+    background: #f9fafb;
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 700;
+    color: #4b5563;
+    border-bottom: 2px solid #e5e7eb;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+
+  .data-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+    color: #1f2937;
+    vertical-align: middle;
+  }
+
+  .btn-action {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+  }
+  .btn-view { background: #3b82f6; }
+  .btn-delete { background: #ef4444; }
+
+  .badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  .badge-disrespect { background: #fee2e2; color: #991b1b; }
+  .badge-general { background: #fef3c7; color: #854d0e; }
+
+  .status-select {
+    padding: 0.25rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border: 1px solid #d1d5db;
+    background: white;
+  }
+
+  .loading { text-align: center; padding: 2rem; color: #6b7280; font-style: italic; }
+
+  /* Modal */
+  .modal {
+    position: fixed; z-index: 1000; left: 0; top: 0;
+    width: 100%; height: 100%; background: rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hidden { display: none; }
+  .modal-content {
+    background: white; padding: 24px; border-radius: 12px;
+    width: 90%; max-width: 500px; position: relative;
+  }
+  .close-modal { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; }
+</style>
+
+<script>
+    import jsPDF from 'jspdf';
+    import autoTable from 'jspdf-autotable';
+
+    let currentTab = 'complaints';
+    let dataCache = { complaints: [], requests: [] };
+
+    async function loadData() {
+        const loading = document.getElementById('loading-msg');
+        const empty = document.getElementById('empty-msg');
+        const tbody = document.getElementById('table-body');
+        const thead = document.getElementById('table-head');
+        
+        loading?.classList.remove('hidden');
+        empty?.classList.add('hidden');
+        if(tbody) tbody.innerHTML = '';
+
+        try {
+            const endpoint = currentTab === 'complaints' ? '/api/complaints' : '/api/requests';
+            const res = await fetch(endpoint);
+            if(!res.ok) throw new Error();
+            const data = await res.json();
+            
+            if (currentTab === 'complaints') {
+                dataCache.complaints = data;
+                renderComplaints();
+            } else {
+                dataCache.requests = data;
+                renderRequests();
+            }
+        } catch(e) {
+            if(tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-center text-red-500 py-4">Error cargando datos. Revisa tus permisos.</td></tr>';
+        } finally {
+            loading?.classList.add('hidden');
+        }
+    }
+
+    function renderComplaints() {
+        const tbody = document.getElementById('table-body');
+        const thead = document.getElementById('table-head');
+        if(!tbody || !thead) return;
+
+        thead.innerHTML = `
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Autor</th>
+                <th>Profesor</th>
+                <th>Resumen</th>
+                <th>Acciones</th>
+            </tr>
+        `;
+
+        if (dataCache.complaints.length === 0) {
+            document.getElementById('empty-msg')?.classList.remove('hidden');
+            return;
+        }
+
+        tbody.innerHTML = dataCache.complaints.map((c: any) => `
+            <tr>
+                <td class="whitespace-nowrap">${new Date(c.createdAt).toLocaleDateString()}</td>
+                <td><span class="badge ${c.type === 'disrespect' ? 'badge-disrespect' : 'badge-general'}">${c.type}</span></td>
+                <td class="font-semibold">${c.authorName || 'Anónimo'}</td>
+                <td class="font-bold">${c.teacher || '-'}</td>
+                <td class="truncate max-w-[150px]">${c.description}</td>
+                <td class="whitespace-nowrap">
+                    <button class="btn-action btn-view" onclick="viewDetail('${c.id}', 'complaint')">Ver</button>
+                    <button class="btn-action btn-delete" onclick="deleteItem('${c.id}', 'complaint')">X</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderRequests() {
+        const tbody = document.getElementById('table-body');
+        const thead = document.getElementById('table-head');
+        if(!tbody || !thead) return;
+
+        thead.innerHTML = `
+            <tr>
+                <th>Fecha</th>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        `;
+
+        if (dataCache.requests.length === 0) {
+            document.getElementById('empty-msg')?.classList.remove('hidden');
+            return;
+        }
+
+        tbody.innerHTML = dataCache.requests.map((r: any) => `
+            <tr>
+                <td class="whitespace-nowrap">${new Date(r.createdAt).toLocaleDateString()}</td>
+                <td class="font-bold text-blue-800">${r.title}</td>
+                <td class="font-semibold">${r.authorName || 'Anónimo'}</td>
+                <td>
+                    <select onchange="updateStatus('${r.id}', this.value)" class="status-select">
+                        <option value="pendiente" ${r.status === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                        <option value="en proceso" ${r.status === 'en proceso' ? 'selected' : ''}>En Proceso</option>
+                        <option value="tramitada" ${r.status === 'tramitada' ? 'selected' : ''}>Tramitada</option>
+                        <option value="denegada" ${r.status === 'denegada' ? 'selected' : ''}>Denegada</option>
+                        <option value="cancelada" ${r.status === 'cancelada' ? 'selected' : ''}>Cancelada</option>
+                    </select>
+                </td>
+                <td class="whitespace-nowrap">
+                    <button class="btn-action btn-view" onclick="viewDetail('${r.id}', 'request')">Ver</button>
+                    <button class="btn-action btn-delete" onclick="deleteItem('${r.id}', 'request')">X</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    (window as any).updateStatus = async (id: string, status: string) => {
+        try {
+            const res = await fetch('/api/requests', {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id, status })
+            });
+            if(!res.ok) alert("Error actualizando estado");
+        } catch(e) {
+            alert("Error de conexión");
+        }
+    };
+
+    (window as any).switchTab = (tab: string) => {
+        currentTab = tab;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(`tab-${tab}`)?.classList.add('active');
+        loadData();
+    };
+
+    (window as any).deleteItem = async (id: string, type: string) => {
+        if(!confirm('¿Eliminar definitivamente?')) return;
+        const endpoint = type === 'complaint' ? '/api/complaints' : '/api/requests';
+        try {
+            const res = await fetch(endpoint, {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id })
+            });
+            if(res.ok) loadData();
+        } catch(e) { alert('Error de conexión.'); }
+    };
+
+    (window as any).viewDetail = (id: string, type: string) => {
+        const list = type === 'complaint' ? dataCache.complaints : dataCache.requests;
+        const item = list.find((i: any) => i.id === id);
+        if(!item) return;
+
+        const modal = document.getElementById('detail-modal');
+        const body = document.getElementById('modal-body');
+        const title = document.getElementById('modal-title');
+        
+        if (modal && body && title) {
+            title.textContent = type === 'complaint' ? 'Detalle de Incidencia' : 'Detalle de Solicitud';
+            body.innerHTML = `
+                <div class="space-y-2">
+                    <p><strong>Autor:</strong> ${item.authorName || 'Anónimo'}</p>
+                    <p><strong>Fecha:</strong> ${new Date(item.createdAt).toLocaleString()}</p>
+                    ${type === 'complaint' ? `<p><strong>Tipo:</strong> ${item.type}</p><p><strong>Profesor:</strong> ${item.teacher || '-'}</p>` : `<p><strong>Título:</strong> ${item.title}</p>`}
+                    <hr class="my-3"/>
+                    <p class="font-bold">Descripción:</p>
+                    <p class="whitespace-pre-wrap bg-gray-50 p-3 rounded border text-gray-800">${item.description}</p>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }
+    };
+
+    (window as any).closeModal = () => { document.getElementById('detail-modal')?.classList.add('hidden'); };
+
+    (window as any).exportData = (format: string) => {
+        const data = currentTab === 'complaints' ? dataCache.complaints : dataCache.requests;
+        const filename = `${currentTab}_report`;
+
+        if (format === 'csv') {
+            const headers = currentTab === 'complaints' 
+                ? ["Fecha", "Tipo", "Autor", "Profesor", "Descripción"]
+                : ["Fecha", "Título", "Autor", "Descripción"];
+            
+            let csv = headers.join(",") + "\n";
+            data.forEach((row: any) => {
+                const date = new Date(row.createdAt).toLocaleDateString();
+                const line = currentTab === 'complaints'
+                    ? [date, row.type, row.authorName || "-", row.teacher || "-", `"${row.description}"`]
+                    : [date, `"${row.title}"`, row.authorName || "-", `"${row.description}"`];
+                csv += line.join(",") + "\n";
+            });
+            window.open('data:text/csv;charset=utf-8,' + encodeURI(csv));
+        } else {
+            const doc = new jsPDF();
+            doc.text(`Reporte de ${currentTab}`, 14, 20);
+            const body = data.map((row: any) => [
+                new Date(row.createdAt).toLocaleDateString(),
+                currentTab === 'complaints' ? row.type : row.title,
+                row.authorName || "-",
+                row.description
+            ]);
+            autoTable(doc, { head: [["Fecha", "Tipo/Título", "Autor", "Descripción"]], body, startY: 30 });
+            doc.save(filename + ".pdf");
+        }
+    };
+
+    loadData();
+</script>

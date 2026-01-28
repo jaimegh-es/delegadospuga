@@ -1,0 +1,291 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import DashboardCalendar from '../../components/DashboardCalendar.astro';
+import { db } from '../../lib/firebase/server';
+import { Timestamp } from "firebase-admin/firestore";
+
+const user = Astro.locals;
+const isAdmin = user.role === 'admin';
+
+// Fetch Absences
+const snapshot = await db.collection("absences").orderBy("date", "asc").get();
+const absences = snapshot.docs.map(doc => ({
+  id: doc.id,
+  ...doc.data(),
+  date: doc.data().date instanceof Timestamp ? doc.data().date.toDate().toISOString() : new Date(doc.data().date).toISOString(),
+}));
+
+// Fetch Config
+const configDoc = await db.collection("config").doc("dashboard").get();
+const showRequests = configDoc.exists ? configDoc.data()?.showRequests : false;
+
+let requests = [];
+if (showRequests) {
+    const reqSnapshot = await db.collection("requests").orderBy("createdAt", "desc").limit(5).get();
+    requests = reqSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt.toDate()
+    }));
+}
+---
+
+<DashboardLayout title="Calendario" currentPath="/dashboard">
+    <div class="space-y-8">
+        <DashboardCalendar absences={absences} isAdmin={isAdmin} />
+
+        {showRequests && requests.length > 0 && (
+            <div class="requests-section">
+                <h3 class="requests-title">
+                    <i class="fa-solid fa-bullhorn"></i> Solicitudes Recientes
+                </h3>
+                <div class="requests-grid">
+                    {requests.map((r: any) => (
+                        <div class="request-card" onclick={`openRequestModal('${r.title}', '${r.description}', '${r.authorName}', '${r.status || 'pendiente'}')`}>
+                            <div class="card-header">
+                                <h4>{r.title}</h4>
+                                <span class={`status-badge status-${r.status || 'pendiente'}`}>{r.status || 'pendiente'}</span>
+                            </div>
+                            <span class="card-date">{r.createdAt.toLocaleDateString()}</span>
+                            <p class="card-author">Por: {r.authorName || 'Anónimo'}</p>
+                            <p class="card-desc">{r.description}</p>
+                            <span class="read-more">Ver más...</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )}
+    </div>
+
+    <!-- Request Modal -->
+    <div id="req-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h3 id="modal-title"></h3>
+                <span id="modal-status" class="status-badge"></span>
+            </div>
+            <p id="modal-author" class="text-sm text-gray-500 mb-4"></p>
+            <div id="modal-body" class="text-gray-700 whitespace-pre-wrap"></div>
+        </div>
+    </div>
+</DashboardLayout>
+
+<style>
+  /* Dashboard Container Styles (from previous turns) */
+  .dashboard-container {
+    max-width: 1200px;
+    margin: 80px auto 0;
+    padding: 2rem;
+  }
+  
+  .space-y-8 > * + * {
+    margin-top: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 1rem;
+    padding-left: 0.5rem;
+    border-left: 4px solid #2000ad;
+  }
+
+  /* Request Section Styles */
+  .requests-section {
+      margin-top: 3rem;
+  }
+
+  .requests-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #111827;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+  }
+  
+  .requests-title i {
+      color: #2000ad;
+  }
+
+  .requests-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+  }
+
+  .request-card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border: 1px solid #f3f4f6;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+  }
+
+  .request-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+  }
+
+  .card-header h4 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1f2937;
+      line-height: 1.4;
+  }
+
+  .card-date {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      white-space: nowrap;
+      margin-left: 1rem;
+  }
+
+  .card-author {
+      font-size: 0.8rem;
+      color: #2000ad;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+  }
+
+  .card-desc {
+      color: #4b5563;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: auto; /* Push read more to bottom */
+  }
+
+  .read-more {
+      display: block;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: #2000ad;
+      font-weight: 600;
+  }
+
+  /* Status Badges */
+  .status-badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+  }
+  .status-pendiente { background: #fef3c7; color: #92400e; }
+  .status-en-proceso { background: #dbeafe; color: #1e40af; }
+  .status-tramitada { background: #d1fae5; color: #065f46; }
+  .status-denegada { background: #fee2e2; color: #991b1b; }
+  .status-cancelada { background: #f3f4f6; color: #374151; }
+
+  /* Modal Styles */
+  .modal {
+      position: fixed;
+      z-index: 2000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+  }
+  
+  .modal:not(.hidden) {
+      opacity: 1;
+      pointer-events: auto;
+  }
+
+  .hidden { display: none; } /* Fallback */
+
+  .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+  }
+
+  .modal:not(.hidden) .modal-content {
+      transform: scale(1);
+  }
+
+  .close-modal {
+      position: absolute;
+      top: 1rem; right: 1.5rem;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #9ca3af;
+      transition: color 0.2s;
+  }
+  .close-modal:hover { color: #111827; }
+  
+  .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      padding-right: 2rem;
+  }
+  #modal-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #111827;
+      margin: 0;
+  }
+</style>
+
+<script is:inline>
+    const modal = document.getElementById('req-modal');
+    const closeBtn = document.querySelector('.close-modal');
+
+    window.openRequestModal = (title, desc, author, status) => {
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-body').textContent = desc;
+        document.getElementById('modal-author').textContent = `Solicitado por: ${author}`;
+        
+        const statusEl = document.getElementById('modal-status');
+        statusEl.textContent = status;
+        statusEl.className = `status-badge status-${status.toLowerCase().replace(' ', '-')}`;
+        
+        modal.classList.remove('hidden');
+    };
+
+    closeBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    window.onclick = (event) => {
+        if (event.target == modal) {
+            modal.classList.add('hidden');
+        }
+    };
+</script>

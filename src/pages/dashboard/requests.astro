@@ -1,0 +1,19 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import ComplaintForm from '../../components/ComplaintForm.astro';
+import RequestForm from '../../components/RequestForm.astro';
+---
+
+<DashboardLayout title="Reportes y Solicitudes" currentPath="/dashboard/requests">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <!-- Private Complaints Column -->
+        <div>
+            <ComplaintForm />
+        </div>
+
+        <!-- Public Requests Column -->
+        <div>
+            <RequestForm />
+        </div>
+    </div>
+</DashboardLayout>

@@ -1,0 +1,133 @@
+---
+import Layout from './Layout.astro';
+import { ADMIN_EMAIL } from '../lib/constants';
+
+interface Props {
+  title: string;
+  currentPath: string;
+}
+
+const { title, currentPath } = Astro.props;
+const user = Astro.locals;
+const isAdmin = user.role === 'admin';
+
+const tabs = [
+  { name: 'Calendario', path: '/dashboard', icon: 'fa-calendar' },
+  { name: 'Reportar Ausencia', path: '/dashboard/report', icon: 'fa-pen-to-square' },
+  { name: 'Quejas y Solicitudes', path: '/dashboard/requests', icon: 'fa-bullhorn' }, // New Tab
+  { name: 'Estadísticas', path: '/dashboard/stats', icon: 'fa-chart-pie' },
+];
+
+if (isAdmin) {
+  tabs.push({ name: 'Administración', path: '/dashboard/admin', icon: 'fa-users-gear' });
+}
+---
+
+<Layout title={`${title} | Dashboard`}>
+  <div class="bg-white min-h-screen">
+    <div class="dashboard-container">
+      
+      <!-- Header & Navigation -->
+      <div class="dashboard-header-wrapper">
+        <div class="dashboard-top-bar">
+            <div>
+                <h1 class="text-2xl font-bold text-[#2000ad]">Panel de Control</h1>
+                <p class="text-sm text-gray-500">Bienvenido, {user.email}</p>
+            </div>
+            <a href="/api/auth/signout" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i> Salir
+            </a>
+        </div>
+
+        <nav class="dashboard-nav">
+            {tabs.map(tab => (
+                <a href={tab.path} class={`nav-tab ${currentPath === tab.path ? 'active' : ''}`}>
+                    <i class={`fa-solid ${tab.icon}`}></i> {tab.name}
+                </a>
+            ))}
+        </nav>
+      </div>
+
+      <!-- Main Content -->
+      <main class="dashboard-content">
+        <slot />
+      </main>
+
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .dashboard-container {
+    max-width: 1200px;
+    margin: 80px auto 0;
+    padding: 2rem;
+  }
+
+  .dashboard-header-wrapper {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f3f4f6;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+
+  .dashboard-top-bar {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .logout-btn {
+    color: #ef4444;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+  .logout-btn:hover { background: #fee2e2; }
+
+  .dashboard-nav {
+    display: flex;
+    background: #f9fafb;
+    padding: 0 1rem;
+  }
+
+  .nav-tab {
+    padding: 1rem 1.5rem;
+    color: #6b7280;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .nav-tab:hover {
+    color: #2000ad;
+    background: #f3f4f6;
+  }
+
+  .nav-tab.active {
+    color: #2000ad;
+    border-bottom-color: #2000ad;
+    background: white;
+  }
+
+  .dashboard-content {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

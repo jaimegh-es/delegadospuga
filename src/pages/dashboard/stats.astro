@@ -1,0 +1,20 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import SearchStats from '../../components/SearchStats.astro';
+import { db } from '../../lib/firebase/server';
+import { Timestamp } from "firebase-admin/firestore";
+
+const user = Astro.locals;
+const isAdmin = user.role === 'admin';
+
+const snapshot = await db.collection("absences").orderBy("date", "asc").get();
+const absences = snapshot.docs.map(doc => ({
+  id: doc.id,
+  ...doc.data(),
+  date: doc.data().date instanceof Timestamp ? doc.data().date.toDate().toISOString() : new Date(doc.data().date).toISOString(),
+}));
+---
+
+<DashboardLayout title="Estadísticas" currentPath="/dashboard/stats">
+    <SearchStats absences={absences} isAdmin={isAdmin} />
+</DashboardLayout>

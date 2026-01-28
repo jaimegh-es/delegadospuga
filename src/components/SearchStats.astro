@@ -1,0 +1,383 @@
+---
+import { teachersData } from '../data/teachers';
+
+interface Props {
+  absences: any[];
+  isAdmin: boolean;
+}
+
+const { absences, isAdmin } = Astro.props;
+const subjects = [...new Set(teachersData.map(t => t.subject))].sort();
+---
+
+<div class="search-stats-container">
+    <!-- Filters Section -->
+    <div class="card filters-card">
+        <h3>Búsqueda Avanzada</h3>
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label>Asignatura</label>
+                <select id="filter-subject">
+                    <option value="">Todas</option>
+                    {subjects.map(s => <option value={s}>{s}</option>)}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Desde</label>
+                <input type="date" id="filter-start" />
+            </div>
+            <div class="filter-group">
+                <label>Hasta</label>
+                <input type="date" id="filter-end" />
+            </div>
+            <div class="filter-group flex items-end">
+                <button id="search-btn" class="action-btn search-btn w-full justify-center">
+                    <i class="fa-solid fa-magnifying-glass"></i> Buscar
+                </button>
+            </div>
+        </div>
+        <div class="actions-row">
+            <button id="export-csv-btn" class="action-btn csv-btn">
+                <i class="fa-solid fa-file-csv"></i> Exportar CSV
+            </button>
+            <button id="export-pdf-btn" class="action-btn pdf-btn">
+                <i class="fa-solid fa-file-pdf"></i> Exportar PDF
+            </button>
+        </div>
+    </div>
+    <!-- Stats Section -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <h4>Total Ausencias</h4>
+            <p id="stat-total" class="stat-number">0</p>
+        </div>
+        <div class="stat-card">
+            <h4>Día con más faltas</h4>
+            <p id="stat-max-day" class="stat-text">-</p>
+            <small id="stat-max-day-count">0 faltas</small>
+        </div>
+        <div class="stat-card">
+            <h4>Materia más afectada</h4>
+            <p id="stat-top-subject" class="stat-text">-</p>
+        </div>
+    </div>
+
+    <!-- Results List -->
+    <div class="card results-card">
+        <h3>Resultados</h3>
+        <div id="results-list" class="results-list">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+</div>
+
+<style>
+    .search-stats-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+        color: #2000ad;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 0.5rem;
+    }
+
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .filter-group label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #4b5563;
+        margin-bottom: 0.25rem;
+    }
+
+    .filter-group select, .filter-group input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+    }
+
+    .actions-row {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: none;
+        transition: opacity 0.2s;
+        color: white;
+    }
+
+    .csv-btn { background-color: #10b981; }
+    .pdf-btn { background-color: #ef4444; }
+    .search-btn { background-color: #2000ad; margin-top: auto; }
+    .action-btn:hover { opacity: 0.9; }
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        border-top: 4px solid #2000ad;
+    }
+
+    .stat-card h4 {
+        color: #6b7280;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #111827;
+        line-height: 1;
+    }
+
+    .stat-text {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.25rem;
+    }
+
+    .results-list {
+        max-height: 400px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .result-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .delete-btn {
+        background: #fee2e2;
+        color: #991b1b;
+        border: none;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .delete-btn:hover { background: #fecaca; }
+</style>
+
+<script define:vars={{ initialAbsences: absences, isAdmin }}>
+    import jsPDF from 'jspdf';
+    import autoTable from 'jspdf-autotable';
+
+    let currentData = [...initialAbsences];
+    
+    // DOM Elements
+    const subjectSelect = document.getElementById('filter-subject');
+    const startInput = document.getElementById('filter-start');
+    const endInput = document.getElementById('filter-end');
+    const resultsContainer = document.getElementById('results-list');
+    
+    // Stats Elements
+    const statTotal = document.getElementById('stat-total');
+    const statMaxDay = document.getElementById('stat-max-day');
+    const statMaxDayCount = document.getElementById('stat-max-day-count');
+    const statTopSubject = document.getElementById('stat-top-subject');
+
+    function formatDate(isoString) {
+        return new Date(isoString).toLocaleDateString('es-ES', { 
+            day: '2-digit', month: '2-digit', year: 'numeric' 
+        });
+    }
+
+    function renderResults() {
+        if (currentData.length === 0) {
+            resultsContainer.innerHTML = '<p class="text-center text-gray-500 py-4">No se encontraron resultados</p>';
+            return;
+        }
+
+        resultsContainer.innerHTML = currentData.map(item => `
+            <div class="result-item">
+                <div>
+                    <span class="font-bold text-gray-800 block">${item.subject}</span>
+                    <span class="text-xs text-gray-400 ml-2">• ${formatDate(item.date)}</span>
+                </div>
+                ${isAdmin ? `<button class="delete-btn" onclick="deleteAbsence('${item.id}')">Eliminar</button>` : ''}
+            </div>
+        `).join('');
+    }
+
+    function updateStats() {
+        // Total
+        statTotal.textContent = currentData.length;
+
+        if (currentData.length === 0) {
+            statMaxDay.textContent = "-";
+            statMaxDayCount.textContent = "0 faltas";
+            statTopSubject.textContent = "-";
+            return;
+        }
+
+        // Max Day
+        const days = {};
+        currentData.forEach(item => {
+            const dateStr = item.date.split('T')[0];
+            days[dateStr] = (days[dateStr] || 0) + 1;
+        });
+        const maxDay = Object.keys(days).reduce((a, b) => days[a] > days[b] ? a : b);
+        statMaxDay.textContent = formatDate(maxDay);
+        statMaxDayCount.textContent = `${days[maxDay]} faltas`;
+
+        // Top Subject
+        const subjects = {};
+        currentData.forEach(item => {
+            subjects[item.subject] = (subjects[item.subject] || 0) + 1;
+        });
+        const topSubject = Object.keys(subjects).reduce((a, b) => subjects[a] > subjects[b] ? a : b);
+        statTopSubject.textContent = topSubject;
+    }
+
+    function filterData() {
+        const sVal = subjectSelect.value;
+        const startVal = startInput.value ? new Date(startInput.value) : null;
+        const endVal = endInput.value ? new Date(endInput.value) : null;
+
+        // Normalize filter dates to midnight
+        if (startVal) startVal.setHours(0,0,0,0);
+        if (endVal) endVal.setHours(23,59,59,999);
+
+        currentData = initialAbsences.filter(item => {
+            const itemDate = new Date(item.date);
+            itemDate.setHours(0,0,0,0); // Normalize item date too
+
+            const matchesSubject = !sVal || item.subject === sVal;
+            const afterStart = !startVal || itemDate >= startVal;
+            const beforeEnd = !endVal || itemDate <= endVal; // Use itemDate (midnight) <= endVal (end of day)
+            
+            return matchesSubject && afterStart && beforeEnd;
+        });
+
+        renderResults();
+        updateStats();
+    }
+
+    // Export Functions
+    document.getElementById('export-csv-btn').addEventListener('click', () => {
+        const headers = ["Fecha", "Asignatura"];
+        const rows = currentData.map(item => [formatDate(item.date), item.subject]);
+        
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += headers.join(",") + "\r\n";
+        rows.forEach(row => {
+            csvContent += row.join(",") + "\r\n";
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "ausencias_1bach.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+
+    document.getElementById('export-pdf-btn').addEventListener('click', () => {
+        const doc = new jsPDF();
+        
+        doc.setFontSize(18);
+        doc.text("Reporte de Ausencias - 1Bach", 14, 22);
+        
+        doc.setFontSize(11);
+        doc.text(`Generado el: ${new Date().toLocaleDateString()}`, 14, 30);
+        doc.text(`Total registros: ${currentData.length}`, 14, 36);
+
+        const tableColumn = ["Fecha", "Asignatura"];
+        const tableRows = currentData.map(item => [formatDate(item.date), item.subject]);
+
+        autoTable(doc, {
+            head: [tableColumn],
+            body: tableRows,
+            startY: 44,
+        });
+
+        doc.save("ausencias_1bach.pdf");
+    });
+
+    // Delete Logic (Global for inline onclick)
+    window.deleteAbsence = async (id) => {
+        if(!confirm("¿Seguro que quieres eliminar esta ausencia?")) return;
+        
+        try {
+            const res = await fetch('/api/absences', {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id })
+            });
+
+            if (res.ok) {
+                // Remove from local array and re-render
+                initialAbsences = initialAbsences.filter(i => i.id !== id);
+                filterData(); // Re-runs filters on new data
+                alert("Eliminado correctamente");
+                window.location.reload(); // Refresh to sync calendar too
+            } else {
+                alert("Error al eliminar");
+            }
+        } catch(e) {
+            console.error(e);
+            alert("Error de conexión");
+        }
+    };
+
+    // Listeners
+    document.getElementById('search-btn').addEventListener('click', filterData);
+    // teacherSelect.addEventListener('change', filterData);
+    // subjectSelect.addEventListener('change', filterData);
+    // startInput.addEventListener('change', filterData);
+    // endInput.addEventListener('change', filterData);
+
+    // Initial render
+    filterData();
+</script>

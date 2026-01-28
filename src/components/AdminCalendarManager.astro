@@ -1,0 +1,777 @@
+---
+---
+
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+
+<div class="admin-card">
+    <h3>Gestión de Calendario (Exámenes y Eventos)</h3>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="exams" id="tab-btn-exams">Exámenes</button>
+        <button class="tab-btn" data-tab="events" id="tab-btn-events">Eventos</button>
+    </div>
+
+    <!-- Formulario Exámenes -->
+    <div id="tab-exams" class="tab-content active">
+        <h4 id="exam-form-title" class="form-title">Añadir Examen</h4>
+        <form id="exam-form" class="event-form">
+            <input type="hidden" name="id" id="exam-id">
+            <input type="hidden" name="type" value="exam">
+            
+            <div class="form-group">
+                <label>Fecha:</label>
+                <input type="date" name="date" id="exam-date" required>
+            </div>
+
+            <div class="form-group">
+                <label>Asignatura:</label>
+                <select name="subject" id="exam-subject" required>
+                    <option value="">Selecciona una asignatura</option>
+                    <option value="Lengua">Lengua</option>
+                    <option value="Gallego">Gallego</option>
+                    <option value="Inglés">Inglés</option>
+                    <option value="Matemáticas">Matemáticas</option>
+                    <option value="Física y Química">Física y Química</option>
+                    <option value="Biología">Biología</option>
+                    <option value="Historia">Historia</option>
+                    <option value="Filosofía">Filosofía</option>
+                    <option value="Educación Física">Educación Física</option>
+                    <option value="Religión/Valores">Religión/Valores</option>
+                    <option value="TIC">TIC</option>
+                    <option value="Economía">Economía</option>
+                    <option value="Cultura Clásica">Cultura Clásica</option>
+                    <option value="Dibujo Técnico">Dibujo Técnico</option>
+                    <option value="Latín">Latín</option>
+                    <option value="Griego">Griego</option>
+                    <option value="Francés">Francés</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Hora (Opcional):</label>
+                <input type="text" name="time" id="exam-time" placeholder="Ej: 08:30">
+            </div>
+
+            <div class="form-group">
+                <label>Aula (Opcional):</label>
+                <input type="text" name="classroom" id="exam-classroom" placeholder="Ej: B1B" value="B1B">
+            </div>
+
+            <div class="form-group full-width">
+                <label>Detalles:</label>
+                <div id="editor-exams" class="quill-editor"></div>
+                <input type="hidden" name="details" id="hidden-details-exams">
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="cancel-exam-edit" class="secondary-btn hidden">Cancelar Edición</button>
+                <button type="submit" class="submit-btn" id="exam-submit-btn">Añadir Examen</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Formulario Eventos -->
+    <div id="tab-events" class="tab-content">
+        <h4 id="event-form-title" class="form-title">Añadir Evento</h4>
+        <form id="event-form" class="event-form">
+            <input type="hidden" name="id" id="event-id">
+            <input type="hidden" name="type" value="event">
+            
+            <div class="form-group">
+                <label>Fecha:</label>
+                <input type="date" name="date" id="event-date" required>
+            </div>
+
+            <div class="form-group">
+                <label>Título del Evento:</label>
+                <input type="text" name="title" id="event-title" required placeholder="Ej: Excursión, Festivo...">
+            </div>
+
+             <div class="form-group">
+                <label>Hora (Opcional):</label>
+                <input type="text" name="time" id="event-time" placeholder="Ej: Todo el día">
+            </div>
+
+            <div class="form-group full-width">
+                <label>Detalles:</label>
+                <div id="editor-events" class="quill-editor"></div>
+                <input type="hidden" name="details" id="hidden-details-events">
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="cancel-event-edit" class="secondary-btn hidden">Cancelar Edición</button>
+                <button type="submit" class="submit-btn" id="event-submit-btn">Añadir Evento</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Vista Calendario Estilo CalendarioExamenes -->
+    <div class="calendar-preview-section">
+        <div class="section-header-preview">
+            <h4>Vista Previa</h4>
+            <p class="hint-preview">Pasa el ratón para editar o borrar</p>
+        </div>
+        
+        <div class="month-controls">
+            <button id="prev-month">&lt;</button>
+            <h3 id="current-month-display" class="mes-titulo"></h3>
+            <button id="next-month">&gt;</button>
+        </div>
+        
+        <div class="mes-container">
+            <div class="mes">
+                <table class="calendario-tabla">
+                    <thead>
+                        <tr>
+                            <th>L</th>
+                            <th>M</th>
+                            <th>X</th>
+                            <th>J</th>
+                            <th>V</th>
+                            <th>S</th>
+                            <th>D</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-calendar-body">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maintenance Section -->
+    <div class="maintenance-section">
+        <h4>Mantenimiento</h4>
+        <button id="import-legacy-btn" class="secondary-btn">Importar Exámenes Anteriores</button>
+        <p class="hint">Usar solo una vez para cargar los exámenes antiguos.</p>
+    </div>
+</div>
+
+<style>
+    /* Admin Card & Forms */
+    .admin-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    h3 {
+        color: #2000ad;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 1rem;
+    }
+
+    .section-header-preview {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    h4 {
+        color: #475569;
+        margin: 0;
+    }
+
+    .hint-preview {
+        font-size: 0.8rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 10px;
+    }
+
+    .tab-btn {
+        background: none;
+        border: none;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #64748b;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+        background: #eff6ff;
+        color: #2000ad;
+    }
+
+    .tab-content {
+        display: none;
+    }
+    .tab-content.active {
+        display: block;
+    }
+
+    .event-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    input, select {
+        padding: 8px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 0.95rem;
+    }
+
+    /* Quill Styles Override */
+    .quill-editor {
+        height: 150px;
+        background: white;
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
+    }
+    .ql-toolbar {
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        background: #f8fafc;
+    }
+    .ql-container {
+        font-family: inherit;
+        font-size: 0.95rem;
+    }
+
+    .form-actions {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .submit-btn {
+        background: #2000ad;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .submit-btn:hover {
+        background: #1a008d;
+    }
+
+    .secondary-btn {
+        background: #e2e8f0;
+        color: #475569;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    .hint {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+
+    /* COPIED CALENDAR STYLES */
+    .month-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .month-controls button {
+        background: #f1f5f9;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-weight: bold;
+        color: #2000ad;
+    }
+    .month-controls button:hover {
+        background: #e2e8f0;
+    }
+
+    .mes-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .mes {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .mes-titulo {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2000ad;
+        margin: 0;
+        text-align: center;
+    }
+
+    .calendario-tabla {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .calendario-tabla th {
+        background: linear-gradient(45deg, #2000ad, #003d99);
+        color: white;
+        padding: 12px 8px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+        border: none;
+    }
+
+    /* Override for global styles in Astro component */
+    :global(.calendario-tabla td) {
+        width: 14.28%;
+        height: 80px;
+        border: 1px solid #e2e8f0;
+        position: relative;
+        vertical-align: top;
+        padding: 4px;
+    }
+
+    :global(.dia) {
+        background: white;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    :global(.dia-vacio) {
+        background: #f8fafc;
+    }
+
+    :global(.dia.tiene-examen) {
+        background: linear-gradient(45deg, #2000ad, #003d99);
+        color: white;
+    }
+    
+    :global(.dia.tiene-evento) {
+        background: linear-gradient(45deg, #10b981, #059669);
+        color: white;
+    }
+
+    /* Hover Overlay */
+    :global(.dia-overlay) {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        z-index: 10;
+    }
+
+    :global(.dia:hover .dia-overlay) {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    :global(.overlay-btn) {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        color: white;
+        font-size: 1.2rem;
+        transition: background 0.2s;
+    }
+
+    :global(.btn-edit-cal) {
+        background: rgba(32, 0, 173, 0.9);
+    }
+    :global(.btn-edit-cal:hover) {
+        background: rgba(32, 0, 173, 1);
+    }
+
+    :global(.btn-delete-cal) {
+        background: rgba(239, 68, 68, 0.9);
+    }
+    :global(.btn-delete-cal:hover) {
+        background: rgba(239, 68, 68, 1);
+    }
+
+    :global(.numero-dia) {
+        position: absolute;
+        top: 4px;
+        left: 6px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #374151;
+    }
+
+    :global(.dia.tiene-examen .numero-dia), :global(.dia.tiene-evento .numero-dia) {
+        color: white;
+    }
+
+    :global(.examen-info) {
+        position: absolute;
+        bottom: 4px;
+        left: 4px;
+        right: 4px;
+        text-align: center;
+        font-size: 0.6rem;
+        line-height: 1.1;
+    }
+
+    :global(.examen-info .asignatura) {
+        font-weight: 700;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+    }
+</style>
+
+<script>
+    import Quill from 'quill';
+
+    let currentDate = new Date();
+    let eventsData = [];
+    let quillExams, quillEvents;
+
+    function initQuill() {
+        const toolbarOptions = [
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'header': [1, 2, 3, false] }],
+            [{ 'color': [] }],
+            ['link', 'clean']
+        ];
+
+        quillExams = new Quill('#editor-exams', {
+            theme: 'snow',
+            placeholder: 'Detalles del examen...',
+            modules: { toolbar: toolbarOptions }
+        });
+
+        quillEvents = new Quill('#editor-events', {
+            theme: 'snow',
+            placeholder: 'Detalles del evento...',
+            modules: { toolbar: toolbarOptions }
+        });
+    }
+
+    async function loadEvents() {
+        try {
+            const res = await fetch('/api/calendar');
+            eventsData = await res.json();
+            renderCalendar();
+        } catch (e) {
+            console.error("Error loading events", e);
+        }
+    }
+
+    function renderCalendar() {
+        const tbody = document.getElementById('admin-calendar-body');
+        const monthDisplay = document.getElementById('current-month-display');
+        
+        if (!tbody || !monthDisplay) return;
+
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+
+        monthDisplay.textContent = new Date(year, month).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const firstDay = new Date(year, month, 1).getDay(); // 0 = Sunday
+        const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1; // 0 = Monday
+
+        tbody.innerHTML = '';
+        
+        let currentDay = 1;
+        let row = document.createElement('tr');
+        let dayCount = 0;
+
+        for (let i = 0; i < adjustedFirstDay; i++) {
+            const cell = document.createElement('td');
+            cell.className = 'dia-vacio';
+            row.appendChild(cell);
+            dayCount++;
+        }
+
+        while (currentDay <= daysInMonth) {
+            if (dayCount === 7) {
+                tbody.appendChild(row);
+                row = document.createElement('tr');
+                dayCount = 0;
+            }
+
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`;
+            const dayEvents = eventsData.filter(e => e.date === dateStr);
+            const hasExam = dayEvents.some(e => e.type === 'exam');
+            const hasEvent = dayEvents.some(e => e.type === 'event');
+            
+            const cell = document.createElement('td');
+            let className = 'dia';
+            if (hasExam) className += ' tiene-examen';
+            else if (hasEvent) className += ' tiene-evento';
+            
+            cell.className = className;
+
+            let content = `<div class="numero-dia">${currentDay}</div>`;
+            
+            if (dayEvents.length > 0) {
+                 content += `<div class="examen-info">`;
+                 dayEvents.slice(0, 2).forEach(ev => {
+                     const text = ev.type === 'exam' ? ev.subject : ev.title;
+                     content += `<div class="asignatura">${text}</div>`;
+                 });
+                 if (dayEvents.length > 2) content += `<div class="asignatura">+${dayEvents.length - 2}</div>`;
+                 content += `</div>`;
+
+                 // Hover Overlay with icons
+                 content += `
+                    <div class="dia-overlay">
+                        <button class="overlay-btn btn-edit-cal" onclick="editCalendarItem('${dayEvents[0].id}')" title="Editar">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button class="overlay-btn btn-delete-cal" onclick="deleteEvent('${dayEvents[0].id}')" title="Borrar">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                 `;
+            }
+
+            cell.innerHTML = content;
+            row.appendChild(cell);
+            currentDay++;
+            dayCount++;
+        }
+
+        while (dayCount < 7 && dayCount > 0) {
+            const cell = document.createElement('td');
+            cell.className = 'dia-vacio';
+            row.appendChild(cell);
+            dayCount++;
+        }
+        if (row.children.length > 0) tbody.appendChild(row);
+    }
+
+    (window as any).editCalendarItem = (id) => {
+        const item = eventsData.find(e => e.id === id);
+        if (!item) return;
+
+        if (item.type === 'exam') {
+            (document.getElementById('tab-btn-exams') as HTMLButtonElement).click();
+            (document.getElementById('exam-id') as HTMLInputElement).value = item.id;
+            (document.getElementById('exam-date') as HTMLInputElement).value = item.date;
+            (document.getElementById('exam-subject') as HTMLSelectElement).value = item.subject;
+            (document.getElementById('exam-time') as HTMLInputElement).value = item.time || '';
+            (document.getElementById('exam-classroom') as HTMLInputElement).value = item.classroom || 'B1B';
+            quillExams.root.innerHTML = item.details || '';
+            
+            document.getElementById('exam-form-title').textContent = "Editar Examen";
+            document.getElementById('exam-submit-btn').textContent = "Actualizar Examen";
+            document.getElementById('cancel-exam-edit').classList.remove('hidden');
+        } else {
+            (document.getElementById('tab-btn-events') as HTMLButtonElement).click();
+            (document.getElementById('event-id') as HTMLInputElement).value = item.id;
+            (document.getElementById('event-date') as HTMLInputElement).value = item.date;
+            (document.getElementById('event-title') as HTMLInputElement).value = item.title;
+            (document.getElementById('event-time') as HTMLInputElement).value = item.time || '';
+            quillEvents.root.innerHTML = item.details || '';
+
+            document.getElementById('event-form-title').textContent = "Editar Evento";
+            document.getElementById('event-submit-btn').textContent = "Actualizar Evento";
+            document.getElementById('cancel-event-edit').classList.remove('hidden');
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    function resetExamsForm() {
+        const form = document.getElementById('exam-form') as HTMLFormElement;
+        form.reset();
+        (document.getElementById('exam-id') as HTMLInputElement).value = '';
+        quillExams.setContents([]);
+        document.getElementById('exam-form-title').textContent = "Añadir Examen";
+        document.getElementById('exam-submit-btn').textContent = "Añadir Examen";
+        document.getElementById('cancel-exam-edit').classList.add('hidden');
+    }
+
+    function resetEventsForm() {
+        const form = document.getElementById('event-form') as HTMLFormElement;
+        form.reset();
+        (document.getElementById('event-id') as HTMLInputElement).value = '';
+        quillEvents.setContents([]);
+        document.getElementById('event-form-title').textContent = "Añadir Evento";
+        document.getElementById('event-submit-btn').textContent = "Añadir Evento";
+        document.getElementById('cancel-event-edit').classList.add('hidden');
+    }
+
+    async function deleteEvent(id) {
+        if (!confirm("¿Borrar este elemento?")) return;
+
+        try {
+            const res = await fetch('/api/calendar', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+
+            if (res.ok) {
+                loadEvents();
+            } else {
+                alert("Error al borrar");
+            }
+        } catch (e) {
+            alert("Error de conexión");
+        }
+    }
+    (window as any).deleteEvent = deleteEvent;
+
+    function setupTabs() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(`tab-${(tab as HTMLElement).dataset.tab}`).classList.add('active');
+            });
+        });
+    }
+
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        const form = e.target;
+        
+        if (form.id === 'exam-form') {
+            document.getElementById('hidden-details-exams').value = quillExams.root.innerHTML;
+        } else if (form.id === 'event-form') {
+            document.getElementById('hidden-details-events').value = quillEvents.root.innerHTML;
+        }
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        
+        try {
+            const res = await fetch('/api/calendar', {
+                method: data.id ? 'PATCH' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                if (form.id === 'exam-form') resetExamsForm();
+                else resetEventsForm();
+                
+                loadEvents();
+                alert("Guardado correctamente");
+            } else {
+                alert("Error al guardar");
+            }
+        } catch (e) {
+            alert("Error de conexión");
+        }
+    }
+
+    // Legacy Import Logic
+    const legacyExams = {
+        "2026-01-14": [{ asignatura: "Recuperación Lengua", hora: "", aula: "B1B", detalles: "Recuperación examen de Lengua." }],
+        "2026-01-21": [{ asignatura: "Recuperación Lengua", hora: "", aula: "B1B", detalles: "Recuperación examen de Lengua." }],
+        "2026-01-16": [{ asignatura: "Recuperación Gallego", hora: "", aula: "B1B", detalles: "Recuperación examen de Gallego." }],
+        "2026-01-23": [{ asignatura: "Recuperación Química", hora: "", aula: "B1B", detalles: "Para recuperar la parte de química." }],
+        "2026-02-05": [{ asignatura: "Examen libro gallego", hora: "", aula: "B1B", detalles: `<p>El libro es <strong>'As malas mulleres'</strong>, de <em>Marilar Alexandre</em>.</p>` }],
+        "2026-01-28": [{ asignatura: "Examen Mate", hora: "", aula: "B1B", detalles: `<p>Lo que cae:</p><a href="/materia.ex.mate.28.pdf" target="_blank" class="btn">📚 Descargar PDF con la materia del examen</a>` }],
+        "2026-01-30": [{ asignatura: "Examen Mate", hora: "", aula: "B1B", detalles: `<p>Lo que cae:</p><a href="/materia.ex.mate.28.pdf" target="_blank" class="btn">📚 Descargar PDF con la materia del examen</a>` }],
+        "2026-02-24": [{ asignatura: "Global Química", hora: "", aula: "B1B", detalles: "Próximamente lo que cae." }],
+        "2026-02-25": [{ asignatura: "Global Química", hora: "", aula: "B1B", detalles: "Próximamente lo que cae." }],
+        "2026-02-12": [{ asignatura: "Examen Gallego 1", hora: "", aula: "B1B", detalles: "Próximamente lo que cae." }],
+        "2026-03-03": [{ asignatura: "Examen Física", hora: "", aula: "B1B", detalles: "Próximamente lo que cae." }],
+        "2026-03-06": [{ asignatura: "Examen Gallego 2", hora: "", aula: "B1B", detalles: "Próximamente lo que cae." }]
+    };
+
+    async function importLegacyExams() {
+        if (!confirm("¿Estás seguro?")) return;
+        const button = document.getElementById('import-legacy-btn');
+        button.disabled = true;
+        try {
+            for (const [date, exams] of Object.entries(legacyExams)) {
+                for (const exam of exams) {
+                    await fetch('/api/calendar', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: 'exam', date, subject: exam.asignatura, classroom: exam.aula, details: exam.detalles, time: exam.hora
+                        })
+                    });
+                }
+            }
+            alert("Importado.");
+            loadEvents();
+        } catch (e) {
+            alert("Error.");
+        } finally {
+            button.disabled = false;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initQuill();
+        setupTabs();
+        loadEvents();
+        document.getElementById('exam-form')?.addEventListener('submit', handleFormSubmit);
+        document.getElementById('event-form')?.addEventListener('submit', handleFormSubmit);
+        document.getElementById('cancel-exam-edit')?.addEventListener('click', resetExamsForm);
+        document.getElementById('cancel-event-edit')?.addEventListener('click', resetEventsForm);
+        document.getElementById('prev-month')?.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
+        document.getElementById('next-month')?.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
+        document.getElementById('import-legacy-btn')?.addEventListener('click', importLegacyExams);
+    });
+</script>

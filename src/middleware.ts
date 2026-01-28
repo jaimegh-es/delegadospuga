@@ -1,11 +1,70 @@
 import { defineMiddleware } from 'astro:middleware';
+import { auth, db } from './lib/firebase/server';
+import { ADMIN_EMAIL } from './lib/constants';
 
 export const onRequest = defineMiddleware(async (context, next) => {
-    const response = await next();
-
-    // Obtener la URL de la petición
     const url = new URL(context.request.url);
     const pathname = url.pathname;
+
+    // Rutas protegidas
+    if (pathname.startsWith('/dashboard') || 
+        pathname.startsWith('/api/absences') || 
+        pathname.startsWith('/api/users') ||
+        pathname.startsWith('/api/complaints') ||
+        pathname.startsWith('/api/requests') ||
+        pathname.startsWith('/api/settings') ||
+        pathname.startsWith('/api/calendar') ||
+        pathname.startsWith('/api/news') ||
+        pathname.startsWith('/api/files')) {
+        const sessionCookie = context.cookies.get('session')?.value;
+
+        if (!sessionCookie) {
+            return context.redirect('/login');
+        }
+
+        try {
+            const decodedCookie = await auth.verifySessionCookie(sessionCookie);
+            context.locals.uid = decodedCookie.uid;
+            context.locals.email = decodedCookie.email;
+
+            // Fetch user record for display name
+            const userRecord = await auth.getUser(decodedCookie.uid);
+            context.locals.displayName = userRecord.displayName || "Usuario";
+
+            // Fetch role from DB to be sure
+            const userDoc = await db.collection("users").doc(decodedCookie.uid).get();
+            const userData = userDoc.data();
+            
+            if (userData?.banned) {
+                return context.redirect('/maintenance');
+            }
+
+            // Force admin role if email matches constant
+            if (context.locals.email === ADMIN_EMAIL) {
+                context.locals.role = 'admin';
+            } else {
+                context.locals.role = userData?.role || 'user';
+            }
+
+            // Check for Maintenance Mode
+            const configDoc = await db.collection("config").doc("dashboard").get();
+            const config = configDoc.data();
+            
+            if (config?.blockNonAdmins && context.locals.role !== 'admin') {
+                return context.redirect('/maintenance');
+            }
+
+        } catch (error) {
+            return context.redirect('/login');
+        }
+    }
+
+    const response = await next();
+
+    // Security Headers
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
     // Verificar si es una imagen
     const isImage = /\.(jpg|jpeg|png|gif|svg|webp|avif|ico)$/i.test(pathname);
@@ -13,8 +72,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     if (isImage) {
         // Para imágenes: caché largo
         response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
-    } else {
-        // Para todo lo demás: sin caché
+    } else if (!pathname.startsWith('/dashboard') && !pathname.startsWith('/api/')) {
+        // Para otras rutas públicas (no dashboard/api)
         response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
         response.headers.set('Pragma', 'no-cache');
         response.headers.set('Expires', '0');

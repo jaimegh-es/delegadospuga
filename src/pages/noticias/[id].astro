@@ -1,0 +1,87 @@
+---
+import NewsLayout from '../../layouts/NewsLayout.astro';
+import { db } from "../../lib/firebase/server";
+
+const { id } = Astro.params;
+
+if (!id) {
+    return Astro.redirect('/404');
+}
+
+let newsItem = null;
+try {
+    const doc = await db.collection("news").doc(id).get();
+    if (doc.exists) {
+        const data = doc.data();
+        newsItem = {
+            title: data.title,
+            date: new Date(data.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }),
+            image: data.image,
+            content: data.content
+        };
+    }
+} catch (error) {
+    console.error("Error fetching news item:", error);
+}
+
+if (!newsItem) {
+    return Astro.redirect('/404');
+}
+---
+
+<NewsLayout title={newsItem.title} publishDate={newsItem.date} heroImage={newsItem.image}>
+    <div class="news-content" set:html={newsItem.content} />
+</NewsLayout>
+
+<style is:global>
+    /* Estilos para el contenido inyectado por Quill */
+    .news-content {
+        line-height: 1.8;
+        color: #374151;
+        font-size: 1.1rem;
+    }
+
+    .news-content p {
+        margin-bottom: 1.5rem;
+    }
+
+    .news-content h1, .news-content h2, .news-content h3 {
+        color: #2000ad;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+    
+    .news-content h1 { font-size: 2rem; }
+    .news-content h2 { font-size: 1.75rem; }
+    .news-content h3 { font-size: 1.5rem; }
+
+    .news-content ul, .news-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 2rem;
+    }
+
+    .news-content li {
+        margin-bottom: 0.5rem;
+    }
+
+    .news-content blockquote {
+        border-left: 4px solid #2000ad;
+        padding-left: 1rem;
+        font-style: italic;
+        color: #4b5563;
+        margin: 1.5rem 0;
+    }
+
+    .news-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 1rem 0;
+    }
+    
+    .news-content a {
+        color: #2000ad;
+        text-decoration: underline;
+    }
+</style>

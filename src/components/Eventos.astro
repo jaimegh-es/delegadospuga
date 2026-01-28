@@ -1,18 +1,31 @@
 ---
-// Datos de exámenes - Editar aquí para añadir/modificar exámenes
-const examenes = {
-    "2026-02-13": [
-        {
-            asignatura: "Fiesta carnaval",
-            hora: "",
-            aula: "",
-            detalles: `
-                <p><strong>¡Este año la organizamos nosotros!</strong> 🎉</p>
-               
-            `,
-        },
-    ],
-};
+import { db } from "../lib/firebase/server";
+
+// Obtener eventos de Firestore
+let examenes = {}; // Se llama examenes para mantener compatibilidad con el código existente, aunque son eventos
+try {
+  const snapshot = await db.collection("calendar_events").where("type", "==", "event").get();
+  
+  // Agrupar por fecha
+  snapshot.docs.forEach(doc => {
+    const data = doc.data();
+    const fecha = data.date;
+    
+    if (!examenes[fecha]) {
+      examenes[fecha] = [];
+    }
+    
+    examenes[fecha].push({
+      asignatura: data.title, // Mapeamos title a asignatura para reutilizar estructura
+      hora: data.time || "",
+      aula: "",
+      detalles: data.details || ""
+    });
+  });
+} catch (error) {
+  console.error("Error fetching events:", error);
+  examenes = {};
+}
 
 // Función para generar los días del mes
 function generarDiasMes(año, mes) {

@@ -1,0 +1,182 @@
+---
+interface Props {
+  absences: any[];
+  isAdmin?: boolean;
+}
+
+const { absences, isAdmin = false } = Astro.props;
+
+const today = new Date();
+const currentMonth = today.getMonth();
+const currentYear = today.getFullYear();
+
+const firstDay = new Date(currentYear, currentMonth, 1);
+const lastDay = new Date(currentYear, currentMonth + 1, 0);
+
+const daysInMonth = lastDay.getDate();
+const startingDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Start Monday (0) to Sunday (6)
+
+const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+const calendarDays = [];
+// Pad empty days
+for (let i = 0; i < startingDay; i++) {
+  calendarDays.push(null);
+}
+// Fill days
+for (let i = 1; i <= daysInMonth; i++) {
+  calendarDays.push(i);
+}
+
+const getAbsencesForDay = (day: number) => {
+  if (!day) return [];
+  return absences.filter(a => {
+    const d = new Date(a.date);
+    if (isNaN(d.getTime())) return false;
+    return d.getDate() === day && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+  });
+};
+---
+
+<div class="calendar-card">
+  <h2 class="calendar-title">{monthNames[currentMonth]} {currentYear}</h2>
+  
+  <div class="weekdays-grid">
+    <div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div>
+  </div>
+
+  <div class="days-grid">
+    {calendarDays.map((day) => (
+      <div class={`day-cell ${day ? 'active-day' : 'empty-day'}`}>
+        {day && (
+            <>
+                <span class="day-number">{day}</span>
+                <div class="absences-list">
+                {getAbsencesForDay(day).map((abs: any) => (
+                    <div 
+                        class={`absence-pill ${isAdmin ? 'admin-pill' : ''}`} 
+                        title={`${abs.subject} (${abs.teacher})`}
+                        onclick={isAdmin ? `deleteAbsence('${abs.id}')` : undefined}
+                    >
+                      {abs.subject}
+                    </div>
+                ))}
+                </div>
+            </>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .calendar-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    height: 100%; /* Fill available height */
+  }
+
+  .calendar-title {
+    text-align: center;
+    text-transform: capitalize;
+    color: #2000ad;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+  }
+
+  .weekdays-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+    text-align: center;
+    font-weight: 700;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+  }
+
+  .days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+  }
+
+  .day-cell {
+    min-height: 80px; /* Reduced from 100px */
+    border-radius: 8px;
+    padding: 0.25rem;
+    position: relative;
+    background-clip: padding-box;
+  }
+
+  .active-day {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+  }
+
+  .empty-day {
+    background: transparent;
+  }
+
+  .day-number {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #9ca3af;
+  }
+
+  .absences-list {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .absence-pill {
+    background-color: #fee2e2;
+    color: #991b1b;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .admin-pill {
+    cursor: pointer;
+  }
+  
+  .admin-pill:hover {
+    background-color: #dc2626; /* Darker red */
+    color: white;
+    transform: scale(1.05);
+  }
+</style>
+
+<script>
+  (window as any).deleteAbsence = async (id: string) => {
+    if(!confirm("¿Eliminar esta ausencia permanentemente?")) return;
+
+    try {
+        const res = await fetch('/api/absences', {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ id })
+        });
+        if(res.ok) {
+            window.location.reload();
+        } else {
+            alert("Error al eliminar");
+        }
+    } catch(e) {
+        alert("Error de conexión");
+    }
+  };
+</script>

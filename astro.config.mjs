@@ -1,9 +1,15 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import AstroPWA from '@vite-pwa/astro';
+import vercel from '@astrojs/vercel';
+
+import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
+  output: 'server',
+  adapter: vercel(),
+
   integrations: [
     AstroPWA({
       registerType: 'autoUpdate',
@@ -55,5 +61,9 @@ export default defineConfig({
         suppressWarnings: true,
       }
     })
-  ]
+  ],
+
+  vite: {
+    plugins: [tailwindcss()]
+  }
 });

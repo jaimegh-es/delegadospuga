@@ -1,0 +1,133 @@
+---
+---
+
+<div class="card form-card">
+    <h3><i class="fa-solid fa-lightbulb text-blue-500"></i> Solicitud Pública</h3>
+    <p class="text-sm text-gray-500 mb-4">Sugerencias visibles para todos. ¡Sé constructivo!</p>
+    
+    <form id="request-form">
+        <div class="form-group">
+            <label>Título</label>
+            <input type="text" name="title" required placeholder="Ej: Clase de repaso..." />
+        </div>
+
+        <div class="form-group">
+            <label>Detalles</label>
+            <textarea id="req-desc" name="description" rows="4" required placeholder="Explica tu propuesta..."></textarea>
+        </div>
+
+        <button type="button" id="gpt-btn" class="gpt-btn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Reescribir con ChatGPT (Formal)
+        </button>
+
+        <button type="submit" class="submit-btn">Publicar Solicitud</button>
+    </form>
+</div>
+
+<style>
+    .card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #f3f4f6;
+    }
+    
+    h3 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #1f2937;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #4b5563;
+        margin-bottom: 0.25rem;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 0.6rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .gpt-btn {
+        width: 100%;
+        background: #10a37f;
+        color: white;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .gpt-btn:hover { background: #0d8a6a; }
+
+    .submit-btn {
+        width: 100%;
+        background: #3b82f6;
+        color: white;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .submit-btn:hover { background: #2563eb; }
+</style>
+
+<script>
+    const form = document.getElementById('request-form') as HTMLFormElement;
+    const descInput = document.getElementById('req-desc') as HTMLTextAreaElement;
+    const gptBtn = document.getElementById('gpt-btn');
+
+    gptBtn?.addEventListener('click', () => {
+        const text = descInput.value;
+        if(!text) {
+            alert("Escribe algo primero para reescribirlo.");
+            return;
+        }
+        const prompt = `Reescribe la siguiente solicitud de un alumno para que suene formal, seria, decente y constructiva: "${text}"`;
+        const url = `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
+        window.open(url, '_blank');
+    });
+
+    form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        
+        try {
+            const res = await fetch('/api/requests', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if(res.ok) {
+                alert('Solicitud publicada correctamente.');
+                form.reset();
+                window.location.reload();
+            } else {
+                alert('Error al publicar solicitud.');
+            }
+        } catch(e) {
+            alert('Error de conexión.');
+        }
+    });
+</script>

@@ -1,0 +1,499 @@
+---
+---
+<div class="admin-card">
+    <h3>Gestión de Noticias</h3>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="create-news" id="tab-btn-create">Crear Noticia</button>
+        <button class="tab-btn" data-tab="list-news">Lista de Noticias</button>
+    </div>
+
+    <!-- Create/Edit News Form -->
+    <div id="tab-create-news" class="tab-content active">
+        <h4 id="form-title" class="mb-4 text-lg font-semibold text-gray-700">Nueva Noticia</h4>
+        <form id="news-form" class="event-form">
+            <input type="hidden" name="id" id="news-id">
+            
+            <div class="form-group full-width">
+                <label>Título:</label>
+                <input type="text" name="title" id="news-title" required placeholder="Título de la noticia">
+            </div>
+
+            <div class="form-group">
+                <label>Fecha:</label>
+                <input type="date" name="date" id="news-date" required>
+            </div>
+
+            <div class="form-group">
+                <label>Imagen de Portada:</label>
+                <select name="image" id="image-selector" required>
+                    <option value="">Cargando imágenes...</option>
+                </select>
+                <div id="image-preview" class="image-preview"></div>
+            </div>
+
+            <div class="form-group full-width">
+                <label>Subtítulo / Descripción Corta:</label>
+                <textarea name="description" id="news-description" rows="2" placeholder="Breve descripción que aparecerá en la tarjeta..." required></textarea>
+            </div>
+
+            <div class="form-group full-width">
+                <label>Contenido (HTML):</label>
+                <div id="editor-news" class="quill-editor"></div>
+                <input type="hidden" name="content" id="hidden-content-news">
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="cancel-edit-btn" class="secondary-btn hidden">Cancelar Edición</button>
+                <button type="submit" class="submit-btn" id="submit-btn-text">Publicar Noticia</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- News List Table -->
+    <div id="tab-list-news" class="tab-content">
+        <div class="table-container">
+            <table class="news-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%">Fecha</th>
+                        <th style="width: 40%">Título</th>
+                        <th style="width: 15%">Imagen</th>
+                        <th style="width: 30%">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="news-table-body">
+                    <tr><td colspan="4" class="text-center py-4 text-gray-500">Cargando noticias...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    h3 {
+        color: #2000ad;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 10px;
+    }
+
+    .tab-btn {
+        background: none;
+        border: none;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #64748b;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+        background: #eff6ff;
+        color: #2000ad;
+    }
+
+    .tab-content {
+        display: none;
+    }
+    .tab-content.active {
+        display: block;
+    }
+
+    .event-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    input, select, textarea {
+        padding: 8px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 0.95rem;
+    }
+
+    textarea {
+        font-family: inherit;
+    }
+
+    .quill-editor {
+        height: 300px;
+        background: white;
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
+    }
+
+    .form-actions {
+        grid-column: 1 / -1;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
+
+    .submit-btn {
+        background: #2000ad;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .submit-btn:hover {
+        background: #1a008d;
+    }
+
+    .secondary-btn {
+        background: #e2e8f0;
+        color: #475569;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .secondary-btn:hover {
+        background: #cbd5e1;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    .image-preview {
+        margin-top: 5px;
+        height: 100px;
+        background-color: #f1f5f9;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border: 1px dashed #cbd5e1;
+    }
+    .image-preview img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    /* Table Styles */
+    .table-container {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .news-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+    
+    .news-table th {
+        background: #f8fafc;
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #475569;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .news-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+        vertical-align: middle;
+    }
+    
+    .news-table tr:hover {
+        background: #f8fafc;
+    }
+
+    .table-img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .action-btn {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        margin-right: 5px;
+        transition: all 0.2s;
+    }
+
+    .btn-edit {
+        background: #e0f2fe;
+        color: #0284c7;
+    }
+    .btn-edit:hover {
+        background: #bae6fd;
+    }
+
+    .btn-delete {
+        background: #fee2e2;
+        color: #ef4444;
+    }
+    .btn-delete:hover {
+        background: #fecaca;
+        color: #dc2626;
+    }
+</style>
+
+<script>
+    import Quill from 'quill';
+
+    let quillNews;
+    let allNews = [];
+
+    function initQuill() {
+        const toolbarOptions = [
+            ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
+            [{ 'header': 1 }, { 'header': 2 }],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'script': 'sub'}, { 'script': 'super' }],
+            [{ 'indent': '-1'}, { 'indent': '+1' }],
+            [{ 'direction': 'rtl' }],
+            [{ 'size': ['small', false, 'large', 'huge'] }],
+            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'font': [] }],
+            [{ 'align': [] }],
+            ['clean'],
+            ['link', 'image', 'video']
+        ];
+
+        quillNews = new Quill('#editor-news', {
+            theme: 'snow',
+            placeholder: 'Escribe el contenido de la noticia...',
+            modules: { toolbar: toolbarOptions }
+        });
+    }
+
+    async function loadFiles() {
+        try {
+            const res = await fetch('/api/files');
+            const files = await res.json();
+            const selector = document.getElementById('image-selector');
+            const preview = document.getElementById('image-preview');
+
+            if (selector) {
+                const currentVal = selector.value;
+                selector.innerHTML = '<option value="">Selecciona una imagen...</option>';
+                files.forEach(file => {
+                    const option = document.createElement('option');
+                    option.value = file;
+                    option.textContent = file;
+                    selector.appendChild(option);
+                });
+                if(currentVal) selector.value = currentVal;
+
+                selector.addEventListener('change', (e) => {
+                    const val = (e.target as HTMLSelectElement).value;
+                    if (val) {
+                        preview.innerHTML = `<img src="/${val}" alt="Preview">`;
+                    } else {
+                        preview.innerHTML = '';
+                    }
+                });
+            }
+        } catch (e) {
+            console.error("Error loading files", e);
+        }
+    }
+
+    async function loadNews() {
+        const tbody = document.getElementById('news-table-body');
+        if (!tbody) return;
+
+        try {
+            const res = await fetch('/api/news');
+            allNews = await res.json();
+
+            if (allNews.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">No hay noticias publicadas.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = allNews.map(item => `
+                <tr>
+                    <td>${new Date(item.date).toLocaleDateString()}</td>
+                    <td class="font-medium">${item.title}</td>
+                    <td><img src="/${item.image}" class="table-img" alt="img"></td>
+                    <td>
+                        <button class="action-btn btn-edit" onclick="editNews('${item.id}')">Editar</button>
+                        <button class="action-btn btn-delete" onclick="deleteNews('${item.id}')">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('');
+
+        } catch (e) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-red-500">Error cargando noticias.</td></tr>';
+        }
+    }
+
+    // Edit Function
+    (window as any).editNews = (id) => {
+        const newsItem = allNews.find(n => n.id === id);
+        if (!newsItem) return;
+
+        // Populate form
+        (document.getElementById('news-id') as HTMLInputElement).value = newsItem.id;
+        (document.getElementById('news-title') as HTMLInputElement).value = newsItem.title;
+        (document.getElementById('news-date') as HTMLInputElement).value = newsItem.date;
+        (document.getElementById('news-description') as HTMLInputElement).value = newsItem.description;
+        
+        const selector = document.getElementById('image-selector') as HTMLSelectElement;
+        selector.value = newsItem.image;
+        // Trigger change to update preview
+        selector.dispatchEvent(new Event('change'));
+
+        quillNews.root.innerHTML = newsItem.content;
+
+        // Change UI state
+        document.getElementById('form-title').textContent = "Editar Noticia";
+        document.getElementById('submit-btn-text').textContent = "Actualizar Noticia";
+        document.getElementById('cancel-edit-btn').classList.remove('hidden');
+        document.getElementById('tab-btn-create').click(); // Switch to form tab
+    };
+
+    function resetForm() {
+        const form = document.getElementById('news-form') as HTMLFormElement;
+        form.reset();
+        (document.getElementById('news-id') as HTMLInputElement).value = '';
+        quillNews.setContents([]);
+        document.getElementById('image-preview').innerHTML = '';
+
+        document.getElementById('form-title').textContent = "Nueva Noticia";
+        document.getElementById('submit-btn-text').textContent = "Publicar Noticia";
+        document.getElementById('cancel-edit-btn').classList.add('hidden');
+    }
+
+    (window as any).deleteNews = async (id) => {
+        if (!confirm("¿Seguro que quieres borrar esta noticia?")) return;
+
+        try {
+            const res = await fetch('/api/news', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+
+            if (res.ok) {
+                loadNews();
+            } else {
+                alert("Error al borrar");
+            }
+        } catch (e) {
+            alert("Error de conexión");
+        }
+    };
+
+    function setupTabs() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = (tab as HTMLElement).dataset.tab;
+                
+                // Update tabs
+                const parent = tab.parentElement;
+                parent.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Update content
+                const container = parent.parentElement;
+                container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                container.querySelector(`#tab-${targetId}`).classList.add('active');
+
+                if (targetId === 'list-news') {
+                    loadNews();
+                }
+            });
+        });
+    }
+
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        const form = e.target;
+        
+        document.getElementById('hidden-content-news').value = quillNews.root.innerHTML;
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        
+        const isEdit = !!data.id;
+        const method = isEdit ? 'PATCH' : 'POST';
+
+        try {
+            const res = await fetch('/api/news', {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                resetForm();
+                alert(isEdit ? "Noticia actualizada correctamente" : "Noticia publicada correctamente");
+                
+                // If editing, maybe go back to list? Or stay to create new?
+                // Let's stay in create tab but reset, user can check list.
+                loadNews(); // Update cache
+            } else {
+                alert("Error al guardar");
+            }
+        } catch (e) {
+            alert("Error de conexión");
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initQuill();
+        loadFiles();
+        loadNews();
+        setupTabs();
+        document.getElementById('news-form')?.addEventListener('submit', handleFormSubmit);
+        document.getElementById('cancel-edit-btn')?.addEventListener('click', resetForm);
+    });
+</script>

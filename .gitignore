@@ -25,3 +25,4 @@ pnpm-debug.log*
 .vercel
 firebase-debug.log
 .env*.local
+.gemini-clipboard/

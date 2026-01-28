@@ -1,113 +1,32 @@
 ---
-// Datos de exámenes - Editar aquí para añadir/modificar exámenes
-const examenes = {
-    "2026-01-14": [
-        {
-            asignatura: "Recuperación Lengua",
-            hora: "",
-            aula: "B1B",
-            detalles: "Recuperación examen de Lengua.",
-        },
-    ],
-    "2026-01-21": [
-        {
-            asignatura: "Recuperación Lengua",
-            hora: "",
-            aula: "B1B",
-            detalles: "Recuperación examen de Lengua.",
-        },
-    ],
-    "2026-01-16": [
-        {
-            asignatura: "Recuperación Gallego",
-            hora: "",
-            aula: "B1B",
-            detalles: "Recuperación examen de Gallego.",
-        },
-    ],
-    "2026-01-23": [
-        {
-            asignatura: "Recuperación Química",
-            hora: "",
-            aula: "B1B",
-            detalles: "Para recuperar la parte de química.",
-        },
-    ],
-    "2026-02-05": [
-        {
-            asignatura: "Examen libro gallego",
-            hora: "",
-            aula: "B1B",
-            detalles: `
-                <p>El libro es <strong>'As malas mulleres'</strong>, de <em>Marilar Alexandre</em>.</p>
-                
-            `,
-        },
-    ],
-    "2026-01-28": [
-        {
-            asignatura: "Examen Mate",
-            hora: "",
-            aula: "B1B",
-            detalles: `
-                <p>Lo que cae:</p>
-                <a href="/materia.ex.mate.28.pdf" target="_blank" class="btn">📚 Descargar PDF con la materia del examen</a>
-            `,
-        },
-    ],
-    "2026-01-30": [
-        {
-            asignatura: "Examen Mate",
-            hora: "",
-            aula: "B1B",
-            detalles: `
-                <p>Lo que cae:</p>
-                <a href="/materia.ex.mate.28.pdf" target="_blank" class="btn">📚 Descargar PDF con la materia del examen</a>
-            `,
-        },
-    ],
-    "2026-02-24": [
-        {
-            asignatura: "Global Química",
-            hora: "",
-            aula: "B1B",
-            detalles: "Próximamente lo que cae.",
-        },
-    ],
-    "2026-02-25": [
-        {
-            asignatura: "Global Química",
-            hora: "",
-            aula: "B1B",
-            detalles: "Próximamente lo que cae.",
-        },
-    ],
-    "2026-02-12": [
-        {
-            asignatura: "Examen Gallego 1",
-            hora: "",
-            aula: "B1B",
-            detalles: "Próximamente lo que cae.",
-        },
-    ],
+import { db } from "../lib/firebase/server";
 
-    "2026-03-03": [
-        {
-            asignatura: "Examen Física",
-            hora: "",
-            aula: "B1B",
-            detalles: "Próximamente lo que cae.",
-        },
-    ],
-    "2026-03-06": [
-        {
-            asignatura: "Examen Gallego 2",
-            hora: "",
-            aula: "B1B",
-            detalles: "Próximamente lo que cae.",
-        },
-    ],
-};
+// Obtener exámenes de Firestore
+let examenes = {};
+try {
+  const snapshot = await db.collection("calendar_events").where("type", "==", "exam").get();
+  
+  // Agrupar por fecha
+  snapshot.docs.forEach(doc => {
+    const data = doc.data();
+    const fecha = data.date;
+    
+    if (!examenes[fecha]) {
+      examenes[fecha] = [];
+    }
+    
+    examenes[fecha].push({
+      asignatura: data.subject,
+      hora: data.time || "",
+      aula: data.classroom || "B1B",
+      detalles: data.details || ""
+    });
+  });
+} catch (error) {
+  console.error("Error fetching exams:", error);
+  // Fallback to empty or keep hardcoded as backup? Better empty to avoid confusion.
+  examenes = {};
+}
 
 // Función para generar los días del mes
 function generarDiasMes(año, mes) {

@@ -1,0 +1,17 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ESTADO: BLOQUEO TOTAL (Deny All)
+    // Razón: Esta aplicación usa Server-Side Rendering (SSR).
+    // Toda la lectura/escritura a la base de datos se realiza a través de la API del servidor
+    // (/src/pages/api/absences.ts) usando el SDK de Admin (firebase-admin).
+    // El SDK de Admin se salta estas reglas por diseño (tiene permisos totales).
+    // Por lo tanto, bloqueamos cualquier intento de acceso directo desde el navegador (Client SDK)
+    // para máxima seguridad. Nadie puede leer/escribir usando solo la API Key pública.
+    
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
