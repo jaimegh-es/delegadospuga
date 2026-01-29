@@ -72,13 +72,6 @@ if (showRequests) {
 </DashboardLayout>
 
 <style>
-  /* Dashboard Container Styles (from previous turns) */
-  .dashboard-container {
-    max-width: 1200px;
-    margin: 80px auto 0;
-    padding: 2rem;
-  }
-  
   .space-y-8 > * + * {
     margin-top: 2rem;
   }
@@ -113,8 +106,17 @@ if (showRequests) {
 
   .requests-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
       gap: 1.5rem;
+  }
+
+  @media (max-width: 640px) {
+      .requests-grid {
+          gap: 1rem;
+      }
+      .request-card {
+          padding: 1rem;
+      }
   }
 
   .request-card {
@@ -139,6 +141,7 @@ if (showRequests) {
       justify-content: space-between;
       align-items: flex-start;
       margin-bottom: 0.5rem;
+      gap: 0.5rem;
   }
 
   .card-header h4 {
@@ -146,13 +149,13 @@ if (showRequests) {
       font-weight: 700;
       color: #1f2937;
       line-height: 1.4;
+      word-break: break-word;
   }
 
   .card-date {
       font-size: 0.75rem;
       color: #9ca3af;
       white-space: nowrap;
-      margin-left: 1rem;
   }
 
   .card-author {
@@ -211,6 +214,7 @@ if (showRequests) {
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
+      padding: 1rem;
   }
   
   .modal:not(.hidden) {
@@ -224,14 +228,23 @@ if (showRequests) {
       background: white;
       padding: 2rem;
       border-radius: 16px;
-      width: 90%;
+      width: 100%;
       max-width: 600px;
-      max-height: 80vh;
+      max-height: 90vh;
       overflow-y: auto;
       position: relative;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
       transform: scale(0.95);
       transition: transform 0.3s ease;
+  }
+
+  @media (max-width: 640px) {
+      .modal-content {
+          padding: 1.5rem;
+      }
+      #modal-title {
+          font-size: 1.25rem !important;
+      }
   }
 
   .modal:not(.hidden) .modal-content {
@@ -253,7 +266,8 @@ if (showRequests) {
       justify-content: space-between;
       align-items: center;
       margin-bottom: 0.5rem;
-      padding-right: 2rem;
+      padding-right: 2.5rem;
+      gap: 1rem;
   }
   #modal-title {
       font-size: 1.5rem;

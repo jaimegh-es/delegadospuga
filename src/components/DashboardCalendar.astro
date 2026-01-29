@@ -41,31 +41,35 @@ const getAbsencesForDay = (day: number) => {
 <div class="calendar-card">
   <h2 class="calendar-title">{monthNames[currentMonth]} {currentYear}</h2>
   
-  <div class="weekdays-grid">
-    <div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div>
-  </div>
-
-  <div class="days-grid">
-    {calendarDays.map((day) => (
-      <div class={`day-cell ${day ? 'active-day' : 'empty-day'}`}>
-        {day && (
-            <>
-                <span class="day-number">{day}</span>
-                <div class="absences-list">
-                {getAbsencesForDay(day).map((abs: any) => (
-                    <div 
-                        class={`absence-pill ${isAdmin ? 'admin-pill' : ''}`} 
-                        title={`${abs.subject} (${abs.teacher})`}
-                        onclick={isAdmin ? `deleteAbsence('${abs.id}')` : undefined}
-                    >
-                      {abs.subject}
-                    </div>
-                ))}
-                </div>
-            </>
-        )}
+  <div class="calendar-scroll-container">
+    <div class="calendar-min-width">
+      <div class="weekdays-grid">
+        <div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div>
       </div>
-    ))}
+
+      <div class="days-grid">
+        {calendarDays.map((day) => (
+          <div class={`day-cell ${day ? 'active-day' : 'empty-day'}`}>
+            {day && (
+                <>
+                    <span class="day-number">{day}</span>
+                    <div class="absences-list">
+                    {getAbsencesForDay(day).map((abs: any) => (
+                        <div 
+                            class={`absence-pill ${isAdmin ? 'admin-pill' : ''}`} 
+                            title={`${abs.subject} (${abs.teacher})`}
+                            onclick={isAdmin ? `deleteAbsence('${abs.id}')` : undefined}
+                        >
+                          {abs.subject}
+                        </div>
+                    ))}
+                    </div>
+                </>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
   </div>
 </div>
 
@@ -78,6 +82,12 @@ const getAbsencesForDay = (day: number) => {
     height: 100%; /* Fill available height */
   }
 
+  @media (max-width: 640px) {
+    .calendar-card {
+      padding: 1rem;
+    }
+  }
+
   .calendar-title {
     text-align: center;
     text-transform: capitalize;
@@ -85,6 +95,23 @@ const getAbsencesForDay = (day: number) => {
     font-size: 1.5rem;
     font-weight: 800;
     margin-bottom: 1.5rem;
+  }
+
+  .calendar-scroll-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -0.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .calendar-min-width {
+    min-width: 600px;
+  }
+
+  @media (max-width: 640px) {
+    .calendar-min-width {
+      min-width: 500px;
+    }
   }
 
   .weekdays-grid {
@@ -109,6 +136,13 @@ const getAbsencesForDay = (day: number) => {
     padding: 0.25rem;
     position: relative;
     background-clip: padding-box;
+    transition: background-color 0.2s;
+  }
+
+  @media (max-width: 640px) {
+    .day-cell {
+      min-height: 60px;
+    }
   }
 
   .active-day {

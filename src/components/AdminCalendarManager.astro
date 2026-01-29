@@ -146,6 +146,19 @@
         <button id="import-legacy-btn" class="secondary-btn">Importar Exámenes Anteriores</button>
         <p class="hint">Usar solo una vez para cargar los exámenes antiguos.</p>
     </div>
+
+    <!-- Bottom Bar for Mobile -->
+    <div id="mobile-action-bar" class="bottom-action-bar">
+        <button id="bar-edit-btn" class="bar-edit-btn">
+            <i class="fa-solid fa-pen-to-square"></i> Editar
+        </button>
+        <button id="bar-delete-btn" class="bar-delete-btn">
+            <i class="fa-solid fa-trash"></i> Borrar
+        </button>
+        <button id="bar-close-btn" class="bar-close-btn">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
 </div>
 
 <style>
@@ -229,6 +242,15 @@
         gap: 16px;
     }
 
+    @media (max-width: 640px) {
+        .event-form {
+            grid-template-columns: 1fr;
+        }
+        .admin-card {
+            padding: 1rem;
+        }
+    }
+
     .form-group {
         display: flex;
         flex-direction: column;
@@ -251,6 +273,44 @@
         border-radius: 6px;
         font-size: 0.95rem;
     }
+
+    /* Bottom Action Bar for Mobile */
+    .bottom-action-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+        padding: 1rem;
+        display: flex;
+        gap: 1rem;
+        z-index: 2000;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .bottom-action-bar.active {
+        transform: translateY(0);
+    }
+
+    .bottom-action-bar button {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+    }
+
+    .bar-edit-btn { background: #2000ad; color: white; }
+    .bar-delete-btn { background: #fee2e2; color: #ef4444; }
+    .bar-close-btn { background: #f1f5f9; color: #475569; max-width: 50px; }
 
     /* Quill Styles Override */
     .quill-editor {
@@ -275,6 +335,15 @@
         justify-content: flex-end;
         gap: 10px;
         margin-top: 10px;
+    }
+
+    @media (max-width: 640px) {
+        .form-actions {
+            flex-direction: column;
+        }
+        .form-actions button {
+            width: 100%;
+        }
     }
 
     .submit-btn {
@@ -344,6 +413,12 @@
         border: 1px solid #e2e8f0;
     }
 
+    @media (max-width: 640px) {
+        .mes {
+            padding: 12px;
+        }
+    }
+
     .mes-titulo {
         font-size: 1.5rem;
         font-weight: 600;
@@ -381,6 +456,12 @@
         padding: 4px;
     }
 
+    @media (max-width: 640px) {
+        :global(.calendario-tabla td) {
+            height: 60px;
+        }
+    }
+
     :global(.dia) {
         background: white;
         height: 100%;
@@ -402,7 +483,7 @@
         color: white;
     }
 
-    /* Hover Overlay */
+    /* Hover Overlay (Hidden on Mobile) */
     :global(.dia-overlay) {
         position: absolute;
         top: 0;
@@ -416,9 +497,20 @@
         z-index: 10;
     }
 
-    :global(.dia:hover .dia-overlay) {
-        opacity: 1;
-        pointer-events: auto;
+    @media (hover: hover) {
+        :global(.dia:hover .dia-overlay) {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    }
+
+    @media (hover: none) {
+        :global(.dia-overlay) {
+            display: none;
+        }
+        :global(.dia.tiene-examen), :global(.dia.tiene-evento) {
+            cursor: pointer;
+        }
     }
 
     :global(.overlay-btn) {
@@ -562,6 +654,15 @@
             else if (hasEvent) className += ' tiene-evento';
             
             cell.className = className;
+            
+            // Add click listener for mobile
+            if (dayEvents.length > 0) {
+                cell.addEventListener('click', () => {
+                    if (window.matchMedia("(hover: none)").matches) {
+                        openMobileActionBar(dayEvents[0].id);
+                    }
+                });
+            }
 
             let content = `<div class="numero-dia">${currentDay}</div>`;
             
@@ -577,10 +678,10 @@
                  // Hover Overlay with icons
                  content += `
                     <div class="dia-overlay">
-                        <button class="overlay-btn btn-edit-cal" onclick="editCalendarItem('${dayEvents[0].id}')" title="Editar">
+                        <button class="overlay-btn btn-edit-cal" onclick="event.stopPropagation(); editCalendarItem('${dayEvents[0].id}')" title="Editar">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
-                        <button class="overlay-btn btn-delete-cal" onclick="deleteEvent('${dayEvents[0].id}')" title="Borrar">
+                        <button class="overlay-btn btn-delete-cal" onclick="event.stopPropagation(); deleteEvent('${dayEvents[0].id}')" title="Borrar">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
@@ -602,7 +703,21 @@
         if (row.children.length > 0) tbody.appendChild(row);
     }
 
+    let selectedId = null;
+    const mobileBar = document.getElementById('mobile-action-bar');
+
+    function openMobileActionBar(id) {
+        selectedId = id;
+        mobileBar.classList.add('active');
+    }
+
+    function closeMobileActionBar() {
+        mobileBar.classList.remove('active');
+        selectedId = null;
+    }
+
     (window as any).editCalendarItem = (id) => {
+        closeMobileActionBar();
         const item = eventsData.find(e => e.id === id);
         if (!item) return;
 
@@ -664,6 +779,7 @@
             });
 
             if (res.ok) {
+                closeMobileActionBar();
                 loadEvents();
             } else {
                 alert("Error al borrar");
@@ -773,5 +889,14 @@
         document.getElementById('prev-month')?.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
         document.getElementById('next-month')?.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
         document.getElementById('import-legacy-btn')?.addEventListener('click', importLegacyExams);
+
+        // Mobile Bar Listeners
+        document.getElementById('bar-edit-btn')?.addEventListener('click', () => {
+            if (selectedId) (window as any).editCalendarItem(selectedId);
+        });
+        document.getElementById('bar-delete-btn')?.addEventListener('click', () => {
+            if (selectedId) deleteEvent(selectedId);
+        });
+        document.getElementById('bar-close-btn')?.addEventListener('click', closeMobileActionBar);
     });
 </script>
