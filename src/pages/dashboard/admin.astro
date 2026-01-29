@@ -1,7 +1,8 @@
 ---
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
 import AdminPanel from '../../components/AdminPanel.astro';
-import AdminCalendarManager from '../../components/AdminCalendarManager.astro';
+import AdminExamManager from '../../components/AdminExamManager.astro';
+import AdminEventManager from '../../components/AdminEventManager.astro';
 import AdminNewsManager from '../../components/AdminNewsManager.astro';
 import AdminComplaints from '../../components/AdminComplaints.astro';
 
@@ -15,7 +16,8 @@ if (user.role !== 'admin') {
 <DashboardLayout title="Administración" currentPath="/dashboard/admin">
     <div class="max-w-4xl mx-auto space-y-8">
         <AdminPanel />
-        <AdminCalendarManager />
+        <AdminExamManager />
+        <AdminEventManager />
         <AdminNewsManager />
         <AdminComplaints />
     </div>

@@ -4,15 +4,10 @@
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 
 <div class="admin-card">
-    <h3>Gestión de Calendario (Exámenes y Eventos)</h3>
-
-    <div class="tabs">
-        <button class="tab-btn active" data-tab="exams" id="tab-btn-exams">Exámenes</button>
-        <button class="tab-btn" data-tab="events" id="tab-btn-events">Eventos</button>
-    </div>
+    <h3>Gestión de Exámenes</h3>
 
     <!-- Formulario Exámenes -->
-    <div id="tab-exams" class="tab-content active">
+    <div id="exam-manager-content">
         <h4 id="exam-form-title" class="form-title">Añadir Examen</h4>
         <form id="exam-form" class="event-form">
             <input type="hidden" name="id" id="exam-id">
@@ -70,52 +65,17 @@
         </form>
     </div>
 
-    <!-- Formulario Eventos -->
-    <div id="tab-events" class="tab-content">
-        <h4 id="event-form-title" class="form-title">Añadir Evento</h4>
-        <form id="event-form" class="event-form">
-            <input type="hidden" name="id" id="event-id">
-            <input type="hidden" name="type" value="event">
-            
-            <div class="form-group">
-                <label>Fecha:</label>
-                <input type="date" name="date" id="event-date" required>
-            </div>
-
-            <div class="form-group">
-                <label>Título del Evento:</label>
-                <input type="text" name="title" id="event-title" required placeholder="Ej: Excursión, Festivo...">
-            </div>
-
-             <div class="form-group">
-                <label>Hora (Opcional):</label>
-                <input type="text" name="time" id="event-time" placeholder="Ej: Todo el día">
-            </div>
-
-            <div class="form-group full-width">
-                <label>Detalles:</label>
-                <div id="editor-events" class="quill-editor"></div>
-                <input type="hidden" name="details" id="hidden-details-events">
-            </div>
-
-            <div class="form-actions">
-                <button type="button" id="cancel-event-edit" class="secondary-btn hidden">Cancelar Edición</button>
-                <button type="submit" class="submit-btn" id="event-submit-btn">Añadir Evento</button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Vista Calendario Estilo CalendarioExamenes -->
+    <!-- Vista Calendario -->
     <div class="calendar-preview-section">
         <div class="section-header-preview">
-            <h4>Vista Previa</h4>
+            <h4>Vista Previa Exámenes</h4>
             <p class="hint-preview">Pasa el ratón para editar o borrar</p>
         </div>
         
         <div class="month-controls">
-            <button id="prev-month">&lt;</button>
-            <h3 id="current-month-display" class="mes-titulo"></h3>
-            <button id="next-month">&gt;</button>
+            <button id="prev-month-exams">&lt;</button>
+            <h3 id="current-month-display-exams" class="mes-titulo"></h3>
+            <button id="next-month-exams">&gt;</button>
         </div>
         
         <div class="mes-container">
@@ -132,7 +92,7 @@
                             <th>D</th>
                         </tr>
                     </thead>
-                    <tbody id="admin-calendar-body">
+                    <tbody id="admin-exam-calendar-body">
                         <!-- Filled by JS -->
                     </tbody>
                 </table>
@@ -148,14 +108,14 @@
     </div>
 
     <!-- Bottom Bar for Mobile -->
-    <div id="mobile-action-bar" class="bottom-action-bar">
-        <button id="bar-edit-btn" class="bar-edit-btn">
+    <div id="mobile-action-bar-exams" class="bottom-action-bar">
+        <button id="bar-edit-btn-exams" class="bar-edit-btn">
             <i class="fa-solid fa-pen-to-square"></i> Editar
         </button>
-        <button id="bar-delete-btn" class="bar-delete-btn">
+        <button id="bar-delete-btn-exams" class="bar-delete-btn">
             <i class="fa-solid fa-trash"></i> Borrar
         </button>
-        <button id="bar-close-btn" class="bar-close-btn">
+        <button id="bar-close-btn-exams" class="bar-close-btn">
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
@@ -205,37 +165,6 @@
         font-weight: 600;
     }
 
-    .tabs {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-        border-bottom: 1px solid #e2e8f0;
-        padding-bottom: 10px;
-    }
-
-    .tab-btn {
-        background: none;
-        border: none;
-        padding: 8px 16px;
-        cursor: pointer;
-        font-weight: 600;
-        color: #64748b;
-        border-radius: 6px;
-        transition: all 0.2s;
-    }
-
-    .tab-btn.active {
-        background: #eff6ff;
-        color: #2000ad;
-    }
-
-    .tab-content {
-        display: none;
-    }
-    .tab-content.active {
-        display: block;
-    }
-
     .event-form {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -245,9 +174,6 @@
     @media (max-width: 640px) {
         .event-form {
             grid-template-columns: 1fr;
-        }
-        .admin-card {
-            padding: 1rem;
         }
     }
 
@@ -319,15 +245,6 @@
         border-bottom-left-radius: 6px;
         border-bottom-right-radius: 6px;
     }
-    .ql-toolbar {
-        border-top-left-radius: 6px;
-        border-top-right-radius: 6px;
-        background: #f8fafc;
-    }
-    .ql-container {
-        font-family: inherit;
-        font-size: 0.95rem;
-    }
 
     .form-actions {
         grid-column: 1 / -1;
@@ -335,15 +252,6 @@
         justify-content: flex-end;
         gap: 10px;
         margin-top: 10px;
-    }
-
-    @media (max-width: 640px) {
-        .form-actions {
-            flex-direction: column;
-        }
-        .form-actions button {
-            width: 100%;
-        }
     }
 
     .submit-btn {
@@ -378,7 +286,7 @@
         color: #94a3b8;
     }
 
-    /* COPIED CALENDAR STYLES */
+    /* CALENDAR STYLES */
     .month-controls {
         display: flex;
         justify-content: center;
@@ -397,9 +305,6 @@
         font-weight: bold;
         color: #2000ad;
     }
-    .month-controls button:hover {
-        background: #e2e8f0;
-    }
 
     .mes-container {
         max-width: 600px;
@@ -413,12 +318,6 @@
         border: 1px solid #e2e8f0;
     }
 
-    @media (max-width: 640px) {
-        .mes {
-            padding: 12px;
-        }
-    }
-
     .mes-titulo {
         font-size: 1.5rem;
         font-weight: 600;
@@ -430,7 +329,6 @@
     .calendario-tabla {
         width: 100%;
         border-collapse: collapse;
-        border-spacing: 0;
         border: 2px solid #e2e8f0;
         border-radius: 12px;
         overflow: hidden;
@@ -443,10 +341,8 @@
         text-align: center;
         font-weight: 600;
         font-size: 0.875rem;
-        border: none;
     }
 
-    /* Override for global styles in Astro component */
     :global(.calendario-tabla td) {
         width: 14.28%;
         height: 80px;
@@ -456,34 +352,11 @@
         padding: 4px;
     }
 
-    @media (max-width: 640px) {
-        :global(.calendario-tabla td) {
-            height: 60px;
-        }
-    }
-
-    :global(.dia) {
-        background: white;
-        height: 100%;
-        position: relative;
-        overflow: hidden;
-    }
-
-    :global(.dia-vacio) {
-        background: #f8fafc;
-    }
-
     :global(.dia.tiene-examen) {
         background: linear-gradient(45deg, #2000ad, #003d99);
         color: white;
     }
-    
-    :global(.dia.tiene-evento) {
-        background: linear-gradient(45deg, #10b981, #059669);
-        color: white;
-    }
 
-    /* Hover Overlay (Hidden on Mobile) */
     :global(.dia-overlay) {
         position: absolute;
         top: 0;
@@ -504,15 +377,6 @@
         }
     }
 
-    @media (hover: none) {
-        :global(.dia-overlay) {
-            display: none;
-        }
-        :global(.dia.tiene-examen), :global(.dia.tiene-evento) {
-            cursor: pointer;
-        }
-    }
-
     :global(.overlay-btn) {
         flex: 1;
         display: flex;
@@ -522,21 +386,13 @@
         cursor: pointer;
         color: white;
         font-size: 1.2rem;
-        transition: background 0.2s;
     }
 
     :global(.btn-edit-cal) {
         background: rgba(32, 0, 173, 0.9);
     }
-    :global(.btn-edit-cal:hover) {
-        background: rgba(32, 0, 173, 1);
-    }
-
     :global(.btn-delete-cal) {
         background: rgba(239, 68, 68, 0.9);
-    }
-    :global(.btn-delete-cal:hover) {
-        background: rgba(239, 68, 68, 1);
     }
 
     :global(.numero-dia) {
@@ -545,11 +401,6 @@
         left: 6px;
         font-weight: 600;
         font-size: 0.875rem;
-        color: #374151;
-    }
-
-    :global(.dia.tiene-examen .numero-dia), :global(.dia.tiene-evento .numero-dia) {
-        color: white;
     }
 
     :global(.examen-info) {
@@ -564,8 +415,13 @@
 
     :global(.examen-info .asignatura) {
         font-weight: 700;
-        margin-bottom: 2px;
         text-transform: uppercase;
+    }
+
+    .maintenance-section {
+        margin-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 1rem;
     }
 </style>
 
@@ -574,7 +430,7 @@
 
     let currentDate = new Date();
     let eventsData = [];
-    let quillExams, quillEvents;
+    let quillExams;
 
     function initQuill() {
         const toolbarOptions = [
@@ -590,27 +446,22 @@
             placeholder: 'Detalles del examen...',
             modules: { toolbar: toolbarOptions }
         });
-
-        quillEvents = new Quill('#editor-events', {
-            theme: 'snow',
-            placeholder: 'Detalles del evento...',
-            modules: { toolbar: toolbarOptions }
-        });
     }
 
-    async function loadEvents() {
+    async function loadExams() {
         try {
             const res = await fetch('/api/calendar');
-            eventsData = await res.json();
+            const allData = await res.json();
+            eventsData = allData.filter(e => e.type === 'exam');
             renderCalendar();
         } catch (e) {
-            console.error("Error loading events", e);
+            console.error("Error loading exams", e);
         }
     }
 
     function renderCalendar() {
-        const tbody = document.getElementById('admin-calendar-body');
-        const monthDisplay = document.getElementById('current-month-display');
+        const tbody = document.getElementById('admin-exam-calendar-body');
+        const monthDisplay = document.getElementById('current-month-display-exams');
         
         if (!tbody || !monthDisplay) return;
 
@@ -620,8 +471,8 @@
         monthDisplay.textContent = new Date(year, month).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
 
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const firstDay = new Date(year, month, 1).getDay(); // 0 = Sunday
-        const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1; // 0 = Monday
+        const firstDay = new Date(year, month, 1).getDay();
+        const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1;
 
         tbody.innerHTML = '';
         
@@ -644,44 +495,36 @@
             }
 
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`;
-            const dayEvents = eventsData.filter(e => e.date === dateStr);
-            const hasExam = dayEvents.some(e => e.type === 'exam');
-            const hasEvent = dayEvents.some(e => e.type === 'event');
+            const dayExams = eventsData.filter(e => e.date === dateStr);
+            const hasExam = dayExams.length > 0;
             
             const cell = document.createElement('td');
-            let className = 'dia';
-            if (hasExam) className += ' tiene-examen';
-            else if (hasEvent) className += ' tiene-evento';
+            cell.className = hasExam ? 'dia tiene-examen' : 'dia';
             
-            cell.className = className;
-            
-            // Add click listener for mobile
-            if (dayEvents.length > 0) {
+            if (hasExam) {
                 cell.addEventListener('click', () => {
                     if (window.matchMedia("(hover: none)").matches) {
-                        openMobileActionBar(dayEvents[0].id);
+                        openMobileActionBar(dayExams[0].id);
                     }
                 });
             }
 
             let content = `<div class="numero-dia">${currentDay}</div>`;
             
-            if (dayEvents.length > 0) {
+            if (hasExam) {
                  content += `<div class="examen-info">`;
-                 dayEvents.slice(0, 2).forEach(ev => {
-                     const text = ev.type === 'exam' ? ev.subject : ev.title;
-                     content += `<div class="asignatura">${text}</div>`;
+                 dayExams.slice(0, 2).forEach(ev => {
+                     content += `<div class="asignatura">${ev.subject}</div>`;
                  });
-                 if (dayEvents.length > 2) content += `<div class="asignatura">+${dayEvents.length - 2}</div>`;
+                 if (dayExams.length > 2) content += `<div class="asignatura">+${dayExams.length - 2}</div>`;
                  content += `</div>`;
 
-                 // Hover Overlay with icons
                  content += `
                     <div class="dia-overlay">
-                        <button class="overlay-btn btn-edit-cal" onclick="event.stopPropagation(); editCalendarItem('${dayEvents[0].id}')" title="Editar">
+                        <button class="overlay-btn btn-edit-cal" onclick="event.stopPropagation(); editExamItem('${dayExams[0].id}')" title="Editar">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
-                        <button class="overlay-btn btn-delete-cal" onclick="event.stopPropagation(); deleteEvent('${dayEvents[0].id}')" title="Borrar">
+                        <button class="overlay-btn btn-delete-cal" onclick="event.stopPropagation(); deleteExamItem('${dayExams[0].id}')" title="Borrar">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
@@ -704,7 +547,7 @@
     }
 
     let selectedId = null;
-    const mobileBar = document.getElementById('mobile-action-bar');
+    const mobileBar = document.getElementById('mobile-action-bar-exams');
 
     function openMobileActionBar(id) {
         selectedId = id;
@@ -716,36 +559,23 @@
         selectedId = null;
     }
 
-    (window as any).editCalendarItem = (id) => {
+    (window as any).editExamItem = (id) => {
         closeMobileActionBar();
         const item = eventsData.find(e => e.id === id);
         if (!item) return;
 
-        if (item.type === 'exam') {
-            (document.getElementById('tab-btn-exams') as HTMLButtonElement).click();
-            (document.getElementById('exam-id') as HTMLInputElement).value = item.id;
-            (document.getElementById('exam-date') as HTMLInputElement).value = item.date;
-            (document.getElementById('exam-subject') as HTMLSelectElement).value = item.subject;
-            (document.getElementById('exam-time') as HTMLInputElement).value = item.time || '';
-            (document.getElementById('exam-classroom') as HTMLInputElement).value = item.classroom || 'B1B';
-            quillExams.root.innerHTML = item.details || '';
-            
-            document.getElementById('exam-form-title').textContent = "Editar Examen";
-            document.getElementById('exam-submit-btn').textContent = "Actualizar Examen";
-            document.getElementById('cancel-exam-edit').classList.remove('hidden');
-        } else {
-            (document.getElementById('tab-btn-events') as HTMLButtonElement).click();
-            (document.getElementById('event-id') as HTMLInputElement).value = item.id;
-            (document.getElementById('event-date') as HTMLInputElement).value = item.date;
-            (document.getElementById('event-title') as HTMLInputElement).value = item.title;
-            (document.getElementById('event-time') as HTMLInputElement).value = item.time || '';
-            quillEvents.root.innerHTML = item.details || '';
-
-            document.getElementById('event-form-title').textContent = "Editar Evento";
-            document.getElementById('event-submit-btn').textContent = "Actualizar Evento";
-            document.getElementById('cancel-event-edit').classList.remove('hidden');
-        }
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        (document.getElementById('exam-id') as HTMLInputElement).value = item.id;
+        (document.getElementById('exam-date') as HTMLInputElement).value = item.date;
+        (document.getElementById('exam-subject') as HTMLSelectElement).value = item.subject;
+        (document.getElementById('exam-time') as HTMLInputElement).value = item.time || '';
+        (document.getElementById('exam-classroom') as HTMLInputElement).value = item.classroom || 'B1B';
+        quillExams.root.innerHTML = item.details || '';
+        
+        document.getElementById('exam-form-title').textContent = "Editar Examen";
+        document.getElementById('exam-submit-btn').textContent = "Actualizar Examen";
+        document.getElementById('cancel-exam-edit').classList.remove('hidden');
+        
+        window.scrollTo({ top: document.getElementById('exam-manager-content').offsetTop - 100, behavior: 'smooth' });
     };
 
     function resetExamsForm() {
@@ -758,18 +588,8 @@
         document.getElementById('cancel-exam-edit').classList.add('hidden');
     }
 
-    function resetEventsForm() {
-        const form = document.getElementById('event-form') as HTMLFormElement;
-        form.reset();
-        (document.getElementById('event-id') as HTMLInputElement).value = '';
-        quillEvents.setContents([]);
-        document.getElementById('event-form-title').textContent = "Añadir Evento";
-        document.getElementById('event-submit-btn').textContent = "Añadir Evento";
-        document.getElementById('cancel-event-edit').classList.add('hidden');
-    }
-
-    async function deleteEvent(id) {
-        if (!confirm("¿Borrar este elemento?")) return;
+    async function deleteExamItem(id) {
+        if (!confirm("¿Borrar este examen?")) return;
 
         try {
             const res = await fetch('/api/calendar', {
@@ -780,7 +600,7 @@
 
             if (res.ok) {
                 closeMobileActionBar();
-                loadEvents();
+                loadExams();
             } else {
                 alert("Error al borrar");
             }
@@ -788,30 +608,12 @@
             alert("Error de conexión");
         }
     }
-    (window as any).deleteEvent = deleteEvent;
-
-    function setupTabs() {
-        const tabs = document.querySelectorAll('.tab-btn');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                tab.classList.add('active');
-                document.getElementById(`tab-${(tab as HTMLElement).dataset.tab}`).classList.add('active');
-            });
-        });
-    }
+    (window as any).deleteExamItem = deleteExamItem;
 
     async function handleFormSubmit(e) {
         e.preventDefault();
         const form = e.target;
-        
-        if (form.id === 'exam-form') {
-            document.getElementById('hidden-details-exams').value = quillExams.root.innerHTML;
-        } else if (form.id === 'event-form') {
-            document.getElementById('hidden-details-events').value = quillEvents.root.innerHTML;
-        }
+        document.getElementById('hidden-details-exams').value = quillExams.root.innerHTML;
 
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
@@ -824,11 +626,9 @@
             });
 
             if (res.ok) {
-                if (form.id === 'exam-form') resetExamsForm();
-                else resetEventsForm();
-                
-                loadEvents();
-                alert("Guardado correctamente");
+                resetExamsForm();
+                loadExams();
+                alert("Examen guardado correctamente");
             } else {
                 alert("Error al guardar");
             }
@@ -837,7 +637,7 @@
         }
     }
 
-    // Legacy Import Logic
+    // Legacy Import Logic (Exam Specific)
     const legacyExams = {
         "2026-01-14": [{ asignatura: "Recuperación Lengua", hora: "", aula: "B1B", detalles: "Recuperación examen de Lengua." }],
         "2026-01-21": [{ asignatura: "Recuperación Lengua", hora: "", aula: "B1B", detalles: "Recuperación examen de Lengua." }],
@@ -854,12 +654,12 @@
     };
 
     async function importLegacyExams() {
-        if (!confirm("¿Estás seguro?")) return;
+        if (!confirm("¿Estás seguro de importar los exámenes antiguos?")) return;
         const button = document.getElementById('import-legacy-btn');
-        button.disabled = true;
+        (button as HTMLButtonElement).disabled = true;
         try {
             for (const [date, exams] of Object.entries(legacyExams)) {
-                for (const exam of exams) {
+                for (const exam of exams as any[]) {
                     await fetch('/api/calendar', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -869,34 +669,30 @@
                     });
                 }
             }
-            alert("Importado.");
-            loadEvents();
+            alert("Exámenes importados correctamente.");
+            loadExams();
         } catch (e) {
-            alert("Error.");
+            alert("Error al importar.");
         } finally {
-            button.disabled = false;
+            (button as HTMLButtonElement).disabled = false;
         }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
         initQuill();
-        setupTabs();
-        loadEvents();
+        loadExams();
         document.getElementById('exam-form')?.addEventListener('submit', handleFormSubmit);
-        document.getElementById('event-form')?.addEventListener('submit', handleFormSubmit);
         document.getElementById('cancel-exam-edit')?.addEventListener('click', resetExamsForm);
-        document.getElementById('cancel-event-edit')?.addEventListener('click', resetEventsForm);
-        document.getElementById('prev-month')?.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
-        document.getElementById('next-month')?.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
+        document.getElementById('prev-month-exams')?.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
+        document.getElementById('next-month-exams')?.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
         document.getElementById('import-legacy-btn')?.addEventListener('click', importLegacyExams);
 
-        // Mobile Bar Listeners
-        document.getElementById('bar-edit-btn')?.addEventListener('click', () => {
-            if (selectedId) (window as any).editCalendarItem(selectedId);
+        document.getElementById('bar-edit-btn-exams')?.addEventListener('click', () => {
+            if (selectedId) (window as any).editExamItem(selectedId);
         });
-        document.getElementById('bar-delete-btn')?.addEventListener('click', () => {
-            if (selectedId) deleteEvent(selectedId);
+        document.getElementById('bar-delete-btn-exams')?.addEventListener('click', () => {
+            if (selectedId) deleteExamItem(selectedId);
         });
-        document.getElementById('bar-close-btn')?.addEventListener('click', closeMobileActionBar);
+        document.getElementById('bar-close-btn-exams')?.addEventListener('click', closeMobileActionBar);
     });
 </script>
