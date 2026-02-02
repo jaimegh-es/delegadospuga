@@ -6,40 +6,16 @@ interface Props {
 
 const { absences, isAdmin = false } = Astro.props;
 
-const today = new Date();
-const currentMonth = today.getMonth();
-const currentYear = today.getFullYear();
-
-const firstDay = new Date(currentYear, currentMonth, 1);
-const lastDay = new Date(currentYear, currentMonth + 1, 0);
-
-const daysInMonth = lastDay.getDate();
-const startingDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Start Monday (0) to Sunday (6)
-
-const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-
-const calendarDays = [];
-// Pad empty days
-for (let i = 0; i < startingDay; i++) {
-  calendarDays.push(null);
-}
-// Fill days
-for (let i = 1; i <= daysInMonth; i++) {
-  calendarDays.push(i);
-}
-
-const getAbsencesForDay = (day: number) => {
-  if (!day) return [];
-  return absences.filter(a => {
-    const d = new Date(a.date);
-    if (isNaN(d.getTime())) return false;
-    return d.getDate() === day && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-  });
-};
+// Pass initial data to client
+const initialData = JSON.stringify(absences);
 ---
 
-<div class="calendar-card">
-  <h2 class="calendar-title">{monthNames[currentMonth]} {currentYear}</h2>
+<div class="calendar-card" data-absences={initialData} data-is-admin={isAdmin.toString()}>
+  <div class="calendar-header">
+    <button id="prev-month" class="nav-btn" aria-label="Mes anterior">&lt;</button>
+    <h2 class="calendar-title" id="calendar-title">Cargando...</h2>
+    <button id="next-month" class="nav-btn" aria-label="Mes siguiente">&gt;</button>
+  </div>
   
   <div class="calendar-scroll-container">
     <div class="calendar-min-width">
@@ -47,27 +23,8 @@ const getAbsencesForDay = (day: number) => {
         <div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div>
       </div>
 
-      <div class="days-grid">
-        {calendarDays.map((day) => (
-          <div class={`day-cell ${day ? 'active-day' : 'empty-day'}`}>
-            {day && (
-                <>
-                    <span class="day-number">{day}</span>
-                    <div class="absences-list">
-                    {getAbsencesForDay(day).map((abs: any) => (
-                        <div 
-                            class={`absence-pill ${isAdmin ? 'admin-pill' : ''}`} 
-                            title={`${abs.subject} (${abs.teacher})`}
-                            onclick={isAdmin ? `deleteAbsence('${abs.id}')` : undefined}
-                        >
-                          {abs.subject}
-                        </div>
-                    ))}
-                    </div>
-                </>
-            )}
-          </div>
-        ))}
+      <div class="days-grid" id="days-grid">
+        <!-- Filled by JS -->
       </div>
     </div>
   </div>
@@ -82,6 +39,34 @@ const getAbsencesForDay = (day: number) => {
     height: 100%; /* Fill available height */
   }
 
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .nav-btn {
+    background: #f3f4f6;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #4b5563;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  
+  .nav-btn:hover {
+    background: #e5e7eb;
+    color: #1f2937;
+  }
+
   @media (max-width: 640px) {
     .calendar-card {
       padding: 1rem;
@@ -94,7 +79,7 @@ const getAbsencesForDay = (day: number) => {
     color: #2000ad;
     font-size: 1.5rem;
     font-weight: 800;
-    margin-bottom: 1.5rem;
+    margin: 0;
   }
 
   .calendar-scroll-container {
@@ -124,14 +109,15 @@ const getAbsencesForDay = (day: number) => {
     margin-bottom: 0.5rem;
   }
 
-  .days-grid {
+  /* Global styles for dynamic content */
+  :global(.days-grid) {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 0.5rem;
   }
 
-  .day-cell {
-    min-height: 80px; /* Reduced from 100px */
+  :global(.day-cell) {
+    min-height: 80px;
     border-radius: 8px;
     padding: 0.25rem;
     position: relative;
@@ -140,21 +126,21 @@ const getAbsencesForDay = (day: number) => {
   }
 
   @media (max-width: 640px) {
-    .day-cell {
+    :global(.day-cell) {
       min-height: 60px;
     }
   }
 
-  .active-day {
+  :global(.active-day) {
     background-color: #f9fafb;
     border: 1px solid #e5e7eb;
   }
 
-  .empty-day {
+  :global(.empty-day) {
     background: transparent;
   }
 
-  .day-number {
+  :global(.day-number) {
     position: absolute;
     top: 0.25rem;
     right: 0.5rem;
@@ -163,14 +149,14 @@ const getAbsencesForDay = (day: number) => {
     color: #9ca3af;
   }
 
-  .absences-list {
+  :global(.absences-list) {
     margin-top: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
   }
 
-  .absence-pill {
+  :global(.absence-pill) {
     background-color: #fee2e2;
     color: #991b1b;
     font-size: 0.75rem;
@@ -181,20 +167,131 @@ const getAbsencesForDay = (day: number) => {
     text-overflow: ellipsis;
     font-weight: 500;
     transition: all 0.2s;
+    cursor: default;
   }
 
-  .admin-pill {
+  :global(.admin-pill) {
     cursor: pointer;
   }
   
-  .admin-pill:hover {
-    background-color: #dc2626; /* Darker red */
+  :global(.admin-pill:hover) {
+    background-color: #dc2626;
     color: white;
     transform: scale(1.05);
   }
 </style>
 
 <script>
+  // Definition of variables
+  let currentMonth = new Date().getMonth();
+  let currentYear = new Date().getFullYear();
+  let absences = [];
+  let isAdmin = false;
+
+  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+  function init() {
+    const container = document.querySelector('.calendar-card');
+    if (!container) return;
+
+    try {
+      absences = JSON.parse(container.getAttribute('data-absences') || '[]');
+      isAdmin = container.getAttribute('data-is-admin') === 'true';
+    } catch (e) {
+      console.error("Error parsing absences", e);
+    }
+
+    renderCalendar();
+
+    document.getElementById('prev-month')?.addEventListener('click', () => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderCalendar();
+    });
+
+    document.getElementById('next-month')?.addEventListener('click', () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar();
+    });
+  }
+
+  function getAbsencesForDay(day: number) {
+    return absences.filter((a: any) => {
+      const d = new Date(a.date);
+      if (isNaN(d.getTime())) return false;
+      return d.getDate() === day && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    });
+  }
+
+  function renderCalendar() {
+    const titleEl = document.getElementById('calendar-title');
+    const gridEl = document.getElementById('days-grid');
+    if (!titleEl || !gridEl) return;
+
+    titleEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+    gridEl.innerHTML = '';
+
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    // 0 = Sunday, 1 = Monday. We want 0 = Monday, 6 = Sunday.
+    // JS getDay(): 0=Sun, 1=Mon...6=Sat.
+    // Target: Mon=0, ..., Sun=6.
+    // If getDay() == 0 (Sun) -> 6
+    // If getDay() == 1 (Mon) -> 0
+    // formula: (day + 6) % 7
+    const jsDay = firstDay.getDay();
+    const startingDay = (jsDay + 6) % 7;
+
+    // Pad empty days
+    for (let i = 0; i < startingDay; i++) {
+      const emptyCell = document.createElement('div');
+      emptyCell.className = 'day-cell empty-day';
+      gridEl.appendChild(emptyCell);
+    }
+
+    // Fill days
+    for (let i = 1; i <= daysInMonth; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'day-cell active-day';
+
+      const dayNum = document.createElement('span');
+      dayNum.className = 'day-number';
+      dayNum.textContent = i.toString();
+      cell.appendChild(dayNum);
+
+      const dayAbsences = getAbsencesForDay(i);
+      if (dayAbsences.length > 0) {
+        const list = document.createElement('div');
+        list.className = 'absences-list';
+        
+        dayAbsences.forEach((abs: any) => {
+          const pill = document.createElement('div');
+          pill.className = `absence-pill ${isAdmin ? 'admin-pill' : ''}`;
+          pill.title = `${abs.subject} (${abs.teacher})`;
+          pill.textContent = abs.subject;
+          
+          if (isAdmin) {
+             pill.onclick = () => (window as any).deleteAbsence(abs.id);
+          }
+          
+          list.appendChild(pill);
+        });
+        cell.appendChild(list);
+      }
+
+      gridEl.appendChild(cell);
+    }
+  }
+
+  // Global delete function
   (window as any).deleteAbsence = async (id: string) => {
     if(!confirm("¿Eliminar esta ausencia permanentemente?")) return;
 
@@ -205,6 +302,8 @@ const getAbsencesForDay = (day: number) => {
             body: JSON.stringify({ id })
         });
         if(res.ok) {
+            // Reload page to refresh data from server or just remove element
+            // Reloading is safer to sync everything
             window.location.reload();
         } else {
             alert("Error al eliminar");
@@ -213,4 +312,7 @@ const getAbsencesForDay = (day: number) => {
         alert("Error de conexión");
     }
   };
+
+  // Run init
+  init();
 </script>

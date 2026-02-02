@@ -12,6 +12,28 @@ import Eventos from "../components/Eventos.astro";
 import DisclaimerPopup from "../components/DisclaimerPopup.astro";
 import LostHours from "../components/LostHours.astro";
 import NotificationSettings from "../components/NotificationSettings.astro";
+import AbsencesNotice from "../components/AbsencesNotice.astro";
+
+
+
+import { db } from "../lib/firebase/server";
+import { Timestamp } from "firebase-admin/firestore";
+
+let todayCount = 0;
+try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const snapshot = await db.collection("absences")
+        .where("date", ">=", Timestamp.fromDate(today))
+        .where("date", "<", Timestamp.fromDate(tomorrow))
+        .get();
+    todayCount = snapshot.size;
+} catch (e) {
+    console.error("Error fetching today absences", e);
+}
 ---
 
 <Layout>
@@ -21,6 +43,7 @@ import NotificationSettings from "../components/NotificationSettings.astro";
 
 	<!-- <MoodleNotifierBanner /> -->
 	<LinksSection />
+	<AbsencesNotice todayCount={todayCount} />
 	<NewsSection />
 
 	<CalendarioExamenes />

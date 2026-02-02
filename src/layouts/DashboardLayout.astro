@@ -13,12 +13,12 @@ const isAdmin = user.role === 'admin';
 
 const tabs = [
   { name: 'Calendario', path: '/dashboard', icon: 'fa-calendar' },
-  { name: 'Reportar Ausencia', path: '/dashboard/report', icon: 'fa-pen-to-square' },
   { name: 'Quejas y Solicitudes', path: '/dashboard/requests', icon: 'fa-bullhorn' }, // New Tab
   { name: 'Estadísticas', path: '/dashboard/stats', icon: 'fa-chart-pie' },
 ];
 
 if (isAdmin) {
+  tabs.splice(1, 0, { name: 'Reportar Ausencia', path: '/dashboard/report', icon: 'fa-pen-to-square' });
   tabs.push({ name: 'Administración', path: '/dashboard/admin', icon: 'fa-users-gear' });
 }
 ---

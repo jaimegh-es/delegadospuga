@@ -21,9 +21,9 @@ export const GET: APIRoute = async () => {
 };
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  // Check auth (redundant if middleware works, but good practice)
-  if (!locals.uid) {
-    return new Response("Unauthorized", { status: 401 });
+  // Check auth and role
+  if (!locals.uid || locals.role !== 'admin') {
+    return new Response("Unauthorized", { status: 403 });
   }
 
   try {

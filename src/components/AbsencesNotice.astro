@@ -1,0 +1,324 @@
+---
+// src/components/AbsencesNotice.astro
+import { Info, ShieldAlert, Clock } from "lucide-astro";
+
+interface Props {
+  todayCount?: number;
+}
+
+const { todayCount = 0 } = Astro.props;
+---
+
+<section class="absences-notice" id="absences-info">
+    <div class="container">
+        <div class="notice-card glass">
+            <div class="notice-header">
+                <div class="icon-wrapper primary">
+                    <ShieldAlert size={32} />
+                </div>
+                <div class="title-group">
+                    <span class="badge">Estado actual</span>
+                    <h2>Ausencias del día</h2>
+                </div>
+            </div>
+
+            <div class="notice-body">
+                <div class={`status-banner ${todayCount > 0 ? 'warning' : 'good'}`}>
+                    {todayCount > 0 ? (
+                        <>
+                            <div class="count-badge">{todayCount}</div>
+                            <span>HORAS PERDIDAS HOY</span>
+                        </>
+                    ) : (
+                        <>
+                            <Clock size={20} />
+                            <span>AÚN NO SE HAN REGISTRADO AUSENCIAS.</span>
+                        </>
+                    )}
+                </div>
+
+                <p class="description">
+                    {todayCount > 0 
+                        ? `Hoy se han perdido ${todayCount} horas lectivas por ausencia de profesorado.` 
+                        : "Por el momento no se han registrado ausencias para el día de hoy."}
+                </p>
+
+                <div class="actions">
+                    <a href="/dashboard" class="primary-btn">
+                        <i
+                            class="fa-solid fa-calendar-days"
+                            style="margin-right: 8px;"></i>
+                        Ver Calendario de Ausencias
+                    </a>
+                    <a
+                        href="/noticias/ausencia-profesorado"
+                        class="secondary-btn"
+                    >
+                        Más información
+                    </a>
+                </div>
+
+                <div class="disclaimer-infobox">
+                    <div class="icon-wrapper secondary">
+                        <Info size={20} />
+                    </div>
+                    <div class="infobox-content">
+                        <p>
+                            <strong>Compromiso Ético y de Privacidad:</strong>
+                        </p>
+                        <ul>
+                            <li>
+                                No se publicarán nombres de profesores bajo
+                                ninguna circunstancia.
+                            </li>
+                            <li>
+                                Este registro tiene fines meramente informativos
+                                sobre la calidad educativa y el cumplimiento del
+                                horario lectivo.
+                            </li>
+                            <li>
+                                En ningún caso este sitio apoya, promueve ni
+                                desea ser una herramienta de acoso.
+                            </li>
+                            <li>
+                                Para acceder al calendario completo de ausencias
+                                se requiere iniciar sesión.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .absences-notice {
+        padding: 60px 20px;
+        background: #f8fafc;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .notice-card {
+        padding: 40px;
+        border-radius: 24px;
+        border: 1px solid rgba(32, 0, 173, 0.1);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        background: white;
+        transition: transform 0.3s ease;
+    }
+
+    .notice-header {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+        margin-bottom: 32px;
+    }
+
+    .icon-wrapper.primary {
+        background: #fff1f2;
+        color: #ef4444;
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        flex-shrink: 0;
+    }
+
+    .title-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #ef4444;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .status-banner {
+        background: #fffbeb;
+        border: 2px solid #fde68a;
+        color: #92400e;
+        padding: 12px 24px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+        font-size: 0.9rem;
+        margin-bottom: 24px;
+    }
+
+    .status-banner.warning {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #991b1b;
+    }
+
+    .status-banner.good {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+        color: #166534;
+    }
+
+    .count-badge {
+        background: #ef4444;
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+    }
+
+    .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #92400e;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .description {
+        font-size: 1.1rem;
+        color: #475569;
+        line-height: 1.6;
+        margin-bottom: 24px;
+    }
+
+    .actions {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+    }
+
+    .primary-btn {
+        display: inline-flex;
+        align-items: center;
+        background: #2000ad;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 99px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 4px 12px rgba(32, 0, 173, 0.2);
+    }
+
+    .primary-btn:hover {
+        background: #002a80;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(32, 0, 173, 0.3);
+    }
+
+    .secondary-btn {
+        display: inline-flex;
+        align-items: center;
+        background: white;
+        color: #2000ad;
+        padding: 12px 24px;
+        border-radius: 99px;
+        font-weight: 700;
+        text-decoration: none;
+        border: 2px solid #2000ad;
+        transition: all 0.3s ease;
+    }
+
+    .secondary-btn:hover {
+        background: #f0f7ff;
+        transform: translateY(-2px);
+    }
+
+    .disclaimer-infobox {
+        background: #f1f5f9;
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .icon-wrapper.secondary {
+        color: #2000ad;
+        margin-top: 4px;
+    }
+
+    .infobox-content p {
+        color: #1e293b;
+        margin-bottom: 12px;
+    }
+
+    .infobox-content ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .infobox-content li {
+        color: #475569;
+        font-size: 0.95rem;
+        position: relative;
+        padding-left: 20px;
+        line-height: 1.4;
+    }
+
+    .infobox-content li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #2000ad;
+        font-weight: bold;
+    }
+
+    @media (max-width: 640px) {
+        .notice-card {
+            padding: 24px;
+        }
+
+        .notice-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+        }
+
+        .disclaimer-infobox {
+            flex-direction: column;
+            gap: 12px;
+        }
+    }
+</style>

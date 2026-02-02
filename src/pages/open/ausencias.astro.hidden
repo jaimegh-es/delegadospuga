@@ -1,0 +1,210 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Navigation from "../../components/Navigation.astro";
+import Footer from "../../components/Footer.astro";
+import DashboardCalendar from "../../components/DashboardCalendar.astro";
+import { db } from "../../lib/firebase/server";
+import { Timestamp } from "firebase-admin/firestore";
+import { Calendar, ShieldCheck, ChevronLeft } from "lucide-astro";
+
+// Fetch Absences
+const snapshot = await db.collection("absences").orderBy("date", "asc").get();
+const absences = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+    date:
+        doc.data().date instanceof Timestamp
+            ? doc.data().date.toDate().toISOString()
+            : new Date(doc.data().date).toISOString(),
+}));
+---
+
+<Layout title="Calendario Público de Ausencias | 1º Bachillerato">
+    <Navigation />
+
+    <main class="public-absences">
+        <div class="container">
+            <header class="page-header">
+                <a href="/" class="back-link">
+                    <ChevronLeft size={20} />
+                    Volver al inicio
+                </a>
+                <div class="header-content">
+                    <div class="icon-wrapper">
+                        <Calendar size={40} />
+                    </div>
+                    <div>
+                        <h1>Calendario de Ausencias</h1>
+                        <p>
+                            Registro público de horas lectivas sin profesorado
+                        </p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="notice-box glass">
+                <div class="notice-icon">
+                    <ShieldCheck size={24} />
+                </div>
+                <div class="notice-text">
+                    <p>
+                        <strong>Privacidad garantizada:</strong> En cumplimiento con
+                        nuestro compromiso ético, este calendario muestra únicamente
+                        las materias afectadas. No se publican nombres de docentes.
+                    </p>
+                </div>
+            </div>
+
+            <div class="calendar-wrapper">
+                <DashboardCalendar absences={absences} isAdmin={false} />
+            </div>
+
+            <div class="info-footer">
+                <p>
+                    Las ausencias mostradas son recopiladas por los delegados de
+                    curso para seguimiento de la calidad educativa.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <Footer />
+</Layout>
+
+<style>
+    .public-absences {
+        padding-top: 120px;
+        padding-bottom: 60px;
+        min-height: 100vh;
+        background: #f8fafc;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    .page-header {
+        margin-bottom: 40px;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #2000ad;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 24px;
+        transition: transform 0.2s;
+    }
+
+    .back-link:hover {
+        transform: translateX(-4px);
+    }
+
+    .header-content {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+    }
+
+    .icon-wrapper {
+        background: #2000ad;
+        color: white;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px rgba(32, 0, 173, 0.2);
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        color: #0f172a;
+        margin: 0;
+        line-height: 1.1;
+    }
+
+    .header-content p {
+        color: #64748b;
+        font-size: 1.1rem;
+        margin-top: 4px;
+    }
+
+    .notice-box {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 20px 24px;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .notice-icon {
+        background: #ecfdf5;
+        color: #059669;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .notice-text p {
+        margin: 0;
+        color: #334155;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .calendar-wrapper {
+        margin-bottom: 40px;
+    }
+
+    .info-footer {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 0.9rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .public-absences {
+            padding-top: 100px;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+        }
+
+        .icon-wrapper {
+            width: 60px;
+            height: 60px;
+        }
+
+        .icon-wrapper :global(svg) {
+            width: 30px;
+            height: 30px;
+        }
+
+        .header-content {
+            gap: 16px;
+        }
+
+        .notice-box {
+            flex-direction: column;
+            text-align: center;
+            padding: 24px;
+        }
+    }
+</style>
