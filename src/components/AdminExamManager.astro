@@ -43,6 +43,11 @@
             </div>
 
             <div class="form-group">
+                <label>Nombre personalizado (Opcional):</label>
+                <input type="text" name="title" id="exam-title" placeholder="Ej: Recuperación, Parcial...">
+            </div>
+
+            <div class="form-group">
                 <label>Hora (Opcional):</label>
                 <input type="text" name="time" id="exam-time" placeholder="Ej: 08:30">
             </div>
@@ -107,21 +112,166 @@
         <p class="hint">Usar solo una vez para cargar los exámenes antiguos.</p>
     </div>
 
-    <!-- Bottom Bar for Mobile -->
+    <!-- Bottom Bar for Actions -->
     <div id="mobile-action-bar-exams" class="bottom-action-bar">
-        <button id="bar-edit-btn-exams" class="bar-edit-btn">
-            <i class="fa-solid fa-pen-to-square"></i> Editar
-        </button>
-        <button id="bar-delete-btn-exams" class="bar-delete-btn">
-            <i class="fa-solid fa-trash"></i> Borrar
-        </button>
-        <button id="bar-close-btn-exams" class="bar-close-btn">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
+        <div class="selected-info">
+            <span id="selected-item-name"></span>
+        </div>
+        <div class="action-buttons">
+            <button id="bar-edit-btn-exams" class="bar-edit-btn">
+                <i class="fa-solid fa-pen-to-square"></i> Editar
+            </button>
+            <button id="bar-delete-btn-exams" class="bar-delete-btn">
+                <i class="fa-solid fa-trash"></i> Borrar
+            </button>
+            <button id="bar-close-btn-exams" class="bar-close-btn">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Selection Modal -->
+    <div id="selection-modal-exams" class="modal-selection-overlay hidden">
+        <div class="modal-selection-content">
+            <div class="modal-selection-header">
+                <h4>Exámenes del día</h4>
+                <button id="close-selection-modal-exams">&times;</button>
+            </div>
+            <div id="selection-list-exams" class="selection-list">
+                <!-- Filled by JS -->
+            </div>
+        </div>
     </div>
 </div>
 
 <style>
+    /* Selection Modal Styles */
+    .modal-selection-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 3000;
+        padding: 1rem;
+    }
+
+    .modal-selection-content {
+        background: white;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 400px;
+        overflow: hidden;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-selection-header {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-selection-header h4 {
+        margin: 0;
+        color: #1e293b;
+    }
+
+    .modal-selection-header button {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #64748b;
+    }
+
+    .selection-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    :global(.selection-item) {
+        padding: 1rem;
+        border-bottom: 1px solid #f1f5f9;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    :global(.selection-item:hover) {
+        background: #f8fafc;
+    }
+
+    :global(.selection-item .item-title) {
+        font-weight: 700;
+        color: #2000ad;
+    }
+
+    :global(.selection-item .item-subject) {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    /* Bottom Action Bar enhancements */
+    .bottom-action-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        z-index: 2000;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .bottom-action-bar.active {
+        transform: translateY(0);
+    }
+
+    .selected-info {
+        text-align: center;
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 0.5rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .action-buttons button {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+    }
+
+    .bar-edit-btn { background: #2000ad; color: white; }
+    .bar-delete-btn { background: #fee2e2; color: #ef4444; }
+    .bar-close-btn { background: #f1f5f9; color: #475569; max-width: 50px; }
+
     /* Admin Card & Forms */
     .admin-card {
         background: white;
@@ -350,49 +500,22 @@
         position: relative;
         vertical-align: top;
         padding: 4px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    :global(.calendario-tabla td:hover:not(.dia-vacio)) {
+        background: #f1f5f9;
     }
 
     :global(.dia.tiene-examen) {
-        background: linear-gradient(45deg, #2000ad, #003d99);
+        background: #f0f4ff;
+        border-top: 3px solid #2000ad !important;
+    }
+
+    :global(.dia.tiene-examen.selected) {
+        background: #2000ad;
         color: white;
-    }
-
-    :global(.dia-overlay) {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease;
-        z-index: 10;
-    }
-
-    @media (hover: hover) {
-        :global(.dia:hover .dia-overlay) {
-            opacity: 1;
-            pointer-events: auto;
-        }
-    }
-
-    :global(.overlay-btn) {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: none;
-        cursor: pointer;
-        color: white;
-        font-size: 1.2rem;
-    }
-
-    :global(.btn-edit-cal) {
-        background: rgba(32, 0, 173, 0.9);
-    }
-    :global(.btn-delete-cal) {
-        background: rgba(239, 68, 68, 0.9);
     }
 
     :global(.numero-dia) {
@@ -411,6 +534,7 @@
         text-align: center;
         font-size: 0.6rem;
         line-height: 1.1;
+        pointer-events: none;
     }
 
     :global(.examen-info .asignatura) {
@@ -500,35 +624,19 @@
             
             const cell = document.createElement('td');
             cell.className = hasExam ? 'dia tiene-examen' : 'dia';
+            cell.dataset.date = dateStr;
             
-            if (hasExam) {
-                cell.addEventListener('click', () => {
-                    if (window.matchMedia("(hover: none)").matches) {
-                        openMobileActionBar(dayExams[0].id);
-                    }
-                });
-            }
+            cell.addEventListener('click', () => handleDayClick(dateStr));
 
             let content = `<div class="numero-dia">${currentDay}</div>`;
             
             if (hasExam) {
                  content += `<div class="examen-info">`;
                  dayExams.slice(0, 2).forEach(ev => {
-                     content += `<div class="asignatura">${ev.subject}</div>`;
+                     content += `<div class="asignatura">${ev.title || ev.subject}</div>`;
                  });
                  if (dayExams.length > 2) content += `<div class="asignatura">+${dayExams.length - 2}</div>`;
                  content += `</div>`;
-
-                 content += `
-                    <div class="dia-overlay">
-                        <button class="overlay-btn btn-edit-cal" onclick="event.stopPropagation(); editExamItem('${dayExams[0].id}')" title="Editar">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button class="overlay-btn btn-delete-cal" onclick="event.stopPropagation(); deleteExamItem('${dayExams[0].id}')" title="Borrar">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                 `;
             }
 
             cell.innerHTML = content;
@@ -548,25 +656,74 @@
 
     let selectedId = null;
     const mobileBar = document.getElementById('mobile-action-bar-exams');
+    const selectionModal = document.getElementById('selection-modal-exams');
+    const selectionList = document.getElementById('selection-list-exams');
 
-    function openMobileActionBar(id) {
+    function handleDayClick(dateStr) {
+        const dayExams = eventsData.filter(e => e.date === dateStr);
+        if (dayExams.length === 0) {
+            closeMobileActionBar();
+            return;
+        }
+
+        if (dayExams.length === 1) {
+            selectItem(dayExams[0].id);
+        } else {
+            showSelectionList(dayExams);
+        }
+    }
+
+    function showSelectionList(exams) {
+        selectionList.innerHTML = '';
+        exams.forEach(ex => {
+            const item = document.createElement('div');
+            item.className = 'selection-item';
+            item.innerHTML = `
+                <span class="item-title">${ex.title || 'Sin título'}</span>
+                <span class="item-subject">${ex.subject}</span>
+                <span class="item-time">${ex.time || 'Sin hora'}</span>
+            `;
+            item.onclick = () => {
+                selectItem(ex.id);
+                closeSelectionModal();
+            };
+            selectionList.appendChild(item);
+        });
+        selectionModal.classList.remove('hidden');
+    }
+
+    function closeSelectionModal() {
+        selectionModal.classList.add('hidden');
+    }
+
+    function selectItem(id) {
         selectedId = id;
+        const item = eventsData.find(e => e.id === id);
+        if (!item) return;
+
+        document.getElementById('selected-item-name').textContent = item.title || item.subject;
         mobileBar.classList.add('active');
+
+        // Highlight in calendar
+        document.querySelectorAll('.dia').forEach(d => d.classList.remove('selected'));
+        const cell = document.querySelector(`td[data-date="${item.date}"]`);
+        if (cell) cell.classList.add('selected');
     }
 
     function closeMobileActionBar() {
         mobileBar.classList.remove('active');
         selectedId = null;
+        document.querySelectorAll('.dia').forEach(d => d.classList.remove('selected'));
     }
 
     (window as any).editExamItem = (id) => {
-        closeMobileActionBar();
         const item = eventsData.find(e => e.id === id);
         if (!item) return;
 
         (document.getElementById('exam-id') as HTMLInputElement).value = item.id;
         (document.getElementById('exam-date') as HTMLInputElement).value = item.date;
         (document.getElementById('exam-subject') as HTMLSelectElement).value = item.subject;
+        (document.getElementById('exam-title') as HTMLInputElement).value = item.title || '';
         (document.getElementById('exam-time') as HTMLInputElement).value = item.time || '';
         (document.getElementById('exam-classroom') as HTMLInputElement).value = item.classroom || 'B1B';
         quillExams.root.innerHTML = item.details || '';
@@ -576,12 +733,14 @@
         document.getElementById('cancel-exam-edit').classList.remove('hidden');
         
         window.scrollTo({ top: document.getElementById('exam-manager-content').offsetTop - 100, behavior: 'smooth' });
+        closeMobileActionBar();
     };
 
     function resetExamsForm() {
         const form = document.getElementById('exam-form') as HTMLFormElement;
         form.reset();
         (document.getElementById('exam-id') as HTMLInputElement).value = '';
+        (document.getElementById('exam-title') as HTMLInputElement).value = '';
         quillExams.setContents([]);
         document.getElementById('exam-form-title').textContent = "Añadir Examen";
         document.getElementById('exam-submit-btn').textContent = "Añadir Examen";
@@ -694,5 +853,6 @@
             if (selectedId) deleteExamItem(selectedId);
         });
         document.getElementById('bar-close-btn-exams')?.addEventListener('click', closeMobileActionBar);
+        document.getElementById('close-selection-modal-exams')?.addEventListener('click', closeSelectionModal);
     });
 </script>

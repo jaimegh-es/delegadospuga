@@ -7,22 +7,22 @@ try {
   const snapshot = await db.collection("calendar_events").where("type", "==", "exam").get();
   
   // Agrupar por fecha
-  snapshot.docs.forEach(doc => {
-    const data = doc.data();
-    const fecha = data.date;
-    
-    if (!examenes[fecha]) {
-      examenes[fecha] = [];
-    }
-    
-    examenes[fecha].push({
-      asignatura: data.subject,
-      hora: data.time || "",
-      aula: data.classroom || "B1B",
-      detalles: data.details || ""
-    });
-  });
-} catch (error) {
+      snapshot.docs.forEach(doc => {
+      const data = doc.data();
+      const fecha = data.date;
+      
+      if (!examenes[fecha]) {
+        examenes[fecha] = [];
+      }
+      
+      examenes[fecha].push({
+        asignatura: data.subject,
+        titulo: data.title || null,
+        hora: data.time || "",
+        aula: data.classroom || "B1B",
+        detalles: data.details || ""
+      });
+    });} catch (error) {
   console.error("Error fetching exams:", error);
   // Fallback to empty or keep hardcoded as backup? Better empty to avoid confusion.
   examenes = {};
@@ -144,9 +144,7 @@ function dividirEnSemanas(dias) {
                                                                 <div class="examen-info">
                                                                     <div class="asignatura">
                                                                         {
-                                                                            dia
-                                                                                .examen[0]
-                                                                                .asignatura
+                                                                            dia.examen[0].titulo || dia.examen[0].asignatura
                                                                         }
                                                                     </div>
                                                                     {dia.examen
@@ -154,9 +152,7 @@ function dividirEnSemanas(dias) {
                                                                         1 && (
                                                                         <div class="asignatura">
                                                                             {
-                                                                                dia
-                                                                                    .examen[1]
-                                                                                    .asignatura
+                                                                                dia.examen[1].titulo || dia.examen[1].asignatura
                                                                             }
                                                                         </div>
                                                                     )}
@@ -217,9 +213,7 @@ function dividirEnSemanas(dias) {
                                                                 <div class="examen-info">
                                                                     <div class="asignatura">
                                                                         {
-                                                                            dia
-                                                                                .examen[0]
-                                                                                .asignatura
+                                                                            dia.examen[0].titulo || dia.examen[0].asignatura
                                                                         }
                                                                     </div>
                                                                     {dia.examen
@@ -227,9 +221,7 @@ function dividirEnSemanas(dias) {
                                                                         1 && (
                                                                         <div class="asignatura">
                                                                             {
-                                                                                dia
-                                                                                    .examen[1]
-                                                                                    .asignatura
+                                                                                dia.examen[1].titulo || dia.examen[1].asignatura
                                                                             }
                                                                         </div>
                                                                     )}
@@ -290,9 +282,7 @@ function dividirEnSemanas(dias) {
                                                                 <div class="examen-info">
                                                                     <div class="asignatura">
                                                                         {
-                                                                            dia
-                                                                                .examen[0]
-                                                                                .asignatura
+                                                                            dia.examen[0].titulo || dia.examen[0].asignatura
                                                                         }
                                                                     </div>
                                                                     {dia.examen
@@ -300,9 +290,7 @@ function dividirEnSemanas(dias) {
                                                                         1 && (
                                                                         <div class="asignatura">
                                                                             {
-                                                                                dia
-                                                                                    .examen[1]
-                                                                                    .asignatura
+                                                                                dia.examen[1].titulo || dia.examen[1].asignatura
                                                                             }
                                                                         </div>
                                                                     )}
@@ -848,7 +836,20 @@ function dividirEnSemanas(dias) {
 
                         // Crear elementos individuales
                         const titulo = document.createElement("h4");
-                        titulo.textContent = examen.asignatura;
+                        titulo.textContent = examen.titulo || examen.asignatura;
+
+                        if (examen.titulo && examen.asignatura) {
+                            const sub = document.createElement("p");
+                            sub.style.fontSize = "0.9rem";
+                            sub.style.color = "#64748b";
+                            sub.style.marginTop = "-8px";
+                            sub.style.marginBottom = "8px";
+                            sub.innerHTML = `<strong>Asignatura:</strong> ${examen.asignatura}`;
+                            examenDiv.appendChild(titulo);
+                            examenDiv.appendChild(sub);
+                        } else {
+                            examenDiv.appendChild(titulo);
+                        }
 
                         const horaP = document.createElement("p");
                         horaP.innerHTML = `<strong>Hora:</strong> ${examen.hora || "No especificada"}`;

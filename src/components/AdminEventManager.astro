@@ -76,21 +76,166 @@
         </div>
     </div>
 
-    <!-- Bottom Bar for Mobile -->
+    <!-- Bottom Bar for Actions -->
     <div id="mobile-action-bar-events" class="bottom-action-bar">
-        <button id="bar-edit-btn-events" class="bar-edit-btn">
-            <i class="fa-solid fa-pen-to-square"></i> Editar
-        </button>
-        <button id="bar-delete-btn-events" class="bar-delete-btn">
-            <i class="fa-solid fa-trash"></i> Borrar
-        </button>
-        <button id="bar-close-btn-events" class="bar-close-btn">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
+        <div class="selected-info">
+            <span id="selected-event-name"></span>
+        </div>
+        <div class="action-buttons">
+            <button id="bar-edit-btn-events" class="bar-edit-btn">
+                <i class="fa-solid fa-pen-to-square"></i> Editar
+            </button>
+            <button id="bar-delete-btn-events" class="bar-delete-btn">
+                <i class="fa-solid fa-trash"></i> Borrar
+            </button>
+            <button id="bar-close-btn-events" class="bar-close-btn">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Selection Modal -->
+    <div id="selection-modal-events" class="modal-selection-overlay hidden">
+        <div class="modal-selection-content">
+            <div class="modal-selection-header">
+                <h4>Eventos del día</h4>
+                <button id="close-selection-modal-events">&times;</button>
+            </div>
+            <div id="selection-list-events" class="selection-list">
+                <!-- Filled by JS -->
+            </div>
+        </div>
     </div>
 </div>
 
 <style>
+    /* Selection Modal Styles */
+    .modal-selection-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 3000;
+        padding: 1rem;
+    }
+
+    .modal-selection-content {
+        background: white;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 400px;
+        overflow: hidden;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-selection-header {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-selection-header h4 {
+        margin: 0;
+        color: #1e293b;
+    }
+
+    .modal-selection-header button {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #64748b;
+    }
+
+    .selection-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    :global(.selection-item) {
+        padding: 1rem;
+        border-bottom: 1px solid #f1f5f9;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    :global(.selection-item:hover) {
+        background: #f8fafc;
+    }
+
+    :global(.selection-item .item-title) {
+        font-weight: 700;
+        color: #10b981;
+    }
+
+    :global(.selection-item .item-time) {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    /* Bottom Action Bar enhancements */
+    .bottom-action-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        z-index: 2000;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .bottom-action-bar.active {
+        transform: translateY(0);
+    }
+
+    .selected-info {
+        text-align: center;
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 0.5rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .action-buttons button {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+    }
+
+    .bar-edit-btn { background: #10b981; color: white; }
+    .bar-delete-btn { background: #fee2e2; color: #ef4444; }
+    .bar-close-btn { background: #f1f5f9; color: #475569; max-width: 50px; }
+
     .admin-card {
         background: white;
         padding: 1.5rem;
@@ -311,49 +456,22 @@
         position: relative;
         vertical-align: top;
         padding: 4px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    :global(.calendario-tabla td:hover:not(.dia-vacio)) {
+        background: #f1f5f9;
     }
 
     :global(.dia.tiene-evento) {
-        background: linear-gradient(45deg, #10b981, #059669);
+        background: #ecfdf5;
+        border-top: 3px solid #10b981 !important;
+    }
+
+    :global(.dia.tiene-evento.selected) {
+        background: #10b981;
         color: white;
-    }
-
-    :global(.dia-overlay) {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease;
-        z-index: 10;
-    }
-
-    @media (hover: hover) {
-        :global(.dia:hover .dia-overlay) {
-            opacity: 1;
-            pointer-events: auto;
-        }
-    }
-
-    :global(.overlay-btn) {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: none;
-        cursor: pointer;
-        color: white;
-        font-size: 1.2rem;
-    }
-
-    :global(.btn-edit-cal) {
-        background: rgba(16, 185, 129, 0.9);
-    }
-    :global(.btn-delete-cal) {
-        background: rgba(239, 68, 68, 0.9);
     }
 
     :global(.numero-dia) {
@@ -372,6 +490,7 @@
         text-align: center;
         font-size: 0.6rem;
         line-height: 1.1;
+        pointer-events: none;
     }
 
     :global(.examen-info .asignatura) {
@@ -455,14 +574,9 @@
             
             const cell = document.createElement('td');
             cell.className = hasEvent ? 'dia tiene-evento' : 'dia';
-            
-            if (hasEvent) {
-                cell.addEventListener('click', () => {
-                    if (window.matchMedia("(hover: none)").matches) {
-                        openMobileActionBar(dayEvents[0].id);
-                    }
-                });
-            }
+            cell.dataset.date = dateStr;
+
+            cell.addEventListener('click', () => handleDayClick(dateStr));
 
             let content = `<div class="numero-dia">${currentDay}</div>`;
             
@@ -473,17 +587,6 @@
                  });
                  if (dayEvents.length > 2) content += `<div class="asignatura">+${dayEvents.length - 2}</div>`;
                  content += `</div>`;
-
-                 content += `
-                    <div class="dia-overlay">
-                        <button class="overlay-btn btn-edit-cal" onclick="event.stopPropagation(); editEventItem('${dayEvents[0].id}')" title="Editar">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button class="overlay-btn btn-delete-cal" onclick="event.stopPropagation(); deleteEventItem('${dayEvents[0].id}')" title="Borrar">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                 `;
             }
 
             cell.innerHTML = content;
@@ -503,19 +606,66 @@
 
     let selectedId = null;
     const mobileBar = document.getElementById('mobile-action-bar-events');
+    const selectionModal = document.getElementById('selection-modal-events');
+    const selectionList = document.getElementById('selection-list-events');
 
-    function openMobileActionBar(id) {
+    function handleDayClick(dateStr) {
+        const dayEvents = eventsData.filter(e => e.date === dateStr);
+        if (dayEvents.length === 0) {
+            closeMobileActionBar();
+            return;
+        }
+
+        if (dayEvents.length === 1) {
+            selectItem(dayEvents[0].id);
+        } else {
+            showSelectionList(dayEvents);
+        }
+    }
+
+    function showSelectionList(events) {
+        selectionList.innerHTML = '';
+        events.forEach(ev => {
+            const item = document.createElement('div');
+            item.className = 'selection-item';
+            item.innerHTML = `
+                <span class="item-title">${ev.title}</span>
+                <span class="item-time">${ev.time || 'Todo el día'}</span>
+            `;
+            item.onclick = () => {
+                selectItem(ev.id);
+                closeSelectionModal();
+            };
+            selectionList.appendChild(item);
+        });
+        selectionModal.classList.remove('hidden');
+    }
+
+    function closeSelectionModal() {
+        selectionModal.classList.add('hidden');
+    }
+
+    function selectItem(id) {
         selectedId = id;
+        const item = eventsData.find(e => e.id === id);
+        if (!item) return;
+
+        document.getElementById('selected-event-name').textContent = item.title;
         mobileBar.classList.add('active');
+
+        // Highlight in calendar
+        document.querySelectorAll('.dia').forEach(d => d.classList.remove('selected'));
+        const cell = document.querySelector(`td[data-date="${item.date}"]`);
+        if (cell) cell.classList.add('selected');
     }
 
     function closeMobileActionBar() {
         mobileBar.classList.remove('active');
         selectedId = null;
+        document.querySelectorAll('.dia').forEach(d => d.classList.remove('selected'));
     }
 
     (window as any).editEventItem = (id) => {
-        closeMobileActionBar();
         const item = eventsData.find(e => e.id === id);
         if (!item) return;
 
@@ -530,6 +680,7 @@
         document.getElementById('cancel-event-edit').classList.remove('hidden');
         
         window.scrollTo({ top: document.getElementById('event-manager-content').offsetTop - 100, behavior: 'smooth' });
+        closeMobileActionBar();
     };
 
     function resetEventsForm() {
@@ -606,5 +757,6 @@
             if (selectedId) deleteEventItem(selectedId);
         });
         document.getElementById('bar-close-btn-events')?.addEventListener('click', closeMobileActionBar);
+        document.getElementById('close-selection-modal-events')?.addEventListener('click', closeSelectionModal);
     });
 </script>
