@@ -38,13 +38,19 @@ export const GET: APIRoute = async ({ request }) => {
       const id = doc.id;
       
       // Fecha en formato YYYYMMDD (para eventos de todo el día) o YYYYMMDDTHHMMSS
-      const dateParts = data.date.split("-"); // [YYYY, MM, DD]
-      const timeParts = (data.time || "08:30").split(":"); // [HH, MM]
+      const dateParts = (data.date || "").split("-"); // [YYYY, MM, DD]
+      if (dateParts.length < 3) return; // Saltar si la fecha no es válida
+
+      const rawTime = data.time || "08:30";
+      const timeParts = rawTime.split(":"); // [HH, MM]
       
-      const startStr = `${dateParts[0]}${dateParts[1]}${dateParts[2]}T${timeParts[0].padStart(2, '0')}${timeParts[1].padStart(2, '0')}00`;
+      const hh = (timeParts[0] || "08").padStart(2, '0');
+      const mm = (timeParts[1] || "00").padStart(2, '0');
+      
+      const startStr = `${dateParts[0]}${dateParts[1]}${dateParts[2]}T${hh}${mm}00`;
       
       // Calcular fin (suponemos 1 hora de duración)
-      const startDate = new Date(`${data.date}T${data.time || "08:30"}:00`);
+      const startDate = new Date(`${data.date}T${hh}:${mm}:00`);
       const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
       const endStr = `${endDate.getFullYear()}${(endDate.getMonth() + 1).toString().padStart(2, '0')}${endDate.getDate().toString().padStart(2, '0')}T${endDate.getHours().toString().padStart(2, '0')}${endDate.getMinutes().toString().padStart(2, '0')}00`;
 
