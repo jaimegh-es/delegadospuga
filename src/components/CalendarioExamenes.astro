@@ -93,10 +93,10 @@ function dividirEnSemanas(dias) {
                             <i class="fa-solid fa-calendar-plus"></i> Suscribirse <i class="fa-solid fa-chevron-down" style="font-size: 0.7em; margin-left: 5px;"></i>
                         </button>
                         <div id="subscribe-menu" class="dropdown-content">
-                            <a href="https://www.google.com/calendar/render?cid=https%3A%2F%2F1bach.vercel.app%2Fexams.ics" target="_blank" rel="noopener">
+                            <a href="https://www.google.com/calendar/render?cid=https%3A%2F%2F1bach.vercel.app%2Fcalendario-1b-bach.ics" target="_blank" rel="noopener">
                                 <i class="fa-brands fa-google"></i> Google Calendar (Android)
                             </a>
-                            <a href="webcal://1bach.vercel.app/exams.ics">
+                            <a href="webcal://1bach.vercel.app/calendario-1b-bach.ics">
                                 <i class="fa-brands fa-apple"></i> Apple Calendar / Outlook
                             </a>
                             <button id="copy-calendar-link-btn-dropdown" class="copy-dropdown-item">
@@ -925,7 +925,7 @@ function dividirEnSemanas(dias) {
         const copyLinkBtn = document.getElementById("copy-calendar-link-btn-dropdown");
         copyLinkBtn?.addEventListener("click", (e) => {
             e.stopPropagation();
-            const calendarUrl = "https://1bach.vercel.app/exams.ics";
+            const calendarUrl = "https://1bach.vercel.app/calendario-1b-bach.ics";
             navigator.clipboard.writeText(calendarUrl).then(() => {
                 const originalText = copyLinkBtn.innerHTML;
                 copyLinkBtn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Copiado!';
