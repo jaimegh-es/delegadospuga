@@ -45,6 +45,19 @@
                     "value": "public, max-age=31536000, immutable"
                 }
             ]
+        },
+        {
+            "source": "/api/exams.ics",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, s-maxage=3600, stale-while-revalidate=86400"
+                },
+                {
+                    "key": "Content-Type",
+                    "value": "text/calendar; charset=utf-8"
+                }
+            ]
         }
     ]
 }

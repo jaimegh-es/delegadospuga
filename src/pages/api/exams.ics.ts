@@ -3,25 +3,29 @@ import { db } from "../../lib/firebase/server";
 
 export const GET: APIRoute = async ({ request }) => {
   try {
-    // 1. Obtener metadatos de última actualización
+    // 1. Obtener metadatos de última actualización con fallback robusto
     const metaDoc = await db.collection("app_meta").doc("exams").get();
-    const lastUpdated = metaDoc.exists ? metaDoc.data()?.lastUpdated?.toDate() : new Date();
+    const lastUpdated = (metaDoc.exists && metaDoc.data()?.lastUpdated) 
+      ? metaDoc.data().lastUpdated.toDate() 
+      : new Date();
     
-    // 2. Manejo de caché basado en Last-Modified
+    // 2. Cache-Control para Vercel Edge Network
+    // s-maxage=3600 (1 hora en los servidores de Vercel)
+    // stale-while-revalidate=86400 (permite servir versión vieja mientras se regenera en segundo plano)
+    const headers = new Headers({
+      "Content-Type": "text/calendar; charset=utf-8",
+      "Content-Disposition": 'inline; filename="examenes.ics"',
+      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+      "Last-Modified": lastUpdated.toUTCString(),
+    });
+
+    // 3. Manejo de 304 Not Modified
     const ifModifiedSince = request.headers.get("if-modified-since");
-    const lastUpdatedTime = lastUpdated.getTime();
-    
-    if (ifModifiedSince && new Date(ifModifiedSince).getTime() >= Math.floor(lastUpdatedTime / 1000) * 1000) {
-        return new Response(null, { 
-            status: 304,
-            headers: {
-                "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
-                "Last-Modified": lastUpdated.toUTCString(),
-            }
-        });
+    if (ifModifiedSince && new Date(ifModifiedSince).getTime() >= Math.floor(lastUpdated.getTime() / 1000) * 1000) {
+        return new Response(null, { status: 304, headers });
     }
 
-    // 3. Obtener exámenes
+    // 4. Obtener exámenes
     const snapshot = await db.collection("calendar_events").where("type", "==", "exam").get();
     
     let icsContent = [
@@ -30,10 +34,10 @@ export const GET: APIRoute = async ({ request }) => {
       "PRODID:-//1bach//Examenes//ES",
       "CALSCALE:GREGORIAN",
       "METHOD:PUBLISH",
-      "X-WR-CALNAME:Exámenes 1B Bach",
+      "X-WR-CALNAME:Exámenes 1B",
       "X-WR-TIMEZONE:Europe/Madrid",
       "X-WR-CALDESC:Calendario de exámenes de 1º Bachillerato B",
-      "X-PUBLISHED-TTL:PT1H", // Reducir a 1 hora para mayor frescura
+      "X-PUBLISHED-TTL:PT1H",
       "REFRESH-INTERVAL;VALUE=DURATION:PT1H"
     ];
 
@@ -82,12 +86,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     return new Response(icsContent.join("\r\n"), {
       status: 200,
-      headers: {
-        "Content-Type": "text/calendar; charset=utf-8",
-        "Content-Disposition": 'inline; filename="examenes.ics"',
-        "Last-Modified": lastUpdated.toUTCString(),
-        "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
-      }
+      headers
     });
   } catch (error) {
     console.error("Error generating ICS:", error);
