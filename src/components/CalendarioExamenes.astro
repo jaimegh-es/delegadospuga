@@ -88,12 +88,22 @@ function dividirEnSemanas(dias) {
                     <button id="export-pdf-btn" class="export-btn">
                         <i class="fa-solid fa-file-pdf"></i> Exportar a PDF
                     </button>
-                    <a href="webcal://1bach.vercel.app/api/exams.ics" class="subscribe-btn" id="subscribe-calendar-btn">
-                        <i class="fa-solid fa-calendar-plus"></i> Suscribirse
-                    </a>
-                    <button id="copy-calendar-link-btn" class="copy-btn">
-                        <i class="fa-solid fa-copy"></i> Copiar enlace
-                    </button>
+                    <div class="dropdown">
+                        <button id="subscribe-dropdown-btn" class="subscribe-btn">
+                            <i class="fa-solid fa-calendar-plus"></i> Suscribirse <i class="fa-solid fa-chevron-down" style="font-size: 0.7em; margin-left: 5px;"></i>
+                        </button>
+                        <div id="subscribe-menu" class="dropdown-content">
+                            <a href="https://www.google.com/calendar/render?cid=https://1bach.vercel.app/api/exams.ics" target="_blank" rel="noopener">
+                                <i class="fa-brands fa-google"></i> Google Calendar (Android)
+                            </a>
+                            <a href="webcal://1bach.vercel.app/api/exams.ics" id="apple-cal-link">
+                                <i class="fa-brands fa-apple"></i> Apple Calendar / Outlook
+                            </a>
+                            <button id="copy-calendar-link-btn-dropdown" class="copy-dropdown-item">
+                                <i class="fa-solid fa-copy"></i> Copiar URL del calendario
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -383,6 +393,91 @@ function dividirEnSemanas(dias) {
     .subscribe-btn {
         background: #0080ff;
         box-shadow: 0 4px 15px rgba(0, 128, 255, 0.2);
+        position: relative;
+    }
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        position: absolute;
+        top: 110%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #fff;
+        min-width: 280px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        border-radius: 16px;
+        z-index: 1000;
+        padding: 10px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .dropdown-content.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(5px);
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translate(-50%, -10px); }
+        to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    .dropdown-content a, .copy-dropdown-item {
+        color: #1e293b;
+        padding: 14px 16px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        border: none;
+        background: transparent;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+    .dropdown-content a:hover, .copy-dropdown-item:hover {
+        background-color: #f1f5f9;
+        color: #2000ad;
+        padding-left: 20px;
+    }
+
+    @media (max-width: 480px) {
+        .dropdown-content {
+            position: fixed;
+            bottom: 20px;
+            top: auto;
+            left: 5%;
+            right: 5%;
+            width: 90%;
+            transform: translateY(150%);
+            min-width: 0;
+            border-radius: 20px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+        }
+
+        .dropdown-content.show {
+            transform: translateY(0);
+        }
+    }
+
+    .dropdown-content i {
+        width: 20px;
+        text-align: center;
+        font-size: 1.1rem;
     }
 
     .copy-btn {
@@ -806,17 +901,41 @@ function dividirEnSemanas(dias) {
         const examenesDataElement = document.getElementById("examenes-data");
         const examenes = JSON.parse(examenesDataElement?.textContent || "{}");
 
-        const copyLinkBtn = document.getElementById("copy-calendar-link-btn");
-        copyLinkBtn?.addEventListener("click", () => {
+        const subscribeBtn = document.getElementById("subscribe-dropdown-btn");
+        const subscribeMenu = document.getElementById("subscribe-menu");
+        
+        subscribeBtn?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            subscribeMenu?.classList.toggle("show");
+        });
+
+        document.addEventListener("click", (e) => {
+            if (subscribeMenu?.classList.contains("show") && !subscribeMenu.contains(e.target as Node) && e.target !== subscribeBtn) {
+                subscribeMenu.classList.remove("show");
+            }
+        });
+
+        const menuLinks = subscribeMenu?.querySelectorAll('a');
+        menuLinks?.forEach(link => {
+            link.addEventListener('click', () => {
+                subscribeMenu?.classList.remove("show");
+            });
+        });
+
+        const copyLinkBtn = document.getElementById("copy-calendar-link-btn-dropdown");
+        copyLinkBtn?.addEventListener("click", (e) => {
+            e.stopPropagation();
             const calendarUrl = "https://1bach.vercel.app/api/exams.ics";
             navigator.clipboard.writeText(calendarUrl).then(() => {
                 const originalText = copyLinkBtn.innerHTML;
                 copyLinkBtn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Copiado!';
                 setTimeout(() => {
                     copyLinkBtn.innerHTML = originalText;
-                }, 2000);
+                    subscribeMenu?.classList.remove("show");
+                }, 1500);
             }).catch(err => {
                 console.error('Error al copiar: ', err);
+                alert("Error al copiar el enlace");
             });
         });
 

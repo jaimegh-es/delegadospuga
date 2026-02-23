@@ -9,8 +9,16 @@ export const GET: APIRoute = async ({ request }) => {
     
     // 2. Manejo de caché basado en Last-Modified
     const ifModifiedSince = request.headers.get("if-modified-since");
-    if (ifModifiedSince && new Date(ifModifiedSince) >= lastUpdated) {
-        return new Response(null, { status: 304 });
+    const lastUpdatedTime = lastUpdated.getTime();
+    
+    if (ifModifiedSince && new Date(ifModifiedSince).getTime() >= Math.floor(lastUpdatedTime / 1000) * 1000) {
+        return new Response(null, { 
+            status: 304,
+            headers: {
+                "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+                "Last-Modified": lastUpdated.toUTCString(),
+            }
+        });
     }
 
     // 3. Obtener exámenes
@@ -22,11 +30,11 @@ export const GET: APIRoute = async ({ request }) => {
       "PRODID:-//1bach//Examenes//ES",
       "CALSCALE:GREGORIAN",
       "METHOD:PUBLISH",
-      "X-WR-CALNAME:Exámenes 1º Bachillerato",
+      "X-WR-CALNAME:Exámenes 1B Bach",
       "X-WR-TIMEZONE:Europe/Madrid",
-      "X-WR-CALDESC:Calendario de exámenes de 1º Bachillerato",
-      "X-PUBLISHED-TTL:P1D", // Sugerencia de actualización diaria
-      "REFRESH-INTERVAL;VALUE=DURATION:P1D"
+      "X-WR-CALDESC:Calendario de exámenes de 1º Bachillerato B",
+      "X-PUBLISHED-TTL:PT1H", // Reducir a 1 hora para mayor frescura
+      "REFRESH-INTERVAL;VALUE=DURATION:PT1H"
     ];
 
     snapshot.docs.forEach(doc => {
