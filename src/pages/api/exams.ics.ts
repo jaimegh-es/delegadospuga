@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { db } from "../lib/firebase/server";
+import { db } from "../../lib/firebase/server";
 
 export const GET: APIRoute = async ({ request }) => {
   try {

@@ -1,7 +1,7 @@
 {
     "headers": [
         {
-            "source": "/calendario-1b-bach.ics",
+            "source": "/api/exams.ics",
             "headers": [
                 {
                     "key": "Cache-Control",
