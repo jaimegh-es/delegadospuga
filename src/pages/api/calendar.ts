@@ -2,6 +2,12 @@ import type { APIRoute } from "astro";
 import { db } from "../../lib/firebase/server";
 import { Timestamp } from "firebase-admin/firestore";
 
+async function updateLastModified() {
+  await db.collection("app_meta").doc("exams").set({
+    lastUpdated: Timestamp.now()
+  }, { merge: true });
+}
+
 export const GET: APIRoute = async () => {
   try {
     const snapshot = await db.collection("calendar_events").get();
@@ -45,6 +51,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       createdBy: locals.uid
     });
 
+    await updateLastModified();
+
     return new Response(JSON.stringify({ success: true }), { status: 201 });
   } catch (error) {
     return new Response(JSON.stringify({ error: "Error creating event" }), { status: 500 });
@@ -76,6 +84,8 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
       updatedBy: locals.uid
     });
 
+    await updateLastModified();
+
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error) {
     return new Response(JSON.stringify({ error: "Error updating event" }), { status: 500 });
@@ -92,6 +102,8 @@ export const DELETE: APIRoute = async ({ request, locals }) => {
     if (!id) return new Response("ID required", { status: 400 });
 
     await db.collection("calendar_events").doc(id).delete();
+    await updateLastModified();
+    
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error) {
     return new Response(JSON.stringify({ error: "Error deleting event" }), { status: 500 });

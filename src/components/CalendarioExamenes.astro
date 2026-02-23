@@ -84,9 +84,17 @@ function dividirEnSemanas(dias) {
             <h2 class="section-title">Calendario de Exámenes</h2>
             <div class="header-actions">
                 <p class="section-subtitle">2º Trimestre</p>
-                <button id="export-pdf-btn" class="export-btn">
-                    <i class="fa-solid fa-file-pdf"></i> Exportar a PDF
-                </button>
+                <div class="button-group">
+                    <button id="export-pdf-btn" class="export-btn">
+                        <i class="fa-solid fa-file-pdf"></i> Exportar a PDF
+                    </button>
+                    <a href="webcal://1bach.vercel.app/api/exams.ics" class="subscribe-btn" id="subscribe-calendar-btn">
+                        <i class="fa-solid fa-calendar-plus"></i> Suscribirse
+                    </a>
+                    <button id="copy-calendar-link-btn" class="copy-btn">
+                        <i class="fa-solid fa-copy"></i> Copiar enlace
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -348,7 +356,14 @@ function dividirEnSemanas(dias) {
         margin-top: 10px;
     }
 
-    .export-btn {
+    .button-group {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .export-btn, .subscribe-btn {
         background: #2000ad;
         color: white;
         border: none;
@@ -361,12 +376,48 @@ function dividirEnSemanas(dias) {
         gap: 10px;
         transition: all 0.3s ease;
         box-shadow: 0 4px 15px rgba(32, 0, 173, 0.2);
+        text-decoration: none;
+        font-size: 0.95rem;
+    }
+
+    .subscribe-btn {
+        background: #0080ff;
+        box-shadow: 0 4px 15px rgba(0, 128, 255, 0.2);
+    }
+
+    .copy-btn {
+        background: #64748b;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(100, 116, 139, 0.2);
+        font-size: 0.95rem;
+    }
+
+    .export-btn:hover, .subscribe-btn:hover, .copy-btn:hover {
+        transform: translateY(-2px);
     }
 
     .export-btn:hover {
         background: #003d99;
-        transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(32, 0, 173, 0.3);
+    }
+
+    .subscribe-btn:hover {
+        background: #0066cc;
+        box-shadow: 0 6px 20px rgba(0, 128, 255, 0.3);
+    }
+
+    .copy-btn:hover {
+        background: #475569;
+        box-shadow: 0 6px 20px rgba(100, 116, 139, 0.3);
     }
 
     .section-title {
@@ -754,6 +805,20 @@ function dividirEnSemanas(dias) {
 
         const examenesDataElement = document.getElementById("examenes-data");
         const examenes = JSON.parse(examenesDataElement?.textContent || "{}");
+
+        const copyLinkBtn = document.getElementById("copy-calendar-link-btn");
+        copyLinkBtn?.addEventListener("click", () => {
+            const calendarUrl = "https://1bach.vercel.app/api/exams.ics";
+            navigator.clipboard.writeText(calendarUrl).then(() => {
+                const originalText = copyLinkBtn.innerHTML;
+                copyLinkBtn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Copiado!';
+                setTimeout(() => {
+                    copyLinkBtn.innerHTML = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Error al copiar: ', err);
+            });
+        });
 
         exportBtn?.addEventListener("click", () => {
             try {
