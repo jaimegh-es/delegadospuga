@@ -1,6 +1,32 @@
 {
     "headers": [
         {
+            "source": "/api/exams.ics",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, s-maxage=60, stale-while-revalidate=3600"
+                },
+                {
+                    "key": "Content-Type",
+                    "value": "text/calendar; charset=utf-8"
+                },
+                {
+                    "key": "Access-Control-Allow-Origin",
+                    "value": "*"
+                }
+            ]
+        },
+        {
+            "source": "/(.*)\\.(jpg|jpeg|png|gif|svg|webp|ico|avif)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"
+                }
+            ]
+        },
+        {
             "source": "/(.*)",
             "headers": [
                 {
@@ -34,28 +60,6 @@
                 {
                     "key": "Expires",
                     "value": "0"
-                }
-            ]
-        },
-        {
-            "source": "/(.*)\\.(jpg|jpeg|png|gif|svg|webp|ico|avif)",
-            "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "public, max-age=31536000, immutable"
-                }
-            ]
-        },
-        {
-            "source": "/api/exams.ics",
-            "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "public, s-maxage=3600, stale-while-revalidate=86400"
-                },
-                {
-                    "key": "Content-Type",
-                    "value": "text/calendar; charset=utf-8"
                 }
             ]
         }
