@@ -93,12 +93,12 @@ function dividirEnSemanas(dias) {
                             <i class="fa-solid fa-calendar-plus"></i> Suscribirse <i class="fa-solid fa-chevron-down" style="font-size: 0.7em; margin-left: 5px;"></i>
                         </button>
                         <div id="subscribe-menu" class="dropdown-content">
-                            <a href="https://www.google.com/calendar/render?cid=https%3A%2F%2F1bach.vercel.app%2Fapi%2Fexams.ics" target="_blank" rel="noopener">
+                            <button id="google-calendar-btn" class="copy-dropdown-item">
                                 <i class="fa-brands fa-google"></i> Google Calendar (Android)
-                            </a>
-                            <a href="webcal://1bach.vercel.app/api/exams.ics">
+                            </button>
+                            <button id="apple-calendar-btn" class="copy-dropdown-item">
                                 <i class="fa-brands fa-apple"></i> Apple Calendar / Outlook
-                            </a>
+                            </button>
                             <button id="copy-calendar-link-btn-dropdown" class="copy-dropdown-item">
                                 <i class="fa-solid fa-link"></i> Copiar URL del calendario
                             </button>
@@ -338,6 +338,62 @@ function dividirEnSemanas(dias) {
         <button id="modal-close" class="modal-close">&times;</button>
         <h3 id="modal-fecha-titulo"></h3>
         <div id="modal-examenes-lista"></div>
+    </div>
+</div>
+
+<div
+    id="google-calendar-modal"
+    class="modal-overlay help-modal"
+    style="display: none;"
+>
+    <div class="modal-content">
+        <button id="google-calendar-modal-close" class="modal-close">&times;</button>
+        <h3>Añadir a Google Calendar</h3>
+        <div class="help-content">
+            <p>Sigue los pasos del vídeo para añadir el calendario manualmente:</p>
+            <div class="video-container">
+                <video id="help-video" width="100%" controls playsinline>
+                    <source src="/howtocalendar.mp4" type="video/mp4">
+                    Tu navegador no soporta el vídeo.
+                </video>
+            </div>
+            <div class="modal-actions">
+                <a href="https://calendar.google.com/calendar/u/0/r/settings/addbyurl?pli=1" target="_blank" class="subscribe-btn settings-btn">
+                    <i class="fa-solid fa-gear"></i> Abrir Ajustes de Calendar
+                </a>
+                <button id="copy-url-help-btn" class="export-btn copy-btn">
+                    <i class="fa-solid fa-copy"></i> Copiar URL del Calendario
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div
+    id="apple-calendar-modal"
+    class="modal-overlay help-modal"
+    style="display: none;"
+>
+    <div class="modal-content">
+        <button id="apple-calendar-modal-close" class="modal-close">&times;</button>
+        <h3>Apple Calendar / Outlook</h3>
+        <div class="help-content">
+            <p>Para suscribirte desde iPhone, Mac o Outlook, sigue estos pasos:</p>
+            <ol style="color: #475569; margin-bottom: 20px; padding-left: 20px;">
+                <li style="margin-bottom: 8px;">Copia la URL del calendario con el botón de abajo.</li>
+                <li style="margin-bottom: 8px;">Abre tu aplicación de Calendario.</li>
+                <li style="margin-bottom: 8px;">Selecciona "Añadir suscripción de calendario" o "Añadir desde URL".</li>
+                <li>Pega la URL que has copiado.</li>
+            </ol>
+            <div class="modal-actions">
+                <button id="copy-url-apple-btn" class="subscribe-btn settings-btn">
+                    <i class="fa-solid fa-copy"></i> Copiar URL del Calendario
+                </button>
+                <a href="webcal://1bach.vercel.app/api/exams.ics" class="export-btn" style="text-align: center; justify-content: center; background: #f1f5f9; color: #475569; box-shadow: none;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Intentar apertura directa
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -820,6 +876,74 @@ function dividirEnSemanas(dias) {
         margin: 12px 0;
     }
 
+    .help-modal .modal-content {
+        max-width: 600px;
+        background: white;
+        padding: 40px;
+        border-radius: 24px;
+        position: relative;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .help-modal h3 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #2000ad;
+        margin-bottom: 20px;
+    }
+
+    .help-content p {
+        color: #475569;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .video-container {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        background: #000;
+        margin-bottom: 25px;
+        aspect-ratio: 16/9;
+        display: flex;
+        align-items: center;
+    }
+
+    .modal-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .settings-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 16px;
+        font-size: 1rem;
+    }
+
+    .help-modal .copy-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 16px;
+        background: #64748b;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .help-modal .copy-btn:hover {
+        background: #475569;
+        transform: translateY(-2px);
+    }
+
     /* Responsive */
     @media (max-width: 1024px) {
         .meses-grid {
@@ -923,9 +1047,75 @@ function dividirEnSemanas(dias) {
         });
 
         const copyLinkBtn = document.getElementById("copy-calendar-link-btn-dropdown");
+        const googleCalendarBtn = document.getElementById("google-calendar-btn");
+        const appleCalendarBtn = document.getElementById("apple-calendar-btn");
+        
+        const helpModal = document.getElementById("google-calendar-modal");
+        const appleHelpModal = document.getElementById("apple-calendar-modal");
+        
+        const helpModalClose = document.getElementById("google-calendar-modal-close");
+        const appleHelpModalClose = document.getElementById("apple-calendar-modal-close");
+        
+        const helpVideo = document.getElementById("help-video") as HTMLVideoElement;
+        const copyHelpBtn = document.getElementById("copy-url-help-btn");
+        const copyAppleHelpBtn = document.getElementById("copy-url-apple-btn");
+
+        const calendarUrl = "https://1bach.vercel.app/api/exams.ics";
+
+        googleCalendarBtn?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            subscribeMenu?.classList.remove("show");
+            helpModal!.style.display = "flex";
+            helpVideo?.play().catch(err => console.log("Auto-play blocked:", err));
+        });
+
+        appleCalendarBtn?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            subscribeMenu?.classList.remove("show");
+            appleHelpModal!.style.display = "flex";
+        });
+
+        helpModalClose?.addEventListener("click", () => {
+            helpModal!.style.display = "none";
+            helpVideo?.pause();
+        });
+
+        appleHelpModalClose?.addEventListener("click", () => {
+            appleHelpModal!.style.display = "none";
+        });
+
+        helpModal?.addEventListener("click", (e) => {
+            if (e.target === helpModal) {
+                helpModal.style.display = "none";
+                helpVideo?.pause();
+            }
+        });
+
+        appleHelpModal?.addEventListener("click", (e) => {
+            if (e.target === appleHelpModal) {
+                appleHelpModal.style.display = "none";
+            }
+        });
+
+        const handleCopy = (btn: HTMLElement | null) => {
+            if (!btn) return;
+            navigator.clipboard.writeText(calendarUrl).then(() => {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Copiado!';
+                const originalBg = btn.style.background;
+                btn.style.background = "#10b981";
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = originalBg;
+                }, 2000);
+            });
+        };
+
+        copyHelpBtn?.addEventListener("click", () => handleCopy(copyHelpBtn));
+        copyAppleHelpBtn?.addEventListener("click", () => handleCopy(copyAppleHelpBtn));
+
         copyLinkBtn?.addEventListener("click", (e) => {
             e.stopPropagation();
-            const calendarUrl = "https://1bach.vercel.app/api/exams.ics";
             navigator.clipboard.writeText(calendarUrl).then(() => {
                 const originalText = copyLinkBtn.innerHTML;
                 copyLinkBtn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Copiado!';
