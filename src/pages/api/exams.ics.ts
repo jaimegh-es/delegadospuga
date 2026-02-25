@@ -16,19 +16,48 @@ export const GET: APIRoute = async ({ request }) => {
 
     const stamp = formatICSDate(lastUpdated);
 
+    // Funciones auxiliares para cumplimiento de RFC 5545
+    const escapeText = (text: string) => {
+      if (!text) return "";
+      return text
+        .replace(/\\/g, "\\\\")
+        .replace(/;/g, "\\;")
+        .replace(/,/g, "\\,")
+        .replace(/\n/g, "\\n");
+    };
+
+    const foldLine = (line: string) => {
+      const parts = [];
+      let current = line;
+      // El estándar dice 75 octetos. Usamos un margen de seguridad.
+      while (Buffer.byteLength(current, 'utf8') > 72) {
+        let splitPos = 70;
+        // Evitar romper secuencias de escape o caracteres multi-byte de forma bruta
+        let slice = current.substring(0, splitPos);
+        while (Buffer.byteLength(slice, 'utf8') > 72 && splitPos > 1) {
+          splitPos--;
+          slice = current.substring(0, splitPos);
+        }
+        parts.push(slice);
+        current = " " + current.substring(splitPos);
+      }
+      parts.push(current);
+      return parts.join("\r\n");
+    };
+
     // 3. Obtener exámenes
     const snapshot = await db.collection("calendar_events").where("type", "==", "exam").get();
     
-    // 4. Construir contenido ICS siguiendo RFC 5545
+    // 4. Construir contenido ICS
     let icsLines = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
-      "PRODID:-//1B_Bach//Examenes//ES",
+      "PRODID:-//1B Bach//Examenes//ES",
       "CALSCALE:GREGORIAN",
       "METHOD:PUBLISH",
-      "X-WR-CALNAME:Exámenes 1B Bach",
+      `X-WR-CALNAME:${escapeText("Exámenes 1B Bach")}`,
       "X-WR-TIMEZONE:Europe/Madrid",
-      "X-WR-CALDESC:Calendario de exámenes de 1º Bachillerato B",
+      `X-WR-CALDESC:${escapeText("Calendario de exámenes de 1º Bachillerato B")}`,
       "REFRESH-INTERVAL;VALUE=DURATION:PT1H",
       "X-PUBLISHED-TTL:PT1H"
     ];
@@ -37,12 +66,11 @@ export const GET: APIRoute = async ({ request }) => {
       const data = doc.data();
       const id = doc.id;
       
-      // Fecha en formato YYYYMMDD (para eventos de todo el día) o YYYYMMDDTHHMMSS
       const dateParts = (data.date || "").split("-"); // [YYYY, MM, DD]
-      if (dateParts.length < 3) return; // Saltar si la fecha no es válida
+      if (dateParts.length < 3) return;
 
       const rawTime = data.time || "08:30";
-      const timeParts = rawTime.split(":"); // [HH, MM]
+      const timeParts = rawTime.split(":"); 
       
       const hh = (timeParts[0] || "08").padStart(2, '0');
       const mm = (timeParts[1] || "00").padStart(2, '0');
@@ -54,35 +82,35 @@ export const GET: APIRoute = async ({ request }) => {
       const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
       const endStr = `${endDate.getFullYear()}${(endDate.getMonth() + 1).toString().padStart(2, '0')}${endDate.getDate().toString().padStart(2, '0')}T${endDate.getHours().toString().padStart(2, '0')}${endDate.getMinutes().toString().padStart(2, '0')}00`;
 
-      const summary = (data.title || data.subject || "Examen").replace(/[,;]/g, "\\$0");
+      const summary = escapeText(data.title || data.subject || "Examen");
       const description = [
         data.subject ? `Asignatura: ${data.subject}` : "",
-        data.details ? `Detalles: ${data.details.replace(/<[^>]*>?/gm, '').replace(/\n/g, '\\n')}` : "", 
+        data.details ? `Detalles: ${data.details.replace(/<[^>]*>?/gm, '')}` : "", 
         `Aula: ${data.classroom || "B1B"}`
-      ].filter(Boolean).join("\\n").replace(/[,;]/g, "\\$0");
+      ].filter(Boolean).map(line => escapeText(line)).join("\\n");
 
       icsLines.push("BEGIN:VEVENT");
       icsLines.push(`UID:${id}@1bach.vercel.app`);
       icsLines.push(`DTSTAMP:${stamp}`);
-      icsLines.push(`DTSTART:${startStr}`); // Floating time (compatible con cualquier zona horaria local)
+      icsLines.push(`DTSTART:${startStr}`); 
       icsLines.push(`DTEND:${endStr}`);
       icsLines.push(`SUMMARY:${summary}`);
       icsLines.push(`DESCRIPTION:${description}`);
-      icsLines.push(`LOCATION:${(data.classroom || "B1B").replace(/[,;]/g, "\\$0")}`);
+      icsLines.push(`LOCATION:${escapeText(data.classroom || "B1B")}`);
       icsLines.push(`LAST-MODIFIED:${stamp}`);
       icsLines.push("END:VEVENT");
     });
 
     icsLines.push("END:VCALENDAR");
 
-    // Unir con CRLF (\r\n) como exige el estándar
-    const icsContent = icsLines.join("\r\n");
+    // Aplicar plegado de líneas y unir con CRLF
+    const icsContent = icsLines.map(foldLine).join("\r\n") + "\r\n";
 
     return new Response(icsContent, {
       status: 200,
       headers: {
         "Content-Type": "text/calendar; charset=utf-8",
-        "Content-Disposition": 'attachment; filename="examenes.ics"',
+        // Eliminamos Content-Disposition para evitar problemas con Google Calendar
         "Cache-Control": "public, s-maxage=60, stale-while-revalidate=3600",
         "Access-Control-Allow-Origin": "*",
         "Last-Modified": lastUpdated.toUTCString(),
@@ -93,3 +121,4 @@ export const GET: APIRoute = async ({ request }) => {
     return new Response("Error", { status: 500 });
   }
 };
+
