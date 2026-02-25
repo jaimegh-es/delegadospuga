@@ -66,21 +66,26 @@ export const GET: APIRoute = async ({ request }) => {
       const data = doc.data();
       const id = doc.id;
       
-      const dateParts = (data.date || "").split("-"); // [YYYY, MM, DD]
-      if (dateParts.length < 3) return;
-
+      // Asegurar que tenemos una fecha válida (formato YYYY-MM-DD esperado en data.date)
+      if (!data.date) return;
+      
       const rawTime = data.time || "08:30";
-      const timeParts = rawTime.split(":"); 
+      const [hh, mm] = rawTime.split(":").map(s => s.padStart(2, '0'));
       
-      const hh = (timeParts[0] || "08").padStart(2, '0');
-      const mm = (timeParts[1] || "00").padStart(2, '0');
+      // Crear objeto fecha interpretando como hora local de Madrid
+      // Usamos un string ISO-like para que el constructor de Date lo trate correctamente
+      const startDate = new Date(`${data.date}T${hh || "08"}:${mm || "00"}:00`);
       
-      const startStr = `${dateParts[0]}${dateParts[1]}${dateParts[2]}T${hh}${mm}00`;
-      
-      // Calcular fin (suponemos 1 hora de duración)
-      const startDate = new Date(`${data.date}T${hh}:${mm}:00`);
+      if (isNaN(startDate.getTime())) return;
+
+      // Calcular fin (1 hora después)
       const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
-      const endStr = `${endDate.getFullYear()}${(endDate.getMonth() + 1).toString().padStart(2, '0')}${endDate.getDate().toString().padStart(2, '0')}T${endDate.getHours().toString().padStart(2, '0')}${endDate.getMinutes().toString().padStart(2, '0')}00`;
+
+      // Convertir a formato ICS UTC (YYYYMMDDTHHMMSSZ)
+      const toICSUTC = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+      
+      const startStr = toICSUTC(startDate);
+      const endStr = toICSUTC(endDate);
 
       const summary = escapeText(data.title || data.subject || "Examen");
       const description = [
