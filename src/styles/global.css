@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+/* Global Button Link Style (used in TipTap editors) */
+.btn-link {
+    display: inline-block;
+    background-color: #2000ad;
+    color: white !important;
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    text-decoration: none !important;
+    font-weight: 600;
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-link:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(32, 0, 173, 0.2);
+    opacity: 0.9;
+}
+
+/* Event-specific button color if inside an event container */
+.detalles-html .btn-link, .examen-info .btn-link {
+    background-color: #10b981;
+}
+.detalles-html .btn-link:hover, .examen-info .btn-link:hover {
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}

@@ -12,6 +12,12 @@
   "dependencies": {
     "@astrojs/vercel": "^9.0.4",
     "@tailwindcss/vite": "^4.1.18",
+    "@tiptap/core": "^3.20.0",
+    "@tiptap/extension-image": "^3.20.0",
+    "@tiptap/extension-link": "^3.20.0",
+    "@tiptap/extension-placeholder": "^3.20.0",
+    "@tiptap/extension-underline": "^3.20.0",
+    "@tiptap/starter-kit": "^3.20.0",
     "@vite-pwa/astro": "^1.2.0",
     "astro": "^5.2.5",
     "firebase": "^12.8.0",
@@ -20,7 +26,6 @@
     "jspdf": "^4.0.0",
     "jspdf-autotable": "^5.0.7",
     "lucide-astro": "^0.556.0",
-    "quill": "^2.0.3",
     "tailwindcss": "^4.1.18"
   }
 }

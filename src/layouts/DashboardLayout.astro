@@ -55,9 +55,317 @@ if (isAdmin) {
 
     </div>
   </div>
+
+  <!-- Global Notification Modal -->
+  <div id="global-modal-overlay" class="modal-overlay hidden">
+    <div class="modal-card">
+        <div id="modal-icon" class="modal-icon"></div>
+        <h3 id="modal-title" class="modal-title"></h3>
+        <p id="modal-message" class="modal-message"></p>
+        <div id="modal-input-container" class="modal-input-container hidden">
+            <input type="text" id="modal-input" class="modal-input" placeholder="...">
+        </div>
+        <div class="modal-actions">
+            <button id="modal-cancel-btn" class="modal-btn btn-secondary hidden">Cancelar</button>
+            <button id="modal-ok-btn" class="modal-btn btn-primary">Aceptar</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- Global Loading Overlay -->
+  <div id="global-loading-overlay" class="loading-overlay hidden">
+    <div class="loading-card">
+        <div class="modern-spinner"></div>
+        <p>Cargando...</p>
+    </div>
+  </div>
 </Layout>
 
+<script is:inline>
+    window.showLoading = () => {
+        document.getElementById('global-loading-overlay')?.classList.remove('hidden');
+    };
+    window.hideLoading = () => {
+        document.getElementById('global-loading-overlay')?.classList.add('hidden');
+    };
+
+    let modalResolve = null;
+
+    window.showAlert = (message, type = 'info') => {
+        return new Promise((resolve) => {
+            const overlay = document.getElementById('global-modal-overlay');
+            const icon = document.getElementById('modal-icon');
+            const title = document.getElementById('modal-title');
+            const msg = document.getElementById('modal-message');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+            const inputContainer = document.getElementById('modal-input-container');
+            const okBtn = document.getElementById('modal-ok-btn');
+
+            msg.textContent = message;
+            title.textContent = type === 'success' ? 'Éxito' : (type === 'error' ? 'Error' : 'Información');
+            
+            icon.className = `modal-icon ${type}`;
+            icon.innerHTML = type === 'success' ? '<i class="fas fa-check-circle"></i>' : 
+                            (type === 'error' ? '<i class="fas fa-exclamation-circle"></i>' : '<i class="fas fa-info-circle"></i>');
+
+            cancelBtn.classList.add('hidden');
+            inputContainer.classList.add('hidden');
+            overlay.classList.remove('hidden');
+
+            modalResolve = resolve;
+            okBtn.onclick = () => {
+                overlay.classList.add('hidden');
+                resolve(true);
+            };
+        });
+    };
+
+    window.showConfirm = (message) => {
+        return new Promise((resolve) => {
+            const overlay = document.getElementById('global-modal-overlay');
+            const icon = document.getElementById('modal-icon');
+            const title = document.getElementById('modal-title');
+            const msg = document.getElementById('modal-message');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+            const inputContainer = document.getElementById('modal-input-container');
+            const okBtn = document.getElementById('modal-ok-btn');
+
+            msg.textContent = message;
+            title.textContent = 'Confirmar';
+            icon.className = 'modal-icon confirm';
+            icon.innerHTML = '<i class="fas fa-question-circle"></i>';
+
+            cancelBtn.classList.remove('hidden');
+            inputContainer.classList.add('hidden');
+            overlay.classList.remove('hidden');
+
+            okBtn.onclick = () => {
+                overlay.classList.add('hidden');
+                resolve(true);
+            };
+            cancelBtn.onclick = () => {
+                overlay.classList.add('hidden');
+                resolve(false);
+            };
+        });
+    };
+
+    window.showPrompt = (message, defaultValue = '', placeholder = 'Escribe aquí...') => {
+        return new Promise((resolve) => {
+            const overlay = document.getElementById('global-modal-overlay');
+            const icon = document.getElementById('modal-icon');
+            const title = document.getElementById('modal-title');
+            const msg = document.getElementById('modal-message');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+            const inputContainer = document.getElementById('modal-input-container');
+            const input = document.getElementById('modal-input');
+            const okBtn = document.getElementById('modal-ok-btn');
+
+            msg.textContent = message;
+            title.textContent = 'Entrada de datos';
+            icon.className = 'modal-icon prompt';
+            icon.innerHTML = '<i class="fas fa-edit"></i>';
+            input.value = defaultValue;
+            input.placeholder = placeholder;
+
+            cancelBtn.classList.remove('hidden');
+            inputContainer.classList.remove('hidden');
+            overlay.classList.remove('hidden');
+            input.focus();
+
+            okBtn.onclick = () => {
+                overlay.classList.add('hidden');
+                resolve(input.value);
+            };
+            cancelBtn.onclick = () => {
+                overlay.classList.add('hidden');
+                resolve(null);
+            };
+        });
+    };
+</script>
+
 <style>
+  /* Global Modals */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    transition: all 0.3s ease;
+  }
+
+  .modal-overlay.hidden {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .modal-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 28px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: modalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes modalIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .modal-icon.success { color: #10b981; }
+  .modal-icon.error { color: #ef4444; }
+  .modal-icon.info { color: #3b82f6; }
+  .modal-icon.confirm { color: #2000ad; }
+  .modal-icon.prompt { color: #6366f1; }
+
+  .modal-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+  }
+
+  .modal-message {
+    color: #64748b;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+
+  .modal-input-container {
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .modal-input:focus {
+    border-color: #2000ad;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .modal-btn {
+    flex: 1;
+    padding: 0.875rem;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+
+  .btn-primary {
+    background: #2000ad;
+    color: white;
+  }
+  .btn-primary:hover {
+    background: #1a008a;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+  .btn-secondary:hover {
+    background: #e2e8f0;
+    color: #475569;
+  }
+
+  .hidden { display: none !important; }
+
+  /* Global Loading Overlay */
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: all 0.3s ease;
+  }
+
+  .loading-overlay.hidden {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .loading-card {
+    background: white;
+    padding: 2rem 3rem;
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes scaleIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .loading-card p {
+    color: #2000ad;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  .modern-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f4f6;
+    border-top: 4px solid #2000ad;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
   .dashboard-container {
     max-width: 1200px;
     margin: 80px auto 0;
