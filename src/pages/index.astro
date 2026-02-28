@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import HeroCarousel from "../components/Hero.astro";
 import Navigation from "../components/Navigation.astro";
 import LinksSection from "../components/LinksSection.astro";
+import FAQSection from "../components/FAQSection.astro";
 import MoodleNotifierBanner from "../components/MoodleNotifierBanner.astro";
 import NewsSection from "../components/NewsSection.astro";
 import CountdownBanner from "../components/CountdownBanner.astro";
@@ -10,6 +11,7 @@ import Footer from "../components/Footer.astro";
 import CalendarioExamenes from "../components/CalendarioExamenes.astro";
 import Eventos from "../components/Eventos.astro";
 import DisclaimerPopup from "../components/DisclaimerPopup.astro";
+import CampaignPopup from "../components/CampaignPopup.astro";
 import LostHours from "../components/LostHours.astro";
 import NotificationSettings from "../components/NotificationSettings.astro";
 import AbsencesNotice from "../components/AbsencesNotice.astro";
@@ -43,6 +45,7 @@ try {
 
 	<!-- <MoodleNotifierBanner /> -->
 	<LinksSection />
+	<FAQSection />
 	<!-- <AbsencesNotice todayCount={todayCount} />-->
 	<NewsSection />
 
@@ -52,6 +55,7 @@ try {
 
 	<Footer />
 	<DisclaimerPopup />
+	<CampaignPopup />
 	<NotificationSettings />
 
 	<script>

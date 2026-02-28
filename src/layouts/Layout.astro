@@ -23,6 +23,7 @@ const { title = "1B Bach | Noticias y examenes" } = Astro.props;
 			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
 			rel="stylesheet"
 		/>
+		<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 		<link
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -40,10 +41,73 @@ const { title = "1B Bach | Noticias y examenes" } = Astro.props;
 		{pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
 	</head>
 	<body>
+		<!-- Loading Spinner Overlay -->
+		<div id="loading-overlay" class="loading-overlay">
+			<div class="spinner-wrapper">
+				<img src="/dino.gif" alt="Dino" class="loading-dino" />
+				<div class="main-spinner"></div>
+				<span class="loading-text">Cargando 1B Bach...</span>
+			</div>
+		</div>
+
 		<slot />
 	</body>
 	<script>
 		import { registerSW } from "virtual:pwa-register";
+
+		// Manejo del Loading Overlay (al terminar de cargar la página)
+		const hideOverlay = () => {
+			const overlay = document.getElementById('loading-overlay');
+			if (overlay) {
+				overlay.classList.add('fade-out');
+				setTimeout(() => {
+					overlay.style.display = 'none';
+				}, 600);
+			}
+		};
+
+		const showOverlay = () => {
+			const overlay = document.getElementById('loading-overlay');
+			if (overlay) {
+				overlay.style.display = 'flex';
+				overlay.classList.remove('fade-out');
+			}
+		};
+
+		window.addEventListener('load', hideOverlay);
+		
+		// Manejar navegación hacia atrás (bfcache) para ocultar el spinner
+		window.addEventListener('pageshow', (event) => {
+			if (event.persisted) {
+				hideOverlay();
+			}
+		});
+
+		// Interceptar clicks en enlaces internos para mostrar el spinner inmediatamente
+		document.addEventListener('click', (e) => {
+			const target = (e.target as HTMLElement).closest('a');
+			
+			if (target && target instanceof HTMLAnchorElement) {
+				const url = new URL(target.href);
+				const isInternal = url.origin === window.location.origin;
+				const isSamePage = url.pathname === window.location.pathname;
+				const hasHash = !!url.hash;
+				const isTargetBlank = target.target === '_blank';
+				const isDownload = target.hasAttribute('download');
+
+				// NO mostrar spinner si:
+				// 1. Es un enlace externo
+				// 2. Es un enlace a una sección de la MISMA página (hasHash && isSamePage)
+				// 3. Es un target="_blank" o una descarga
+				if (isInternal && !(isSamePage && hasHash) && !isTargetBlank && !isDownload) {
+					// Pequeña validación extra: si el href es solo "#" o empieza por "#"
+					if (target.getAttribute('href') === '#' || target.getAttribute('href')?.startsWith('#')) {
+						return;
+					}
+					showOverlay();
+				}
+			}
+		});
 
 		// Limpiar cachés antiguos primero
 		if ("caches" in window) {
@@ -168,5 +232,74 @@ const { title = "1B Bach | Noticias y examenes" } = Astro.props;
 	.logo {
 		width: auto;
 		height: 40px;
+	}
+
+	/* Loading Overlay Styles */
+	.loading-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: #f8fafc;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 10000;
+		transition: opacity 0.5s ease, visibility 0.5s ease;
+	}
+
+	.loading-overlay.fade-out {
+		opacity: 0;
+		visibility: hidden;
+	}
+
+	.spinner-wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.loading-dino {
+		width: 400px;
+		max-width: 85vw;
+		height: auto;
+		margin-bottom: 1rem;
+		border-radius: 24px;
+		filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
+		animation: bounce 2s ease-in-out infinite;
+	}
+
+	@keyframes bounce {
+		0%, 100% { transform: translateY(0); }
+		50% { transform: translateY(-10px); }
+	}
+
+	.main-spinner {
+		width: 50px;
+		height: 50px;
+		border: 4px solid rgba(32, 0, 173, 0.1);
+		border-left-color: #2000ad;
+		border-radius: 50%;
+		animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+	}
+
+	.loading-text {
+		font-weight: 600;
+		color: #1e293b;
+		letter-spacing: 0.1em;
+		font-size: 0.85rem;
+		text-transform: uppercase;
+		animation: pulse 1.5s ease-in-out infinite;
+	}
+
+	@keyframes spin {
+		to { transform: rotate(360deg); }
+	}
+
+	@keyframes pulse {
+		0%, 100% { opacity: 0.5; }
+		50% { opacity: 1; }
 	}
 </style>

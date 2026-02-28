@@ -1,0 +1,177 @@
+---
+// src/components/FAQSection.astro
+import fs from 'node:fs';
+import path from 'node:path';
+import { marked } from 'marked';
+
+// Leer el archivo Markdown de FAQs
+const faqPath = path.resolve('./src/data/faqs.md');
+const faqContent = fs.readFileSync(faqPath, 'utf-8');
+
+// Parsear el contenido: Dividir por "## "
+const sections = faqContent.split(/^##\s+/m).filter(Boolean);
+
+const faqs = sections.map(section => {
+  const lines = section.trim().split('\n');
+  const question = lines[0].trim();
+  const answerMarkdown = lines.slice(1).join('\n').trim();
+  const answerHtml = marked.parse(answerMarkdown);
+  return { question, answerHtml };
+});
+---
+
+<section class="faq-section" id="faq">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Preguntas Rápidas</h2>
+      <p class="section-subtitle">Resolvemos tus dudas más comunes al instante.</p>
+    </div>
+
+    <div class="faq-grid">
+      {faqs.map((faq, index) => (
+        <details class="faq-item" style={`--index: ${index}`}>
+          <summary class="faq-question">
+            <span>{faq.question}</span>
+            <div class="faq-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </summary>
+          <div class="faq-answer">
+            <div class="prose-content" set:html={faq.answerHtml} />
+          </div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-section {
+    padding: 80px 0;
+    background-color: #f1f5f9;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    background: #2000ad;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .section-subtitle {
+    color: #64748b;
+    font-size: 1.1rem;
+  }
+
+  .faq-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .faq-item {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .faq-item[open] {
+    box-shadow: 0 10px 25px rgba(32, 0, 173, 0.08);
+    border-color: rgba(32, 0, 173, 0.1);
+  }
+
+  .faq-question {
+    padding: 24px;
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #1e293b;
+    transition: color 0.3s ease;
+    user-select: none;
+  }
+
+  .faq-question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-item:hover .faq-question {
+    color: #2000ad;
+  }
+
+  .faq-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    border-radius: 50%;
+    color: #64748b;
+    transition: all 0.3s ease;
+  }
+
+  .faq-item[open] .faq-icon {
+    transform: rotate(180deg);
+    background: #2000ad;
+    color: white;
+  }
+
+  .faq-answer {
+    padding: 0 24px 24px;
+    color: #4b5563;
+    line-height: 1.6;
+    font-size: 1.05rem;
+    animation: slideDown 0.3s ease-out;
+  }
+
+  /* Ajustes para el contenido renderizado por marked */
+  .faq-answer :global(p:first-child) {
+    margin-top: 0;
+  }
+
+  .faq-answer :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .section-title {
+      font-size: 2rem;
+    }
+    .faq-question {
+      padding: 20px;
+      font-size: 1rem;
+    }
+  }
+</style>

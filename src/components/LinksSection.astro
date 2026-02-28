@@ -1,5 +1,59 @@
 ---
 // src/components/LinksSection.astro
+const mdResources = Object.values(import.meta.glob('../pages/recursos/*.md', { eager: true }));
+const astroResources = Object.values(import.meta.glob('../pages/recursos/*.astro', { eager: true }));
+
+// Mapping for .astro files that don't have frontmatter
+const astroMetadata = {
+  'horario': {
+    title: 'Horario de clases',
+    description: '¡No te pierdas las clases! Consulta el horario oficial actualizado.'
+  },
+  'calendarioescolar': {
+    title: 'Calendario Escolar',
+    description: 'Mantente al tanto de los festivos y días no lectivos del curso.'
+  },
+  'aplazaex': {
+    title: 'Derecho a Exámenes',
+    description: 'Tus derechos ante huelgas: aplazamientos y normativa vigente.'
+  }
+};
+
+// Enlaces externos manuales
+const externalLinks = [
+  {
+    url: 'https://www.iespugaramon.com/ies-puga-ramon/docs/nof_2611201651832981046.pdf',
+    title: 'Normas de organización y funcionamiento (NOF)',
+    description: 'Normativa vigente.',
+    isExternal: true
+  },
+  {
+    url: 'https://www.iespugaramon.com/ies-puga-ramon/docs/plan_de_convivencia1363687176088.pdf',
+    title: 'Plan de convivencia',
+    description: 'Que modifica el NOF.',
+    isExternal: true
+  }
+];
+
+const allResources = [
+  ...mdResources.map((res: any) => ({
+    url: res.url,
+    title: res.frontmatter?.title || 'Recurso',
+    description: res.frontmatter?.description || 'Haz clic para leer más sobre este recurso.',
+    isExternal: false
+  })),
+  ...astroResources.map((res: any) => {
+    const filename = res.file.split('/').pop().replace('.astro', '');
+    const meta = astroMetadata[filename] || { title: filename, description: 'Recurso del centro' };
+    return {
+      url: `/recursos/${filename}`,
+      title: meta.title,
+      description: meta.description,
+      isExternal: false
+    };
+  }),
+  ...externalLinks
+].filter(res => !res.url?.includes('ejemplo-guia')); 
 ---
 
 <section class="links-section" id="links">
@@ -9,31 +63,23 @@
     </div>
     
     <div class="links-grid">
-
-      <a href="/recursos/calendarioescolar" class="link-card">
-        <h3>Calendario Escolar</h3>
-        <p>Estate informado de qué día no hay instituto :).</p>
-        <span>Leer más →</span>
-      </a>
-
-      <a href="/recursos/horario" class="link-card">
-        <h3>Horario de clases</h3>
-        <p>¡No te pierdas las clases! ¡Descubre el horario oficial!.</p>
-        <span>Leer más →</span>
-      </a>
-
-     <!--  <a href="/recursos/sipodemoshuelga" class="link-card">
-        <h3>Tenemos derecho a huelga</h3>
-        <p>La ley nos ampara. No pueden prohibir una huelga..</p>
-        <span>Leer más →</span>
-      </a> -->
-
-
+      {allResources.map(resource => (
+        <a 
+          href={resource.url} 
+          class="link-card" 
+          target={resource.isExternal ? "_blank" : undefined}
+          rel={resource.isExternal ? "noopener noreferrer" : undefined}
+        >
+          <h3>{resource.title}</h3>
+          <p>{resource.description}</p>
+          <span>{resource.isExternal ? 'Visitar sitio' : 'Leer más'} →</span>
+        </a>
+      ))}
     </div>
-
-   
   </div>
 </section>
+
+
 
 <style>
   .links-section {
