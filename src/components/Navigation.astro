@@ -135,7 +135,7 @@ const examsToday = upcomingExams.filter(e => e.date === todayStr);
         )}
         {examsLater.length > 0 && (
           <div class="panel-category">
-            <span class="category-label">ESTA SEMANA</span>
+            <span class="category-label">FECHAS PROXIMAS</span>
             {examsLater.map(exam => (
               <div class="panel-item">
                 <span class="item-title">{exam.title || exam.subject}</span>
