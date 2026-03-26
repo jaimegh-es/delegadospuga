@@ -1,215 +1,590 @@
 ---
+import { db } from "../lib/firebase/server";
 import EmailPopup from "./EmailPopup.astro";
 import InstallPWA from "./InstallPWA.astro";
+
+// Obtener datos para el notch
+const today = new Date();
+const todayStr = today.toISOString().split('T')[0];
+
+const nextPeriod = new Date();
+nextPeriod.setDate(today.getDate() + 15);
+const nextPeriodStr = nextPeriod.toISOString().split('T')[0];
+
+let upcomingExams = [];
+let upcomingEvents = [];
+let latestNews = [];
+let newsCount = 0;
+
+try {
+  // Exámenes en los próximos 15 días
+  const examsSnapshot = await db.collection("calendar_events")
+    .where("type", "==", "exam")
+    .where("date", ">=", todayStr)
+    .where("date", "<=", nextPeriodStr)
+    .orderBy("date", "asc")
+    .get();
+  
+  upcomingExams = examsSnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+
+  // Eventos en los próximos 15 días
+  const eventsSnapshot = await db.collection("calendar_events")
+    .where("type", "==", "event")
+    .where("date", ">=", todayStr)
+    .where("date", "<=", nextPeriodStr)
+    .orderBy("date", "asc")
+    .get();
+
+  upcomingEvents = eventsSnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+
+  // Noticias
+  const newsSnapshot = await db.collection("news")
+    .orderBy("date", "desc")
+    .get();
+  
+  newsCount = newsSnapshot.size;
+  latestNews = newsSnapshot.docs.slice(0, 3).map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+
+} catch (error) {
+  console.error("Error fetching notch data:", error);
+}
+
+// Clasificar exámenes (mañana vs esta semana)
+const tomorrow = new Date();
+tomorrow.setDate(today.getDate() + 1);
+const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+const examsTomorrow = upcomingExams.filter(e => e.date === tomorrowStr);
+const examsLater = upcomingExams.filter(e => e.date !== tomorrowStr && e.date !== todayStr);
+const examsToday = upcomingExams.filter(e => e.date === todayStr);
+
 ---
 
-<nav class="nav-container">
-	<div class="nav-content">
-		<div class="nav-logo">
-			<a href="/" style="text-decoration: none;"
-				><img
-					src={import.meta.env.BASE_URL + "favicon.svg"}
-					class="logo"
-					alt="delegados logo"
-				/><h2>1B Bach</h2></a
-			>
-		</div>
-		<ul class="nav-menu">
-			<li><a href="/#hero">Inicio</a></li>
-			<li><a href="/#calendar">Examenes</a></li>
-			<li><a href="/#eventos">Eventos</a></li>
-			<li><a href="/#noticias">Noticias</a></li>
-			<li><a href="/#links">Recursos</a></li>
-			<!-- <li><a href="/wall">Wall</a></li> -->
-			<li class="relative group">
-				<a
-					href="/login"
-					class="flex items-center gap-2 font-bold !bg-white !text-[#2000ad] px-4 py-2 rounded-full hover:!bg-gray-100 transition-all shadow-lg"
-				>
-					<i class="fa-solid fa-user"></i>
-					<span>Acceso</span>
-				</a>
-			</li>
-			<li>
-				<a href="#" id="mail-btn" aria-label="Contactar por correo">
-					<i class="fa-solid fa-envelope"></i>
-				</a>
-			</li>
-			<li class="install-li">
-				<InstallPWA />
-			</li>
-		</ul>
-		<div class="nav-burger">
-			<span></span>
-			<span></span>
-			<span></span>
-		</div>
-	</div>
-</nav>
+<div class="notch-wrapper">
+  <nav class="floating-notch" id="main-notch">
+    <div class="notch-content">
+      <!-- Logo/Inicio -->
+      <a href="/" class="notch-logo" aria-label="Inicio">
+        <img src="/favicon.svg" alt="Logo" width="24" height="24" />
+        <span class="logo-text">1B Bach</span>
+      </a>
+
+      <div class="notch-divider"></div>
+
+      <!-- Stats / Quick Info -->
+      <div class="notch-stats" id="notch-trigger">
+        <div class="stat-item" title="Exámenes próximos">
+          <i class="fa-solid fa-graduation-cap"></i>
+          {upcomingExams.length > 0 && <span class="badge badge-exam">{upcomingExams.length}</span>}
+        </div>
+        <div class="stat-item" title="Eventos próximos">
+          <i class="fa-solid fa-calendar-day"></i>
+          {upcomingEvents.length > 0 && <span class="badge badge-event">{upcomingEvents.length}</span>}
+        </div>
+        <div class="stat-item" title="Noticias">
+          <i class="fa-solid fa-newspaper"></i>
+          {newsCount > 0 && <span class="badge badge-news">{newsCount}</span>}
+        </div>
+      </div>
+
+      <div class="notch-divider"></div>
+
+      <!-- Burger Menu -->
+      <button class="notch-burger" id="notch-burger" aria-label="Menú">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+    <!-- Dropdown Panel (Summary) -->
+    <div class="notch-panel" id="notch-panel">
+      <!-- Sección de Exámenes -->
+      <div class="panel-section">
+        <h3><i class="fa-solid fa-graduation-cap"></i> Exámenes</h3>
+        {examsToday.length > 0 && (
+          <div class="panel-category">
+            <span class="category-label label-today">HOY</span>
+            {examsToday.map(exam => (
+              <div class="panel-item">
+                <span class="item-title">{exam.title || exam.subject}</span>
+                <span class="item-meta">{exam.time}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {examsTomorrow.length > 0 && (
+          <div class="panel-category">
+            <span class="category-label label-tomorrow">MAÑANA</span>
+            {examsTomorrow.map(exam => (
+              <div class="panel-item">
+                <span class="item-title">{exam.title || exam.subject}</span>
+                <span class="item-meta">{exam.time}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {examsLater.length > 0 && (
+          <div class="panel-category">
+            <span class="category-label">ESTA SEMANA</span>
+            {examsLater.map(exam => (
+              <div class="panel-item">
+                <span class="item-title">{exam.title || exam.subject}</span>
+                <span class="item-meta">{new Date(exam.date).toLocaleDateString('es-ES', {weekday: 'short', day: 'numeric'})}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {upcomingExams.length === 0 && <p class="empty-msg">No hay exámenes próximamente 🙌</p>}
+      </div>
+
+      <div class="panel-divider"></div>
+
+      <!-- Sección de Eventos -->
+      <div class="panel-section">
+        <h3><i class="fa-solid fa-calendar-day"></i> Eventos</h3>
+        {upcomingEvents.length > 0 ? (
+          upcomingEvents.map(event => (
+            <div class="panel-item">
+              <span class="item-title">{event.title}</span>
+              <span class="item-meta">{new Date(event.date).toLocaleDateString('es-ES', {day: 'numeric', month: 'short'})}</span>
+            </div>
+          ))
+        ) : (
+          <p class="empty-msg">Sin eventos esta semana</p>
+        )}
+      </div>
+
+      <div class="panel-divider"></div>
+
+      <!-- Sección de Noticias -->
+      <div class="panel-section">
+        <h3><i class="fa-solid fa-newspaper"></i> Últimas Noticias</h3>
+        {latestNews.length > 0 ? (
+          latestNews.map(item => (
+            <a href={`/noticias/${item.id}`} class="panel-item news-panel-item">
+              <span class="item-title">{item.title}</span>
+              <span class="item-meta">{item.date}</span>
+            </a>
+          ))
+        ) : (
+          <p class="empty-msg">No hay noticias publicadas</p>
+        )}
+      </div>
+      
+      <div class="panel-footer">
+        <a href="/#calendar" class="view-all">Ver todo</a>
+      </div>
+    </div>
+
+    <!-- Navigation Menu (The old links) -->
+    <div class="notch-menu" id="nav-menu">
+      <ul class="menu-links">
+        <li><a href="/#hero"><i class="fa-solid fa-house"></i> Inicio</a></li>
+        <li><a href="/#calendar"><i class="fa-solid fa-graduation-cap"></i> Exámenes</a></li>
+        <li><a href="/#eventos"><i class="fa-solid fa-calendar-alt"></i> Eventos</a></li>
+        <li><a href="/#noticias"><i class="fa-solid fa-newspaper"></i> Noticias</a></li>
+        <li><a href="/#links"><i class="fa-solid fa-link"></i> Recursos</a></li>
+        <li>
+          <a href="/login" class="login-link">
+            <i class="fa-solid fa-user"></i> Acceso
+          </a>
+        </li>
+      </ul>
+      <div class="menu-actions">
+        <button id="mail-btn-notch" class="action-btn" aria-label="Contacto">
+          <i class="fa-solid fa-envelope"></i>
+        </button>
+        <div class="install-wrapper">
+          <InstallPWA />
+        </div>
+      </div>
+    </div>
+  </nav>
+</div>
 
 <style>
-	.nav-container {
-		position: fixed;
-		top: 0;
-		width: 100%;
-		z-index: 1000;
-		background: #2000ad;
-		backdrop-filter: blur(20px);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-		transition: all 0.3s ease;
-	}
+  .notch-wrapper {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 9999;
+    pointer-events: none;
+  }
 
-	.nav-content {
-		max-width: 1200px;
-		margin: 0 auto;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 16px 24px;
-	}
+  .floating-notch {
+    pointer-events: auto;
+    background: rgba(32, 0, 173, 0.85);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 40px;
+    padding: 6px 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    max-width: 95vw;
+    overflow: hidden;
+  }
 
-	.nav-logo h2 {
-		color: white;
-		font-weight: 600;
-		font-size: 1.5rem;
-	}
+  .floating-notch:hover {
+    background: rgba(32, 0, 173, 0.95);
+    transform: translateY(2px);
+  }
 
-	.nav-logo a {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-	}
+  .notch-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 36px;
+  }
 
-	.logo {
-		width: 40px;
-		height: auto;
-	}
+  .notch-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    padding: 0 8px;
+  }
 
-	.nav-menu {
-		display: flex;
-		list-style: none;
-		gap: 32px;
-		align-items: center;
-	}
+  .logo-text {
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
 
-	.nav-menu a {
-		color: white;
-		text-decoration: none;
-		font-weight: 500;
-		transition: all 0.3s ease;
-		position: relative;
-	}
+  .notch-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.2);
+  }
 
-	.nav-menu a::after {
-		content: "";
-		position: absolute;
-		bottom: -4px;
-		left: 0;
-		width: 0;
-		height: 2px;
-		background: white;
-		transition: width 0.3s ease;
-	}
+  .notch-stats {
+    display: flex;
+    gap: 16px;
+    cursor: pointer;
+    padding: 0 8px;
+    border-radius: 20px;
+    transition: background 0.2s ease;
+  }
 
-	.nav-menu a:hover::after {
-		width: 100%;
-	}
+  .notch-stats:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
 
-	.nav-menu a:hover {
-		color: #ffffff;
-		transform: translateY(-2px);
-	}
+  .stat-item {
+    color: white;
+    position: relative;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
 
-	.nav-burger {
-		display: none;
-		flex-direction: column;
-		cursor: pointer;
-		gap: 4px;
-	}
+  .badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 5px;
+    border-radius: 10px;
+    min-width: 16px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
 
-	.nav-burger span {
-		width: 24px;
-		height: 3px;
-		background: white;
-		transition: 0.3s;
-	}
+  .badge-exam { background: #ff4757; color: white; }
+  .badge-event { background: #ffa502; color: white; }
+  .badge-news { background: #2ed573; color: white; }
 
-	.install-li {
-		display: flex;
-		align-items: center;
-	}
+  .notch-burger {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+  }
 
-	@media (max-width: 768px) {
-		.nav-menu {
-			position: fixed;
-			top: 70px;
-			left: -100%;
-			flex-direction: column;
-			background: rgba(32, 0, 173, 0.95);
-			backdrop-filter: blur(20px);
-			width: 100%;
-			height: calc(100vh - 70px);
-			text-align: center;
-			transition: 0.3s;
-			padding: 2rem;
-			gap: 2rem;
-		}
+  .notch-burger:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
 
-		.nav-menu.active {
-			left: 0;
-			display: flex;
-		}
+  .notch-burger span {
+    width: 18px;
+    height: 2px;
+    background: white;
+    border-radius: 2px;
+    transition: 0.3s;
+  }
 
-		.nav-menu a {
-			font-size: 1.2rem;
-			display: block;
-			padding: 1rem;
-		}
+  /* Dropdown Panels */
+  .notch-panel, .notch-menu {
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    width: 320px;
+    overflow-y: auto;
+  }
 
-		.nav-burger {
-			display: flex;
-			z-index: 1001;
-		}
+  .floating-notch.panel-active .notch-panel,
+  .floating-notch.menu-active .notch-menu {
+    max-height: 70vh;
+    opacity: 1;
+    visibility: visible;
+    margin-top: 15px;
+    padding-bottom: 10px;
+  }
 
-		.nav-burger.active span:nth-child(1) {
-			transform: translateY(7px) rotate(45deg);
-		}
+  .panel-section {
+    padding: 10px 5px;
+  }
 
-		.nav-burger.active span:nth-child(2) {
-			opacity: 0;
-		}
+  .panel-section h3 {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
-		.nav-burger.active span:nth-child(3) {
-			transform: translateY(-7px) rotate(-45deg);
-		}
+  .panel-category {
+    margin-bottom: 12px;
+  }
 
-		.install-li {
-			width: 100%;
-		}
-	}
+  .category-label {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 6px;
+  }
+
+  .label-today { background: #ff4757; color: white; }
+  .label-tomorrow { background: #ff7f50; color: white; }
+
+  .panel-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+    text-decoration: none;
+  }
+
+  .panel-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .item-title {
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .item-meta {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+  }
+
+  .news-panel-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .empty-msg {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .panel-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 5px 0;
+  }
+
+  .panel-footer {
+    text-align: center;
+    padding-top: 10px;
+  }
+
+  .view-all {
+    color: #00d2ff;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* Navigation Menu Styles */
+  .menu-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .menu-links li a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+    text-decoration: none;
+    padding: 12px 15px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .menu-links li a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+  }
+
+  .menu-links li a i {
+    width: 20px;
+    text-align: center;
+    opacity: 0.7;
+  }
+
+  .login-link {
+    background: white !important;
+    color: #2000ad !important;
+    margin-top: 10px;
+  }
+
+  .menu-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+  }
+
+  .install-wrapper {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  /* Burger Animation */
+  .floating-notch.menu-active .notch-burger span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+  .floating-notch.menu-active .notch-burger span:nth-child(2) {
+    opacity: 0;
+  }
+  .floating-notch.menu-active .notch-burger span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  /* Mobile Adjustments */
+  @media (max-width: 768px) {
+    .logo-text {
+      display: none;
+    }
+    
+    .notch-panel, .notch-menu {
+      width: 85vw;
+    }
+
+    .floating-notch {
+      padding: 5px 10px;
+    }
+  }
 </style>
 
 <script>
-	document.getElementById("mail-btn")?.addEventListener("click", (e) => {
-		e.preventDefault();
-		document.dispatchEvent(new Event("open-email-popup"));
-	});
+  const notch = document.getElementById('main-notch');
+  const trigger = document.getElementById('notch-trigger');
+  const burger = document.getElementById('notch-burger');
+  const mailBtn = document.getElementById('mail-btn-notch');
 
-	const burger = document.querySelector(".nav-burger");
-	const nav = document.querySelector(".nav-menu");
-	const navLinks = document.querySelectorAll(".nav-menu li");
+  // Toggle Panel
+  trigger?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notch?.classList.toggle('panel-active');
+    notch?.classList.remove('menu-active');
+  });
 
-	burger?.addEventListener("click", () => {
-		nav?.classList.toggle("active");
-		burger.classList.toggle("active");
-	});
+  // Toggle Menu
+  burger?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notch?.classList.toggle('menu-active');
+    notch?.classList.remove('panel-active');
+  });
 
-	navLinks.forEach((link) => {
-		link.addEventListener("click", () => {
-			nav?.classList.remove("active");
-			burger?.classList.remove("active");
-		});
-	});
+  // Mail Button
+  mailBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.dispatchEvent(new Event('open-email-popup'));
+    notch?.classList.remove('menu-active');
+  });
+
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (notch && !notch.contains(e.target as Node)) {
+      notch.classList.remove('panel-active');
+      notch.classList.remove('menu-active');
+    }
+  });
+
+  // Close when clicking links
+  const links = document.querySelectorAll('.menu-links a, .view-all, .news-panel-item');
+  links.forEach(link => {
+    link.addEventListener('click', () => {
+      notch?.classList.remove('panel-active');
+      notch?.classList.remove('menu-active');
+    });
+  });
 </script>
 
 <EmailPopup />
