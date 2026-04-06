@@ -7,11 +7,11 @@ export interface NewsItem {
 }
 
 export const news: NewsItem[] = [
-    /*{
-        title: "A punto de tampoco poder estar en clase en los recreos",
-        image: "favicon.svg",
-        description: "Poco a poco, cada vez menos derechos. Cada vez el tono es más áspero.",
-        link: "/noticias/menosderechos",
-        date: "13 Ene 2026"
-    },*/
+    {
+        title: "Presentada reclamación por prohibición de uso de baños durante y después de clase de educación física",
+        image: "delegados.png",
+        description: "Esta medida, que afecta a todos, inclusive aquellos que no hemos hecho nada, prohibe el uso de los baños previamente, durante y después de la clase de EF en el pabellón y fuera de él.",
+        link: "/noticias/presentada-solicitud-baños",
+        date: "27 Mar 2026"
+    },
 ];

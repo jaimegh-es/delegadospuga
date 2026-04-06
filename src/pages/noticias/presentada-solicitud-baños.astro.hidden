@@ -1,0 +1,127 @@
+---
+import NewsLayout from "../../layouts/NewsLayout.astro";
+---
+
+<NewsLayout title="Nueva sección de noticias |     ">
+    <header class="article-header">
+        <span class="date">27 marzo 2026</span>
+        <h1>Presentada reclamación por prohibición de uso de baños durante y después de clase de educación física</h1>
+        <img
+            src={import.meta.env.BASE_URL + "delegados.png"}
+            alt="Nueva sección de noticias"
+            class="featured-image"
+        />
+    </header>
+
+    <div class="article-body">
+        <p class="lead">
+            Esta medida, que afecta a todos, inclusive aquellos que no hemos hecho nada, prohibe el uso de los baños previamente, durante y después de la clase de EF en el pabellón y fuera de él.
+        </p>
+        <p>Por tanto llegamos todos a clase que no hay quien respire. Es por ello por lo que con la firma de la mayoría de compañeros de clase que tienen conciencia de la importancia del asunto para la salud higiénica y fisiológica, hemos presentado una reclamación a dirección el miércoles tras no recibir respuesta al mensaje que se envió el lunes solicitando lo mismo.</p>
+        <p>A fecha de viernes no hemos recibido contestación alguna por parte de dirección y la medida sigue vigente.</p>
+        <p>Se ve que algunos/as profesores/as solo alcanzan intelectualmente a imponer medidas generales y no son capaces de encontrar otras vías de amonestación a supuestos culpables que no afecten a la mayoría que no tenemos nada que ver.</p>
+        <p>Dicen de la presencia de teléfonos. Tanto la tutora como la profesora de educación física no han accedido nunca a los vestuarios de hombres por tanto, al no haber camaras ni ellos acceder, no pueden verificar la veracidad de sus afirmaciones y probar estas.</p>
+
+        <h3>¿Qué afecta a quén?</h3>
+        <p>A todos sin excepción. Dice la tutora que quien necesite ir al baño sus padres deben presentar una solicitud.</p>
+
+        <h3>¿Por qué antes y después?</h3>
+        <p>Por que, obviamente la gente no se iba a quedar sin higienizar y cuando intentaron ir al baño la jefa de estudios lo impidió ordenando explícitamente ir "arriba".</p>
+
+        <h3>Qué hacemos ahora</h3>
+        <p>Algunos compañeros se cambian en clase durante el recreo antes de ir y al volver, nada.</p>
+        ¿Por qué esta prohibición?
+
+Fundamentan la prohibición (que afecta a todos sin excepción) en el uso (sin pruebas, no verificado) de dispositivos móviles en los aseos del pabellón durante la hora de educación física.
+
+
+
+La gente optó por ir a los de la entrada, pero el último día la jefa de estudios optó por impedirlo.
+
+
+
+Justos x pecadores
+
+La medida afecta a todos. La tutora ha sugerido que quien necesite ir al baño, que sus padres presenten un escrito.
+
+
+
+Nuestra actuación
+
+Tras imponerse esta prohibición, se presentó una reclamación a dirección vía correo electrónico, aún sin respuesta.
+
+Por ello se presentó en secretaría un escrito informando de ello con las firmas de algunos compañeros, aún sin respuesta.
+
+
+    </div>
+</NewsLayout>
+
+<style>
+    .article-header {
+        margin-bottom: 40px;
+    }
+
+    .date {
+        display: block;
+        color: #6b7280;
+        margin-bottom: 12px;
+        font-weight: 500;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        color: #2000ad;
+        margin-bottom: 24px;
+        line-height: 1.2;
+    }
+
+    .featured-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .article-body {
+        font-size: 1.125rem;
+        line-height: 1.8;
+        color: #374151;
+    }
+
+    .lead {
+        font-size: 1.25rem;
+        color: #1f2937;
+        margin-bottom: 32px;
+        font-weight: 500;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+        color: #2000ad;
+        margin: 40px 0 20px;
+    }
+
+    p {
+        margin-bottom: 24px;
+    }
+
+    ul {
+        margin-bottom: 24px;
+        padding-left: 24px;
+    }
+
+    li {
+        margin-bottom: 12px;
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2rem;
+        }
+
+        .featured-image {
+            height: 250px;
+        }
+    }
+</style>
