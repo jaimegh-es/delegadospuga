@@ -15,6 +15,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         pathname.startsWith('/api/settings') ||
         pathname.startsWith('/api/calendar') ||
         pathname.startsWith('/api/news') ||
+        pathname.startsWith('/api/telegram') ||
         pathname.startsWith('/api/files')) {
         const sessionCookie = context.cookies.get('session')?.value;
 

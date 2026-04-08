@@ -1,5 +1,6 @@
 ---
 import { pwaInfo } from "virtual:pwa-info";
+import TelegramPopup from "../components/TelegramPopup.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -52,6 +53,7 @@ const { title = "1B Bach | La página que usan los compañeros y sus padres 🤣
 		</div>
 
 		<slot />
+		<TelegramPopup />
 	</body>
 	<script>
 		import { registerSW } from "virtual:pwa-register";

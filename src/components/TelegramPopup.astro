@@ -1,0 +1,202 @@
+---
+---
+<div id="telegram-modal-overlay" class="modal-overlay hidden">
+    <div class="telegram-modal">
+        <button id="close-telegram-modal" class="close-btn" aria-label="Cerrar">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="telegram-icon-container">
+            <div class="icon-circle">
+                <i class="fab fa-telegram-plane"></i>
+            </div>
+        </div>
+
+        <h2>¡Únete al Telegram!</h2>
+        <p>Recibe al instante notificaciones de noticias, exámenes y eventos. Sin tener siquiera que abrir la web. Todo en una notificación. Lo mejor: todo automatizado, para que solo recibas lo importante. Algunas funciones son experimentales (como el resumen semanal), peor funciona muy bien.</p>
+
+        <a href="https://t.me/+Itq-KhGnWLZiNTZk" target="_blank" id="join-telegram-btn" class="telegram-btn">
+            <i class="fab fa-telegram"></i> Unirme al Canal
+        </a>
+        
+        <button id="maybe-later-telegram" class="secondary-link">Quizás más tarde</button>
+    </div>
+</div>
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        backdrop-filter: blur(4px);
+        padding: 20px;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    .telegram-modal {
+        background: white;
+        padding: 2.5rem 2rem;
+        border-radius: 24px;
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        animation: modalShow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes modalShow {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #f1f5f9;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #64748b;
+        transition: all 0.2s;
+    }
+
+    .close-btn:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+
+    .telegram-icon-container {
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: center;
+    }
+
+    .icon-circle {
+        width: 80px;
+        height: 80px;
+        background: #0088cc;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.5rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 136, 204, 0.3);
+    }
+
+    h2 {
+        color: #1e293b;
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        color: #64748b;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    .telegram-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: #0088cc;
+        color: white;
+        text-decoration: none;
+        padding: 14px 28px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .telegram-btn:hover {
+        background: #0077b5;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .secondary-link {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        margin-top: 1.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: color 0.2s;
+    }
+
+    .secondary-link:hover {
+        color: #64748b;
+        text-decoration: underline;
+    }
+</style>
+
+<script>
+    function initTelegramModal() {
+        const overlay = document.getElementById('telegram-modal-overlay');
+        const closeBtn = document.getElementById('close-telegram-modal');
+        const laterBtn = document.getElementById('maybe-later-telegram');
+        const joinBtn = document.getElementById('join-telegram-btn');
+
+        if (!overlay) return;
+
+        // Verificar si ya se mostró o se unió
+        const hasJoinedOrDismissed = localStorage.getItem('telegram-modal-dismissed');
+        const now = new Date().getTime();
+
+        // Si no se ha interactuado o han pasado más de 7 días desde el "quizás más tarde"
+        if (!hasJoinedOrDismissed || (now - parseInt(hasJoinedOrDismissed)) > (7 * 24 * 60 * 60 * 1000)) {
+            // Mostrar con un pequeño retraso para mejorar UX
+            setTimeout(() => {
+                overlay.classList.remove('hidden');
+            }, 3000);
+        }
+
+        const dismiss = () => {
+            overlay.classList.add('hidden');
+            localStorage.setItem('telegram-modal-dismissed', new Date().getTime().toString());
+        };
+
+        const permanentDismiss = () => {
+            overlay.classList.add('hidden');
+            // Un valor muy alto para que no vuelva a aparecer (un año)
+            localStorage.setItem('telegram-modal-dismissed', (new Date().getTime() + (365 * 24 * 60 * 60 * 1000)).toString());
+        };
+
+        closeBtn?.addEventListener('click', dismiss);
+        laterBtn?.addEventListener('click', dismiss);
+        joinBtn?.addEventListener('click', permanentDismiss);
+
+        // Cerrar al hacer clic fuera
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) dismiss();
+        });
+    }
+
+    // Ejecutar al cargar la página
+    document.addEventListener('DOMContentLoaded', initTelegramModal);
+    // Para transiciones de View Transitions en Astro
+    document.addEventListener('astro:after-swap', initTelegramModal);
+</script>

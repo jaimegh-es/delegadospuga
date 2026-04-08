@@ -108,6 +108,13 @@ const examsToday = upcomingExams.filter(e => e.date === todayStr);
 
     <!-- Dropdown Panel (Summary) -->
     <div class="notch-panel" id="notch-panel">
+      <!-- Aviso Telegram -->
+      <a href="https://t.me/+Itq-KhGnWLZiNTZk" target="_blank" class="telegram-notice-panel">
+        <i class="fab fa-telegram"></i>
+        <span>¡Únete al Telegram para avisos al instante!</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+
       <!-- Sección de Exámenes -->
       <div class="panel-section">
         <h3><i class="fa-solid fa-graduation-cap"></i> Exámenes</h3>
@@ -197,6 +204,11 @@ const examsToday = upcomingExams.filter(e => e.date === todayStr);
         <li>
           <a href="/login" class="login-link">
             <i class="fa-solid fa-user"></i> Acceso
+          </a>
+        </li>
+        <li>
+          <a href="https://t.me/+Itq-KhGnWLZiNTZk" target="_blank" class="telegram-link">
+            <i class="fab fa-telegram"></i> Telegram
           </a>
         </li>
       </ul>
@@ -433,6 +445,42 @@ const examsToday = upcomingExams.filter(e => e.date === todayStr);
     margin: 5px 0;
   }
 
+  /* Telegram Notice in Panel */
+  .telegram-notice-panel {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(0, 136, 204, 0.2);
+    border: 1px solid rgba(0, 136, 204, 0.4);
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .telegram-notice-panel:hover {
+    background: rgba(0, 136, 204, 0.3);
+    transform: scale(1.02);
+  }
+
+  .telegram-notice-panel i.fa-telegram {
+    color: #0088cc;
+    font-size: 1.5rem;
+  }
+
+  .telegram-notice-panel span {
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    flex-grow: 1;
+  }
+
+  .telegram-notice-panel i.fa-chevron-right {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+  }
+
   .panel-footer {
     text-align: center;
     padding-top: 10px;
@@ -479,6 +527,18 @@ const examsToday = upcomingExams.filter(e => e.date === todayStr);
     background: white !important;
     color: #2000ad !important;
     margin-top: 10px;
+  }
+
+  .telegram-link {
+    background: #0088cc !important;
+    color: white !important;
+    margin-top: 8px;
+    box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
+  }
+
+  .telegram-link:hover {
+    background: #0077b5 !important;
+    transform: scale(1.02) !important;
   }
 
   .menu-actions {

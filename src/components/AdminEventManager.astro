@@ -964,6 +964,29 @@
                 resetEventsForm();
                 await loadEvents();
                 (window as any).showAlert("Evento guardado correctamente", "success");
+
+                // Preguntar para Telegram
+                const publishInTelegram = await (window as any).showConfirm("¿Quieres avisar de este evento en Telegram también?");
+                if (publishInTelegram) {
+                    (window as any).showLoading();
+                    try {
+                        const siteUrl = window.location.origin;
+                        await fetch('/api/telegram', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                title: `📢 EVENTO: ${data.title}`,
+                                subtitle: `Fecha: ${new Date(data.date as string).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}${data.time ? ` a las ${data.time}` : ''}`,
+                                link: `${siteUrl}/dashboard`
+                            })
+                        });
+                        (window as any).showAlert("Aviso enviado a Telegram", "success");
+                    } catch (e) {
+                        (window as any).showAlert("Error enviando a Telegram", "error");
+                    } finally {
+                        (window as any).hideLoading();
+                    }
+                }
             } else {
                 (window as any).showAlert("Error al guardar", "error");
             }

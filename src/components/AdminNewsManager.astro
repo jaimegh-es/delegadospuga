@@ -728,9 +728,36 @@
             });
 
             if (res.ok) {
+                const responseData = await res.json();
+                const newsId = isEdit ? data.id : responseData.id;
+                
                 resetForm();
                 await loadNews(); 
                 (window as any).showAlert(isEdit ? "Noticia actualizada correctamente" : "Noticia publicada correctamente", "success");
+
+                // Preguntar para Telegram
+                const publishInTelegram = await (window as any).showConfirm("¿Quieres publicar esta noticia en Telegram también?");
+                if (publishInTelegram) {
+                    (window as any).showLoading();
+                    try {
+                        const siteUrl = window.location.origin;
+                        await fetch('/api/telegram', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                title: data.title,
+                                subtitle: data.description,
+                                image: data.image,
+                                link: `${siteUrl}/noticias/${newsId}`
+                            })
+                        });
+                        (window as any).showAlert("Noticia enviada a Telegram", "success");
+                    } catch (e) {
+                        (window as any).showAlert("Error enviando a Telegram", "error");
+                    } finally {
+                        (window as any).hideLoading();
+                    }
+                }
             } else {
                 (window as any).showAlert("Error al guardar", "error");
             }

@@ -77,6 +77,18 @@ function dividirEnSemanas(dias) {
     }
     return semanas;
 }
+
+// Cálculo del progreso del curso
+const cursoInicio = new Date("2025-09-11");
+const cursoFin = new Date("2026-06-20");
+const hoy = new Date();
+
+const totalDias = Math.ceil((cursoFin.getTime() - cursoInicio.getTime()) / (1000 * 60 * 60 * 24));
+const diasTranscurridos = Math.ceil((hoy.getTime() - cursoInicio.getTime()) / (1000 * 60 * 60 * 24));
+const porcentajeProgreso = Math.max(0, Math.min(100, (diasTranscurridos / totalDias) * 100));
+
+const totalCuadritos = 30;
+const cuadritosRellenos = Math.floor((porcentajeProgreso / 100) * totalCuadritos);
 ---
 
 <section class="calendario-section" id="calendar">
@@ -106,6 +118,21 @@ function dividirEnSemanas(dias) {
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="curso-progreso">
+            <div class="progreso-text">
+                <span class="emoji">🎓</span> Ya queda poco
+            </div>
+            <div class="progreso-grid">
+                {Array.from({ length: totalCuadritos }).map((_, i) => (
+                    <div class={`cuadrito ${i < cuadritosRellenos ? 'relleno' : ''}`}></div>
+                ))}
+            </div>
+            <div class="progreso-stats">
+                <span>{Math.round(porcentajeProgreso)}% completado</span>
+                <span>Curso 2025 - 2026</span>
             </div>
         </div>
 
@@ -481,7 +508,86 @@ function dividirEnSemanas(dias) {
 
     .section-header {
         text-align: center;
-        margin-bottom: 60px;
+        margin-bottom: 30px; /* Reduced from 60px to accommodate progress bar */
+    }
+
+    .curso-progreso {
+        max-width: 600px;
+        margin: 0 auto 50px auto;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 24px;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .progreso-text {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: #2000ad;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: -0.02em;
+    }
+
+    .progreso-text .emoji {
+        font-size: 1.5rem;
+    }
+
+    .progreso-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        justify-content: center;
+    }
+
+    .cuadrito {
+        width: 12px;
+        height: 12px;
+        background-color: #ebedf0;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+
+    .cuadrito.relleno {
+        background-color: #2ea44f;
+        box-shadow: 0 0 8px rgba(46, 164, 79, 0.3);
+    }
+
+    .progreso-stats {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 5px;
+    }
+
+    @media (max-width: 640px) {
+        .curso-progreso {
+            padding: 16px;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+        .cuadrito {
+            width: 9px;
+            height: 9px;
+        }
+        .progreso-text {
+            font-size: 1rem;
+        }
+        .progreso-stats {
+            font-size: 0.7rem;
+        }
     }
 
     .header-actions {
