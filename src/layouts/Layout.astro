@@ -32,10 +32,10 @@ const { title = "1B Bach | La página que usan los compañeros y sus padres 🤣
 		/>
 		<script
 			src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"
-			is:inline></script>
+		></script>
 		<script
 			src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"
-			is:inline></script>
+		></script>
 		<meta
 			name="google-site-verification"
 			content="9ZLJootCsdX0ar_N77lazLJnwImUq-2T5BvRGINna7k"
@@ -43,13 +43,9 @@ const { title = "1B Bach | La página que usan los compañeros y sus padres 🤣
 		{pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
 	</head>
 	<body>
-		<!-- Loading Spinner Overlay -->
-		<div id="loading-overlay" class="loading-overlay">
-			<div class="spinner-wrapper">
-				<img src="/dino.gif" alt="Dino" class="loading-dino" />
-				<div class="main-spinner"></div>
-				<span class="loading-text">La paciencia tiene su recompensa... Está cargando...</span>
-			</div>
+		<!-- Top Progress Bar -->
+		<div id="loading-bar-container" class="progress-bar-container">
+			<div id="loading-bar" class="progress-bar"></div>
 		</div>
 
 		<slot />
@@ -58,35 +54,76 @@ const { title = "1B Bach | La página que usan los compañeros y sus padres 🤣
 	<script>
 		import { registerSW } from "virtual:pwa-register";
 
-		// Manejo del Loading Overlay (al terminar de cargar la página)
-		const hideOverlay = () => {
-			const overlay = document.getElementById('loading-overlay');
-			if (overlay) {
-				overlay.classList.add('fade-out');
-				setTimeout(() => {
-					overlay.style.display = 'none';
-				}, 600);
-			}
-		};
-
-		const showOverlay = () => {
-			const overlay = document.getElementById('loading-overlay');
-			if (overlay) {
-				overlay.style.display = 'flex';
-				overlay.classList.remove('fade-out');
-			}
-		};
-
-		window.addEventListener('load', hideOverlay);
+		// Manejo de la Barra de Progreso
+		let progressInterval: any;
+		let startTime = Date.now();
+		const MIN_LOADING_TIME = 800; // ms para que el usuario lo note
 		
-		// Manejar navegación hacia atrás (bfcache) para ocultar el spinner
+		const finishProgress = () => {
+			const bar = document.getElementById('loading-bar');
+			if (bar) {
+				const elapsedTime = Date.now() - startTime;
+				const remainingTime = Math.max(0, MIN_LOADING_TIME - elapsedTime);
+
+				setTimeout(() => {
+					clearInterval(progressInterval);
+					bar.style.width = '100%';
+					setTimeout(() => {
+						bar.style.opacity = '0';
+						setTimeout(() => {
+							bar.style.width = '0%';
+							bar.style.display = 'none';
+						}, 300);
+					}, 200);
+				}, remainingTime);
+			}
+		};
+
+		const startProgress = () => {
+			const bar = document.getElementById('loading-bar');
+			if (bar) {
+				startTime = Date.now();
+				bar.style.display = 'block';
+				bar.style.opacity = '1';
+				bar.style.width = '0%';
+				
+				// Avance inicial rápido
+				setTimeout(() => { bar.style.width = '40%'; }, 10);
+				
+				// Avance lento hasta el 95%
+				let currentWidth = 40;
+				clearInterval(progressInterval);
+				progressInterval = setInterval(() => {
+					if (currentWidth < 95) {
+						currentWidth += Math.random() * 1.5;
+						bar.style.width = `${currentWidth}%`;
+					}
+				}, 150);
+			}
+		};
+
+		// Iniciar progreso inmediatamente al cargar el script (para el primer render)
+		startProgress();
+
+		// Exponer globalmente
+		(window as any).showLoading = startProgress;
+		(window as any).hideLoading = finishProgress;
+
+		// Ejecutar al terminar la carga total de la página
+		if (document.readyState === 'complete') {
+			finishProgress();
+		} else {
+			window.addEventListener('load', finishProgress);
+		}
+		
+		// Manejar navegación hacia atrás (bfcache)
 		window.addEventListener('pageshow', (event) => {
 			if (event.persisted) {
-				hideOverlay();
+				finishProgress();
 			}
 		});
 
-		// Interceptar clicks en enlaces internos para mostrar el spinner inmediatamente
+		// Interceptar clicks en enlaces internos para mostrar progreso inmediatamente
 		document.addEventListener('click', (e) => {
 			const target = (e.target as HTMLElement).closest('a');
 			
@@ -98,16 +135,11 @@ const { title = "1B Bach | La página que usan los compañeros y sus padres 🤣
 				const isTargetBlank = target.target === '_blank';
 				const isDownload = target.hasAttribute('download');
 
-				// NO mostrar spinner si:
-				// 1. Es un enlace externo
-				// 2. Es un enlace a una sección de la MISMA página (hasHash && isSamePage)
-				// 3. Es un target="_blank" o una descarga
 				if (isInternal && !(isSamePage && hasHash) && !isTargetBlank && !isDownload) {
-					// Pequeña validación extra: si el href es solo "#" o empieza por "#"
 					if (target.getAttribute('href') === '#' || target.getAttribute('href')?.startsWith('#')) {
 						return;
 					}
-					showOverlay();
+					startProgress();
 				}
 			}
 		});
@@ -237,72 +269,24 @@ const { title = "1B Bach | La página que usan los compañeros y sus padres 🤣
 		height: 40px;
 	}
 
-	/* Loading Overlay Styles */
-	.loading-overlay {
+	/* Top Progress Bar Styles */
+	.progress-bar-container {
 		position: fixed;
 		top: 0;
 		left: 0;
 		width: 100%;
+		height: 4px;
+		background: transparent;
+		z-index: 10001;
+		pointer-events: none;
+	}
+
+	.progress-bar {
 		height: 100%;
-		background: #f8fafc;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		z-index: 10000;
-		transition: opacity 0.5s ease, visibility 0.5s ease;
-	}
-
-	.loading-overlay.fade-out {
-		opacity: 0;
-		visibility: hidden;
-	}
-
-	.spinner-wrapper {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 1.5rem;
-	}
-
-	.loading-dino {
-		width: 400px;
-		max-width: 85vw;
-		height: auto;
-		margin-bottom: 1rem;
-		border-radius: 24px;
-		filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
-		animation: bounce 2s ease-in-out infinite;
-	}
-
-	@keyframes bounce {
-		0%, 100% { transform: translateY(0); }
-		50% { transform: translateY(-10px); }
-	}
-
-	.main-spinner {
-		width: 50px;
-		height: 50px;
-		border: 4px solid rgba(32, 0, 173, 0.1);
-		border-left-color: #2000ad;
-		border-radius: 50%;
-		animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-	}
-
-	.loading-text {
-		font-weight: 600;
-		color: #1e293b;
-		letter-spacing: 0.1em;
-		font-size: 0.85rem;
-		text-transform: uppercase;
-		animation: pulse 1.5s ease-in-out infinite;
-	}
-
-	@keyframes spin {
-		to { transform: rotate(360deg); }
-	}
-
-	@keyframes pulse {
-		0%, 100% { opacity: 0.5; }
-		50% { opacity: 1; }
+		width: 0%;
+		background: linear-gradient(to right, #2000ad, #4f46e5);
+		transition: width 0.3s cubic-bezier(0.1, 0.05, 0.1, 1), opacity 0.3s ease;
+		box-shadow: 0 0 15px rgba(32, 0, 173, 0.8), 0 0 5px rgba(32, 0, 173, 1);
+		display: none;
 	}
 </style>
