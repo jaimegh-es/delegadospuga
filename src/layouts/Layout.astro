@@ -22,6 +22,7 @@ const { title = "1B Bach | La página que usan los compañeros y sus padres 🤣
 			})(window, document, "clarity", "script", "wesswb57ab");
 		</script>
 		<meta charset="UTF-8" />
+		<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://apis.google.com https://www.gstatic.com https://vercel.live https://cdn.jsdelivr.net https://cdn-cookieyes.com https://www.clarity.ms; connect-src 'self' https://*.googleapis.com https://*.firebaseapp.com https://*.cookieyes.com https://*.clarity.ms https://*.google.com https://vercel.live https://cdn.jsdelivr.net;">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
@@ -38,17 +39,19 @@ const { title = "1B Bach | La página que usan los compañeros y sus padres 🤣
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 		/>
-		<script
-			src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"
-		></script>
-		<script
-			src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"
-		></script>
 		<meta
 			name="google-site-verification"
 			content="9ZLJootCsdX0ar_N77lazLJnwImUq-2T5BvRGINna7k"
 		/>
 		{pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"
+			is:inline
+		></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"
+			is:inline
+		></script>
 	</head>
 	<body>
 		<!-- Top Progress Bar -->
