@@ -66,6 +66,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     response.headers.set('X-Frame-Options', 'DENY');
     response.headers.set('X-Content-Type-Options', 'nosniff');
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    response.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://apis.google.com https://www.gstatic.com https://vercel.live https://cdn.jsdelivr.net https://cdn-cookieyes.com https://www.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://*.googleusercontent.com https://vercel.com https://*.cookieyes.com https://*.clarity.ms; connect-src 'self' https://api.github.com https://*.googleapis.com https://*.firebaseapp.com https://cdnjs.cloudflare.com https://fonts.gstatic.com https://vercel.live https://cdn.jsdelivr.net https://apis.google.com https://www.gstatic.com https://*.google.com https://*.cookieyes.com https://*.clarity.ms; frame-src 'self' https://*.firebaseapp.com https://vercel.live;");
 
     // Verificar si es una imagen
     const isImage = /\.(jpg|jpeg|png|gif|svg|webp|avif|ico)$/i.test(pathname);
