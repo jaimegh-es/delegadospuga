@@ -26,9 +26,14 @@
 
             <div class="form-group">
                 <label>Imagen de Portada:</label>
-                <select name="image" id="image-selector" required>
-                    <option value="">Cargando imágenes...</option>
-                </select>
+                <div class="flex gap-2">
+                    <select name="image" id="image-selector" required class="flex-1">
+                        <option value="">Cargando imágenes...</option>
+                    </select>
+                    <button type="button" id="upload-portada-btn" class="upload-btn-inline" title="Subir nueva imagen">
+                        <i class="fa-solid fa-upload"></i> Subir
+                    </button>
+                </div>
                 <div id="image-preview" class="image-preview"></div>
             </div>
 
@@ -60,6 +65,8 @@
                 <div class="toolbar-group">
                     <button type="button" data-action="link" title="Enlace"><i class="fas fa-link"></i></button>
                     <button type="button" data-action="unlink" title="Quitar Enlace"><i class="fas fa-unlink"></i></button>
+                    <button type="button" id="upload-file-btn" title="Subir y Enlazar Archivo"><i class="fas fa-file-upload"></i></button>
+                    <button type="button" id="upload-editor-img-btn" title="Subir e Insertar Imagen"><i class="fas fa-image"></i></button>
                     <button type="button" data-action="btnLink" title="Añadir Botón" class="btn-toolbar-special"><i class="fas fa-external-link-alt"></i> Botón</button>
                 </div>
                 <div class="toolbar-group">
@@ -334,6 +341,25 @@
         background: #1a008d;
     }
 
+    .upload-btn-inline {
+        background: #f1f5f9;
+        color: #2000ad;
+        border: 1px solid #cbd5e1;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+    .upload-btn-inline:hover {
+        background: #e2e8f0;
+        border-color: #94a3b8;
+    }
+
     .secondary-btn {
         background: #e2e8f0;
         color: #475569;
@@ -480,6 +506,123 @@
         });
 
         setupToolbarListeners();
+        setupUploadListeners();
+    }
+
+    function setupUploadListeners() {
+        // Botón portada
+        document.getElementById('upload-portada-btn')?.addEventListener('click', () => {
+            saveDraft(); // Guardar por si acaso
+            window.dispatchEvent(new CustomEvent('open-upload-modal', { detail: { mode: 'portada' } }));
+        });
+
+        // Botón imagen editor
+        document.getElementById('upload-editor-img-btn')?.addEventListener('click', () => {
+            saveDraft();
+            window.dispatchEvent(new CustomEvent('open-upload-modal', { detail: { mode: 'editor-image' } }));
+        });
+
+        // Botón archivo editor
+        document.getElementById('upload-file-btn')?.addEventListener('click', () => {
+            saveDraft();
+            window.dispatchEvent(new CustomEvent('open-upload-modal', { detail: { mode: 'editor-file' } }));
+        });
+
+        // Escuchar evento de subida completada
+        window.addEventListener('file-uploaded', (async (e: any) => {
+            const { url, mode, fileName, isImage } = e.detail;
+            
+            if (mode === 'portada') {
+                await loadFiles(); // Recargar lista de archivos
+                const selector = document.getElementById('image-selector') as HTMLSelectElement;
+                if (selector) {
+                    // Esperar un poco a que se actualice el DOM si loadFiles es async
+                    setTimeout(() => {
+                        selector.value = url.replace(/^\//, ''); // Quitar / inicial si existe
+                        selector.dispatchEvent(new Event('change'));
+                        (window as any).showAlert("Imagen de portada actualizada", "success");
+                    }, 500);
+                }
+            } else if (mode === 'editor-image') {
+                tiptapNews.chain().focus().setImage({ src: url, alt: fileName }).run();
+                (window as any).showAlert("Imagen insertada en el editor", "success");
+            } else if (mode === 'editor-file') {
+                const linkText = await (window as any).showPrompt('Texto para el enlace del archivo:', fileName);
+                if (linkText) {
+                    tiptapNews.chain().focus().insertContent(`<a href="${url}" target="_blank" class="file-link"><i class="fas fa-paperclip"></i> ${linkText}</a>`).run();
+                    (window as any).showAlert("Archivo enlazado en el editor", "success");
+                }
+            }
+            
+            // Después de cualquier subida, actualizamos el borrador
+            saveDraft();
+        }) as any);
+    }
+
+    // --- SISTEMA DE BORRADOR (AUTO-SAVE) ---
+    function saveDraft() {
+        if (!tiptapNews) return;
+        const draft = {
+            id: (document.getElementById('news-id') as HTMLInputElement).value,
+            title: (document.getElementById('news-title') as HTMLInputElement).value,
+            date: (document.getElementById('news-date') as HTMLInputElement).value,
+            description: (document.getElementById('news-description') as HTMLInputElement).value,
+            image: (document.getElementById('image-selector') as HTMLSelectElement).value,
+            content: tiptapNews.getHTML(),
+            timestamp: Date.now()
+        };
+        // Solo guardar si hay algo de contenido para no pisar con vacíos innecesarios
+        if (draft.title || draft.content.length > 7) {
+            localStorage.setItem('news_admin_draft', JSON.stringify(draft));
+        }
+    }
+
+    function loadDraft() {
+        const raw = localStorage.getItem('news_admin_draft');
+        if (!raw) return;
+        
+        try {
+            const draft = JSON.parse(raw);
+            // Si el borrador tiene más de 24 horas, ignorarlo (opcional)
+            if (Date.now() - draft.timestamp > 86400000) return;
+
+            if (!draft.title && draft.content.length <= 7) return;
+
+            const confirmLoad = confirm("He encontrado un borrador sin guardar. ¿Quieres restaurarlo?");
+            if (!confirmLoad) {
+                localStorage.removeItem('news_admin_draft');
+                return;
+            }
+
+            (document.getElementById('news-id') as HTMLInputElement).value = draft.id || '';
+            (document.getElementById('news-title') as HTMLInputElement).value = draft.title || '';
+            (document.getElementById('news-date') as HTMLInputElement).value = draft.date || '';
+            (document.getElementById('news-description') as HTMLInputElement).value = draft.description || '';
+            
+            const selector = document.getElementById('image-selector') as HTMLSelectElement;
+            if (selector) {
+                selector.value = draft.image || '';
+                selector.dispatchEvent(new Event('change'));
+            }
+
+            if (tiptapNews && draft.content) {
+                tiptapNews.commands.setContent(draft.content);
+            }
+
+            if (draft.id) {
+                document.getElementById('form-title').textContent = "Editar Noticia (Borrador)";
+                document.getElementById('submit-btn-text').textContent = "Actualizar Noticia";
+                document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            }
+            
+            (window as any).showAlert("Borrador restaurado", "success");
+        } catch (e) {
+            console.error("Error loading draft", e);
+        }
+    }
+
+    function clearDraft() {
+        localStorage.removeItem('news_admin_draft');
     }
 
     function setupToolbarListeners() {
@@ -652,6 +795,7 @@
             document.getElementById('submit-btn-text').textContent = "Publicar Noticia";
             document.getElementById('cancel-edit-btn').classList.add('hidden');
             
+            clearDraft();
             (window as any).hideLoading();
         }, 300);
     }
@@ -733,6 +877,7 @@
                 
                 resetForm();
                 await loadNews(); 
+                clearDraft();
                 (window as any).showAlert(isEdit ? "Noticia actualizada correctamente" : "Noticia publicada correctamente", "success");
 
                 // Preguntar para Telegram
@@ -774,8 +919,19 @@
         await loadFiles();
         await loadNews();
         setupTabs();
+        loadDraft();
+        
+        // Auto-save cada 10 segundos
+        setInterval(saveDraft, 10000);
+
         document.getElementById('news-form')?.addEventListener('submit', handleFormSubmit);
         document.getElementById('cancel-edit-btn')?.addEventListener('click', resetForm);
+        
+        // Guardar al cambiar cualquier campo
+        document.querySelectorAll('#news-form input, #news-form textarea, #news-form select').forEach(el => {
+            el.addEventListener('change', saveDraft);
+        });
+
         (window as any).hideLoading();
     });
 </script>

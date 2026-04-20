@@ -77,6 +77,8 @@
                         <div class="toolbar-group">
                             <button type="button" data-action="link" title="Enlace"><i class="fas fa-link"></i></button>
                             <button type="button" data-action="unlink" title="Quitar Enlace"><i class="fas fa-unlink"></i></button>
+                            <button type="button" id="upload-exam-file-btn" title="Subir y Enlazar Archivo"><i class="fas fa-file-upload"></i></button>
+                            <button type="button" id="upload-exam-img-btn" title="Subir e Insertar Imagen"><i class="fas fa-image"></i></button>
                             <button type="button" data-action="btnLink" title="Añadir Botón" class="btn-toolbar-special"><i class="fas fa-external-link-alt"></i> Botón</button>
                         </div>
                         <div class="toolbar-group">
@@ -685,6 +687,7 @@
     import { Editor } from '@tiptap/core';
     import StarterKit from '@tiptap/starter-kit';
     import Link from '@tiptap/extension-link';
+    import Image from '@tiptap/extension-image';
     import Placeholder from '@tiptap/extension-placeholder';
     import Underline from '@tiptap/extension-underline';
 
@@ -704,6 +707,7 @@
                         class: null,
                     },
                 }),
+                Image,
                 Placeholder.configure({
                     placeholder: 'Detalles del examen...',
                 }),
@@ -720,6 +724,98 @@
         });
 
         setupToolbarListeners();
+        setupUploadListeners();
+    }
+
+    function setupUploadListeners() {
+        // Botón imagen editor
+        document.getElementById('upload-exam-img-btn')?.addEventListener('click', () => {
+            saveDraft();
+            window.dispatchEvent(new CustomEvent('open-upload-modal', { detail: { mode: 'exam-image' } }));
+        });
+
+        // Botón archivo editor
+        document.getElementById('upload-exam-file-btn')?.addEventListener('click', () => {
+            saveDraft();
+            window.dispatchEvent(new CustomEvent('open-upload-modal', { detail: { mode: 'exam-file' } }));
+        });
+
+        // Escuchar evento de subida completada
+        window.addEventListener('file-uploaded', (async (e: any) => {
+            const { url, mode, fileName, isImage } = e.detail;
+            
+            if (mode === 'exam-image') {
+                tiptapExams.chain().focus().setImage({ src: url, alt: fileName }).run();
+                (window as any).showAlert("Imagen insertada en el examen", "success");
+            } else if (mode === 'exam-file') {
+                const linkText = await (window as any).showPrompt('Texto para el enlace del archivo:', fileName);
+                if (linkText) {
+                    tiptapExams.chain().focus().insertContent(`<a href="${url}" target="_blank" class="file-link"><i class="fas fa-paperclip"></i> ${linkText}</a>`).run();
+                    (window as any).showAlert("Archivo enlazado en el examen", "success");
+                }
+            }
+            saveDraft();
+        }) as any);
+    }
+
+    // --- SISTEMA DE BORRADOR (AUTO-SAVE) ---
+    function saveDraft() {
+        if (!tiptapExams) return;
+        const draft = {
+            id: (document.getElementById('exam-id') as HTMLInputElement).value,
+            date: (document.getElementById('exam-date') as HTMLInputElement).value,
+            subject: (document.getElementById('exam-subject') as HTMLSelectElement).value,
+            title: (document.getElementById('exam-title') as HTMLInputElement).value,
+            time: (document.getElementById('exam-time') as HTMLInputElement).value,
+            classroom: (document.getElementById('exam-classroom') as HTMLInputElement).value,
+            content: tiptapExams.getHTML(),
+            timestamp: Date.now()
+        };
+        if (draft.subject || draft.content.length > 7) {
+            localStorage.setItem('exam_admin_draft', JSON.stringify(draft));
+        }
+    }
+
+    function loadDraft() {
+        const raw = localStorage.getItem('exam_admin_draft');
+        if (!raw) return;
+        
+        try {
+            const draft = JSON.parse(raw);
+            if (Date.now() - draft.timestamp > 86400000) return;
+            if (!draft.subject && draft.content.length <= 7) return;
+
+            const confirmLoad = confirm("He encontrado un borrador de examen sin guardar. ¿Restaurar?");
+            if (!confirmLoad) {
+                localStorage.removeItem('exam_admin_draft');
+                return;
+            }
+
+            (document.getElementById('exam-id') as HTMLInputElement).value = draft.id || '';
+            (document.getElementById('exam-date') as HTMLInputElement).value = draft.date || '';
+            (document.getElementById('exam-subject') as HTMLSelectElement).value = draft.subject || '';
+            (document.getElementById('exam-title') as HTMLInputElement).value = draft.title || '';
+            (document.getElementById('exam-time') as HTMLInputElement).value = draft.time || '';
+            (document.getElementById('exam-classroom') as HTMLInputElement).value = draft.classroom || 'B1B';
+            
+            if (tiptapExams && draft.content) {
+                tiptapExams.commands.setContent(draft.content);
+            }
+
+            if (draft.id) {
+                document.getElementById('exam-form-title').textContent = "Editar Examen (Borrador)";
+                document.getElementById('exam-submit-btn').textContent = "Actualizar Examen";
+                document.getElementById('cancel-exam-edit').classList.remove('hidden');
+            }
+            
+            (window as any).showAlert("Borrador de examen restaurado", "success");
+        } catch (e) {
+            console.error("Error loading exam draft", e);
+        }
+    }
+
+    function clearDraft() {
+        localStorage.removeItem('exam_admin_draft');
     }
 
     function setupToolbarListeners() {
@@ -965,6 +1061,7 @@
             document.getElementById('exam-submit-btn').textContent = "Añadir Examen";
             document.getElementById('cancel-exam-edit').classList.add('hidden');
             
+            clearDraft();
             (window as any).hideLoading();
         }, 300);
     }
@@ -1017,6 +1114,7 @@
             if (res.ok) {
                 resetExamsForm();
                 await loadExams();
+                clearDraft();
                 (window as any).showAlert("Examen guardado correctamente", "success");
 
                 // Preguntar para Telegram
@@ -1096,14 +1194,24 @@
             (window as any).hideLoading();
         }
     }
+document.addEventListener('DOMContentLoaded', async () => {
+    (window as any).showLoading();
+    initTipTap();
+    await loadExams();
+    loadDraft();
 
-    document.addEventListener('DOMContentLoaded', async () => {
-        (window as any).showLoading();
-        initTipTap();
-        await loadExams();
-        document.getElementById('exam-form')?.addEventListener('submit', handleFormSubmit);
-        document.getElementById('cancel-exam-edit')?.addEventListener('click', resetExamsForm);
-        document.getElementById('prev-month-exams')?.addEventListener('click', async () => { 
+    // Auto-save cada 10 segundos
+    setInterval(saveDraft, 10000);
+
+    document.getElementById('exam-form')?.addEventListener('submit', handleFormSubmit);
+    document.getElementById('cancel-exam-edit')?.addEventListener('click', resetExamsForm);
+
+    // Guardar al cambiar campos
+    document.querySelectorAll('#exam-form input, #exam-form select, #exam-form textarea').forEach(el => {
+        el.addEventListener('change', saveDraft);
+    });
+
+    document.getElementById('prev-month-exams')?.addEventListener('click', async () => { 
             (window as any).showLoading();
             currentDate.setMonth(currentDate.getMonth() - 1); 
             renderCalendar(); 

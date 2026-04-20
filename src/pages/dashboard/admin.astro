@@ -5,6 +5,7 @@ import AdminExamManager from '../../components/AdminExamManager.astro';
 import AdminEventManager from '../../components/AdminEventManager.astro';
 import AdminNewsManager from '../../components/AdminNewsManager.astro';
 import AdminComplaints from '../../components/AdminComplaints.astro';
+import UploadModal from '../../components/UploadModal.astro';
 
 const user = Astro.locals;
 
@@ -21,4 +22,5 @@ if (user.role !== 'admin') {
         <AdminNewsManager />
         <AdminComplaints />
     </div>
+    <UploadModal />
 </DashboardLayout>
