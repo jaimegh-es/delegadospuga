@@ -531,17 +531,36 @@
         // Escuchar evento de subida completada
         window.addEventListener('file-uploaded', (async (e: any) => {
             const { url, mode, fileName, isImage } = e.detail;
+            const cleanUrl = url.replace(/^\//, ''); // Quitar / inicial para que coincida con el selector
             
             if (mode === 'portada') {
-                await loadFiles(); // Recargar lista de archivos
+                await loadFiles(); // Intentar recargar lista oficial
+                
                 const selector = document.getElementById('image-selector') as HTMLSelectElement;
                 if (selector) {
-                    // Esperar un poco a que se actualice el DOM si loadFiles es async
+                    // Verificar si ya existe en el selector (por si loadFiles lo pilló)
+                    let optionExists = false;
+                    for (let i = 0; i < selector.options.length; i++) {
+                        if (selector.options[i].value === cleanUrl) {
+                            optionExists = true;
+                            break;
+                        }
+                    }
+
+                    // Si no existe (porque el deploy aún no terminó), añadirlo manualmente
+                    if (!optionExists) {
+                        const newOpt = document.createElement('option');
+                        newOpt.value = cleanUrl;
+                        newOpt.textContent = cleanUrl + " (Recién subido)";
+                        selector.appendChild(newOpt);
+                    }
+
+                    // Seleccionar y previsualizar
                     setTimeout(() => {
-                        selector.value = url.replace(/^\//, ''); // Quitar / inicial si existe
+                        selector.value = cleanUrl;
                         selector.dispatchEvent(new Event('change'));
-                        (window as any).showAlert("Imagen de portada actualizada", "success");
-                    }, 500);
+                        (window as any).showAlert("Imagen de portada lista para usar", "success");
+                    }, 100);
                 }
             } else if (mode === 'editor-image') {
                 tiptapNews.chain().focus().setImage({ src: url, alt: fileName }).run();

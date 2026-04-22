@@ -4,6 +4,7 @@
 			<div class="footer-section">
 				<h3> 1B Bach</h3>
 				<p>Información y exámenes.</p>
+				<img src="/confianza-profesorado.png" alt="Sello de confianza del profesorado" class="footer-badge" />
 			</div>
 
 			<div class="footer-section">
@@ -77,6 +78,13 @@
 		margin-bottom: 24px;
 	}
 
+	.footer-badge {
+		height: 120px;
+		width: auto;
+		display: block;
+		margin-top: 10px;
+	}
+
 	.footer-section ul {
 		list-style: none;
 	}
@@ -99,30 +107,6 @@
 		transform: translateX(4px);
 	}
 
-	.social-links {
-		display: flex;
-		gap: 16px;
-	}
-
-	.social-link {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 48px;
-		height: 48px;
-		background: rgba(255, 255, 255, 0.05);
-		border-radius: 12px;
-		font-size: 1.5rem;
-		transition: all 0.3s ease;
-		transform: perspective(1000px);
-	}
-
-	.social-link:hover {
-		background: rgba(255, 255, 255, 0.2);
-		transform: perspective(1000px) translateY(-4px) rotateX(15deg);
-		box-shadow: 0 8px 32px rgba(255, 255, 255, 0.3);
-	}
-
 	.footer-bottom {
 		text-align: center;
 		padding-top: 40px;
@@ -135,9 +119,11 @@
 			grid-template-columns: 1fr;
 			gap: 32px;
 		}
-
 		.footer {
 			padding: 40px 0 20px;
+		}
+		.footer-badge {
+			height: 80px;
 		}
 	}
 </style>
