@@ -4,7 +4,7 @@ import { db } from "../lib/firebase/server";
 
 let news = [];
 try {
-  const snapshot = await db.collection("news").orderBy("date", "desc").limit(6).get();
+  const snapshot = await db.collection("news").orderBy("date", "desc").get();
   news = snapshot.docs.map(doc => {
       const data = doc.data();
       return {
