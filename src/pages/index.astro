@@ -14,6 +14,9 @@ import DisclaimerPopup from "../components/DisclaimerPopup.astro";
 import CampaignPopup from "../components/CampaignPopup.astro";
 import LostHours from "../components/LostHours.astro";
 import NotificationSettings from "../components/NotificationSettings.astro";
+import ChatBot from "../components/ChatBot.astro";
+import TelegramFloatingBtn from "../components/TelegramFloatingBtn.astro";
+import FloatingActionGroup from "../components/FloatingActionGroup.astro";
 import AbsencesNotice from "../components/AbsencesNotice.astro";
 
 
@@ -56,7 +59,11 @@ try {
 
 	<Footer />
 	<!-- <CampaignPopup /> -->
-	<NotificationSettings />
+	<FloatingActionGroup>
+		<ChatBot />
+		<NotificationSettings />
+		<TelegramFloatingBtn />
+	</FloatingActionGroup>
 
 	<script>
 		import "../scripts/main.js";

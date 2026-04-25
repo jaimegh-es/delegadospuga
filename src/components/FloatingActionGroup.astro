@@ -1,0 +1,118 @@
+---
+// FloatingActionGroup.astro - Gestor de botones flotantes (Corregido)
+---
+
+<div id="floating-action-group" class="floating-container">
+    <button id="master-toggle" class="master-toggle-btn" aria-label="Mostrar/Ocultar herramientas">
+        <i class="fa-solid fa-ellipsis-vertical toggle-icon"></i>
+        <i class="fa-solid fa-xmark close-icon"></i>
+    </button>
+    
+    <div id="floating-items" class="floating-items">
+        <slot />
+    </div>
+</div>
+
+<style is:global>
+    .floating-container {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 20000;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: flex-end;
+        gap: 12px;
+        pointer-events: none;
+    }
+
+    .master-toggle-btn {
+        pointer-events: auto;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: white;
+        color: #2000ad;
+        border: 2px solid #2000ad;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 20010;
+        margin-right: 7.5px;
+    }
+
+    .master-toggle-btn .close-icon { display: none; }
+
+    .floating-container.is-active .master-toggle-btn {
+        background: #2000ad;
+        color: white;
+        transform: rotate(90deg);
+    }
+
+    .floating-container.is-active .toggle-icon { display: none; }
+    .floating-container.is-active .close-icon { display: block; }
+
+    .floating-items {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 12px;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+        pointer-events: none;
+        visibility: hidden;
+    }
+
+    .floating-container.is-active .floating-items {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+        visibility: visible;
+    }
+
+    /* Resetear las posiciones fijas de los componentes hijos */
+    .floating-items > div, 
+    .floating-items > .chatbot-wrapper,
+    .floating-items > .notification-settings-wrapper,
+    .floating-items > .telegram-floating-wrapper {
+        position: static !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Asegurar que los paneles absolutos se posicionen bien */
+    .notification-settings-wrapper {
+        position: relative !important;
+    }
+
+    .notif-panel {
+        position: fixed !important;
+        bottom: 100px !important;
+        right: 30px !important;
+        z-index: 20005 !important;
+    }
+
+    @media (max-width: 768px) {
+        .floating-container { bottom: 20px; right: 20px; }
+        .master-toggle-btn { margin-right: 7.5px; }
+        .notif-panel { right: 20px !important; bottom: 90px !important; width: 90vw !important; max-width: 320px !important; }
+    }
+</style>
+
+<script>
+    const group = document.getElementById('floating-action-group');
+    const toggle = document.getElementById('master-toggle');
+
+    const isHidden = localStorage.getItem('floating-actions-collapsed') === 'true';
+    if (!isHidden) {
+        group?.classList.add('is-active');
+    }
+
+    toggle?.addEventListener('click', () => {
+        const isActive = group?.classList.toggle('is-active');
+        localStorage.setItem('floating-actions-collapsed', (!isActive).toString());
+    });
+</script>
