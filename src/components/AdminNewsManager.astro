@@ -904,7 +904,6 @@
                 if (publishInTelegram) {
                     (window as any).showLoading();
                     try {
-                        const siteUrl = window.location.origin;
                         await fetch('/api/telegram', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -912,7 +911,7 @@
                                 title: data.title,
                                 subtitle: data.description,
                                 image: data.image,
-                                link: `${siteUrl}/noticias/${newsId}`
+                                link: `/noticias/${newsId}`
                             })
                         });
                         (window as any).showAlert("Noticia enviada a Telegram", "success");

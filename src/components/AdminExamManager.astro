@@ -1122,14 +1122,12 @@
                 if (publishInTelegram) {
                     (window as any).showLoading();
                     try {
-                        const siteUrl = window.location.origin;
                         await fetch('/api/telegram', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 title: `📅 NUEVO EXAMEN: ${data.subject}`,
                                 subtitle: `Fecha: ${new Date(data.date as string).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}${data.time ? ` a las ${data.time}` : ''}\nAsignatura: ${data.subject}${data.title ? ` (${data.title})` : ''}\nAula: ${data.classroom || 'B1B'}`,
-                                link: `${siteUrl}/dashboard`
                             })
                         });
                         (window as any).showAlert("Aviso enviado a Telegram", "success");

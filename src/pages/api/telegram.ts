@@ -18,11 +18,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const { title, subtitle, image, link, type } = await request.json();
 
     const PRODUCTION_DOMAIN = 'https://1bach.vercel.app';
-    const isLocal = request.url.includes('localhost') || request.url.includes('127.0.0.1');
     
-    // Ajustar el link si viene de localhost para que sea útil en Telegram
-    const finalLink = link?.replace(/http:\/\/localhost:\d+/, PRODUCTION_DOMAIN);
-
     // Función para escapar HTML básico de Telegram
     const escapeHTML = (text: string) => text
       .replace(/&/g, '&amp;')
@@ -34,7 +30,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     let text = `<b>${safeTitle}</b>\n\n`;
     if (safeSubtitle) text += `${safeSubtitle}\n\n`;
-    if (finalLink) text += `<a href="${finalLink}">Ver más detalles</a>`;
+    
+    // Procesar el enlace: si existe, asegurar que usa el dominio de producción
+    let finalLink = link || '/';
+    if (finalLink.startsWith('http')) {
+        finalLink = finalLink.replace(/https?:\/\/[^\/]+/, PRODUCTION_DOMAIN);
+    } else {
+        finalLink = `${PRODUCTION_DOMAIN}${finalLink.startsWith('/') ? finalLink : '/' + finalLink}`;
+    }
+
+    text += `<a href="${finalLink}">${link && link.includes('/noticias/') ? 'Leer noticia completa' : 'Ir a la web oficial'}</a>`;
 
     const baseUrl = `https://api.telegram.org/bot${token}`;
     const isSvg = image?.toLowerCase().endsWith('.svg');
@@ -74,8 +79,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // Fallback: Enviar como mensaje de texto (si no hay imagen, si es SVG, o si falló el upload)
     let finalText = text;
     if (image) {
-        const siteUrl = isLocal ? PRODUCTION_DOMAIN : request.url.split('/api/')[0];
-        const fullImageUrl = image.startsWith('http') ? image : `${siteUrl}/${image.startsWith('/') ? image.slice(1) : image}`;
+        const fullImageUrl = image.startsWith('http') ? image : `${PRODUCTION_DOMAIN}/${image.startsWith('/') ? image.slice(1) : image}`;
         finalText = `${isSvg ? '🖼' : '📸'} <b>Imagen:</b> ${fullImageUrl}\n\n${text}`;
     }
 

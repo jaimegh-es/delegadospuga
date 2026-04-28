@@ -58,6 +58,7 @@
     .floating-items {
         display: flex;
         flex-direction: column-reverse;
+        align-items: flex-end;
         gap: 12px;
         transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         opacity: 0;
@@ -73,7 +74,7 @@
         visibility: visible;
     }
 
-    /* Resetear las posiciones fijas de los componentes hijos */
+    /* Resetear las posiciones fijas de los componentes hijos y asegurar su alineación */
     .floating-items > div, 
     .floating-items > .chatbot-wrapper,
     .floating-items > .notification-settings-wrapper,
@@ -81,6 +82,10 @@
         position: static !important;
         margin: 0 !important;
         padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-end !important;
+        width: auto !important;
     }
 
     /* Asegurar que los paneles absolutos se posicionen bien */

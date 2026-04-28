@@ -56,8 +56,8 @@ export const GET: APIRoute = async ({ request }) => {
       message += `   📍 Aula: ${ex.classroom || 'B1B'}\n\n`;
     });
 
-    const siteUrl = request.url.split('/api/')[0];
-    message += `🔗 <a href="${siteUrl}/dashboard">Ver calendario completo</a>`;
+    const PRODUCTION_DOMAIN = 'https://1bach.vercel.app';
+    message += `🔗 <a href="${PRODUCTION_DOMAIN}/">Ir a la web oficial</a>`;
 
     // Enviar a Telegram
     const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
