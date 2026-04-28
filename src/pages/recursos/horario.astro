@@ -1,19 +1,306 @@
 ---
 import ResourceLayout from '../../layouts/ResourceLayout.astro';
+import { SCHEDULE, SUBJECT_NAMES } from '../../data/schedule';
+
+const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 ---
 
-<ResourceLayout title="Horario de clases" description="¡Que no se te escape ni una hora!">
-	<img class="horario-img" src={import.meta.env.BASE_URL + "horario-secure.png"} alt="Horario de clases" />
+<ResourceLayout title="Horario de clases" description="Digitalizado y siempre a mano.">
+  <div class="schedule-container">
+    <div class="day-selector">
+      {days.slice(1, 6).map((day, index) => (
+        <button class="day-btn" data-day={index + 1}>{day}</button>
+      ))}
+    </div>
+
+    <div id="schedule-list" class="schedule-list">
+      <!-- Se llena via JS -->
+    </div>
+  </div>
+
+  <template id="period-template">
+    <div class="period-card">
+      <div class="period-time">
+        <span class="start"></span>
+        <span class="separator">-</span>
+        <span class="end"></span>
+      </div>
+      <div class="period-content">
+        <!-- Subjects go here -->
+      </div>
+    </div>
+  </template>
+
+  <template id="subject-template">
+    <div class="subject-info">
+      <div class="subject-header">
+        <span class="subject-name"></span>
+        <span class="subject-room"></span>
+      </div>
+      <div class="subject-details">
+        <span class="subject-teacher"></span>
+      </div>
+    </div>
+  </template>
+
+  <template id="break-template">
+    <div class="period-card break">
+      <div class="period-time">
+        <span class="start"></span>
+        <span class="end"></span>
+      </div>
+      <div class="period-content">
+        <span class="break-label">Recreo / Descanso</span>
+      </div>
+    </div>
+  </template>
 </ResourceLayout>
 
-<style>
-.horario-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 1.5rem auto;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-</style>
+<script define:vars={{ SCHEDULE }}>
+  const scheduleList = document.getElementById('schedule-list');
+  const dayButtons = document.querySelectorAll('.day-btn');
+  const periodTemplate = document.getElementById('period-template');
+  const subjectTemplate = document.getElementById('subject-template');
+  const breakTemplate = document.getElementById('break-template');
 
+  function renderDay(dayIndex) {
+    scheduleList.innerHTML = '';
+    const daySchedule = SCHEDULE[dayIndex];
+
+    if (!daySchedule) {
+      scheduleList.innerHTML = '<p class="no-classes">No hay clases programadas para hoy.</p>';
+      return;
+    }
+
+    daySchedule.forEach(period => {
+      if (period.isBreak) {
+        const clone = breakTemplate.content.cloneNode(true);
+        clone.querySelector('.start').textContent = period.start;
+        clone.querySelector('.end').textContent = period.end;
+        scheduleList.appendChild(clone);
+      } else {
+        const clone = periodTemplate.content.cloneNode(true);
+        clone.querySelector('.start').textContent = period.start;
+        clone.querySelector('.end').textContent = period.end;
+        
+        const content = clone.querySelector('.period-content');
+        period.subjects.forEach(sub => {
+          const subClone = subjectTemplate.content.cloneNode(true);
+          subClone.querySelector('.subject-name').textContent = sub.name;
+          subClone.querySelector('.subject-room').textContent = sub.room;
+          subClone.querySelector('.subject-teacher').textContent = sub.teacher;
+          content.appendChild(subClone);
+        });
+        
+        scheduleList.appendChild(clone);
+      }
+    });
+
+    // Update buttons
+    dayButtons.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.day == dayIndex);
+    });
+  }
+
+  // Initial day (today or Monday if weekend)
+  let today = new Date().getDay();
+  if (today === 0 || today === 6) today = 1;
+  renderDay(today);
+
+  // Click handlers
+  dayButtons.forEach(btn => {
+    btn.addEventListener('click', () => renderDay(parseInt(btn.dataset.day)));
+  });
+</script>
+
+<style>
+  .schedule-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .day-selector {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+    overflow-x: auto;
+    padding: 0.5rem 0.25rem;
+    scrollbar-width: none;
+    justify-content: center;
+  }
+  
+  .day-selector::-webkit-scrollbar { display: none; }
+
+  .day-btn {
+    padding: 0.6rem 1.5rem;
+    border: 1px solid #e2e8f0;
+    background: white;
+    border-radius: 9999px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    color: #64748b;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  }
+
+  .day-btn:hover {
+    border-color: #2000ad;
+    color: #2000ad;
+    transform: translateY(-1px);
+  }
+
+  .day-btn.active {
+    background: #2000ad;
+    color: white;
+    border-color: #2000ad;
+    box-shadow: 0 4px 12px rgba(32, 0, 173, 0.2);
+  }
+
+  .schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .period-card {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    border: 1px solid #f1f5f9;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .period-card:hover {
+    transform: translateX(4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  .period-card.break {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    box-shadow: none;
+  }
+
+  .period-card.break:hover {
+    transform: none;
+  }
+
+  .period-time {
+    background: #f8fafc;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #1e293b;
+    border-right: 1px solid #f1f5f9;
+    font-size: 0.95rem;
+  }
+
+  .period-card.break .period-time {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+
+  .period-content {
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .subject-info {
+    position: relative;
+  }
+
+  .subject-info:not(:last-child) {
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 0.75rem;
+  }
+
+  .subject-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+  }
+
+  .subject-name {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+  }
+
+  .subject-room {
+    background: #eef2ff;
+    color: #2000ad;
+    padding: 0.25rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .subject-teacher {
+    font-size: 0.95rem;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .break-label {
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.85rem;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .no-classes {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #94a3b8;
+    font-style: italic;
+    background: #f8fafc;
+    border-radius: 16px;
+    border: 1px dashed #e2e8f0;
+  }
+
+  @media (max-width: 640px) {
+    .day-selector {
+      justify-content: flex-start;
+      padding-left: 0.5rem;
+    }
+    
+    .period-card {
+      grid-template-columns: 90px 1fr;
+    }
+
+    .period-time {
+      font-size: 0.85rem;
+      padding: 0.75rem;
+    }
+
+    .period-content {
+      padding: 1rem;
+    }
+
+    .subject-name {
+      font-size: 1.05rem;
+    }
+  }
+
+</style>
