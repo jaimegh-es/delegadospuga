@@ -5,6 +5,11 @@ import vercel from '@astrojs/vercel';
 
 import tailwindcss from '@tailwindcss/vite';
 
+const noFirebase = process.argv.includes('--nofirebase');
+if (noFirebase) {
+  console.log('🔥 Running in NO-FIREBASE mode');
+}
+
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
@@ -12,6 +17,13 @@ export default defineConfig({
   prefetch: {
     prefetchAll: true,
     defaultStrategy: 'hover'
+  },
+
+  vite: {
+    plugins: [tailwindcss()],
+    define: {
+      'import.meta.env.PUBLIC_NO_FIREBASE': JSON.stringify(noFirebase ? 'true' : 'false')
+    }
   },
 
   integrations: [

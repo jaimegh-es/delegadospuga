@@ -20,8 +20,6 @@ import TelegramFloatingBtn from "../components/TelegramFloatingBtn.astro";
 import FloatingActionGroup from "../components/FloatingActionGroup.astro";
 import AbsencesNotice from "../components/AbsencesNotice.astro";
 
-
-
 import { db } from "../lib/firebase/server";
 import { Timestamp } from "firebase-admin/firestore";
 
@@ -32,7 +30,8 @@ try {
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const snapshot = await db.collection("absences")
+    const snapshot = await db
+        .collection("absences")
         .where("date", ">=", Timestamp.fromDate(today))
         .where("date", "<", Timestamp.fromDate(tomorrow))
         .get();
@@ -43,32 +42,33 @@ try {
 ---
 
 <Layout>
-	<Navigation />
-	<!-- <CountdownBanner /> -->
-	<HeroCarousel />
+    <Navigation />
+    <!-- <CountdownBanner /> -->
+    <HeroCarousel />
 
-	<!-- <MoodleNotifierBanner /> -->
+    <!-- <MoodleNotifierBanner /> -->
 
-	<!-- <AbsencesNotice todayCount={todayCount} />-->
-	<NewsSection />
+    <!-- <AbsencesNotice todayCount={todayCount} />-->
 
-	<CalendarioExamenes />
+    <!-- <CalendarioExamenes /> -->
 
-	<CalendarioExtraordinaria />
+    <CalendarioExtraordinaria />
+    <NewsSection />
 
-	<Eventos />
-		<LinksSection />
-	<FAQSection />
+    <!--	<Eventos /> -->
 
-	<Footer />
-	<!-- <CampaignPopup /> -->
-	<FloatingActionGroup>
-		<ChatBot />
-		<NotificationSettings />
-		<TelegramFloatingBtn />
-	</FloatingActionGroup>
+    <LinksSection />
+    <FAQSection />
 
-	<script>
-		import "../scripts/main.js";
-	</script>
+    <Footer />
+    <!-- <CampaignPopup /> -->
+    <FloatingActionGroup>
+        <ChatBot />
+        <NotificationSettings />
+        <TelegramFloatingBtn />
+    </FloatingActionGroup>
+
+    <script>
+        import "../scripts/main.js";
+    </script>
 </Layout>
